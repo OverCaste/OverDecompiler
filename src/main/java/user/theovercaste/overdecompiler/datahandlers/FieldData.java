@@ -71,7 +71,7 @@ public class FieldData {
 	}
 
 	public Field toField(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
-		Field ret = new Field(getName(constantPool), new ClassPath("java/lang/Object"), flagHandler);
+		Field ret = new Field(getName(constantPool), new ClassPath("java.lang.Object"), flagHandler);
 		return ret;
 	}
 }

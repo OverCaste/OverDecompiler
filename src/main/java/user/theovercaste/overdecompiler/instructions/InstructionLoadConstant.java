@@ -2,49 +2,25 @@ package user.theovercaste.overdecompiler.instructions;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.Stack;
 
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntry;
-import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryFloat;
-import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryInteger;
-import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryString;
-import user.theovercaste.overdecompiler.datahandlers.ImportList;
 
+/**
+ * Equivalent to <a href="http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.ldc">ldc</a>
+ */
 public class InstructionLoadConstant extends Instruction {
 	private final int constantIndex;
 
 	public InstructionLoadConstant(int nameIndex) {
-		this.constantIndex = nameIndex;
+		constantIndex = nameIndex;
 	}
 
 	public static int[] getOpcodes( ) {
 		return new int[] {0x12};
 	}
 
-	@Override
-	public String toJava(ImportList imports, ConstantPoolEntry[] constantPool, Stack<Instruction> stack) {
-		ConstantPoolEntry e = getValue(constantPool);
-		if (e instanceof ConstantPoolEntryInteger) {
-			return "\"Unknown - LDC constant integer?\"";
-			// return String.valueOf(((ConstantPoolEntryInteger)e).getValue());
-		}
-		if (e instanceof ConstantPoolEntryFloat) {
-			return "\"Unknown - LDC constant float?\"";
-		}
-		if (e instanceof ConstantPoolEntryString) {
-			return "\"" + ((ConstantPoolEntryString) e).getValue(constantPool) + "\"";
-		}
-
-		return null;
-	}
-
 	public ConstantPoolEntry getValue(ConstantPoolEntry[] constantPool) {
-		return constantPool[this.constantIndex];
-	}
-
-	@Override
-	public boolean printable( ) {
-		return false;
+		return constantPool[constantIndex];
 	}
 
 	public static Factory factory( ) {
@@ -53,7 +29,7 @@ public class InstructionLoadConstant extends Instruction {
 
 	public static class Factory extends Instruction.Factory {
 		@Override
-		public InstructionLoadConstant load(DataInputStream din) throws IOException {
+		public InstructionLoadConstant load(int opcode, DataInputStream din) throws IOException {
 			int nameIndex = din.readUnsignedByte();
 			return new InstructionLoadConstant(nameIndex);
 		}

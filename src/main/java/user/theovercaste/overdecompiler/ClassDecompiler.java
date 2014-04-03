@@ -17,19 +17,20 @@ import user.theovercaste.overdecompiler.datahandlers.ClassBuilder;
 import user.theovercaste.overdecompiler.datahandlers.FieldData;
 import user.theovercaste.overdecompiler.datahandlers.MethodData;
 import user.theovercaste.overdecompiler.exceptions.InvalidClassException;
+import user.theovercaste.overdecompiler.parsers.AbstractParser;
 
 import com.google.common.base.CharMatcher;
 
 public class ClassDecompiler {
 	public static final int CLASS_MAGIC = 0xCAFEBABE;
 
-	public void decompileFiles(Collection<File> files) {
+	public void decompileFiles(Collection<File> files, AbstractParser parser) {
 		for (File f : files) {
-			decompileFile(f);
+			decompileFile(f, parser);
 		}
 	}
 
-	public void decompileFile(File decompileFile) {
+	public void decompileFile(File decompileFile, AbstractParser parser) {
 		File toFile = new File(decompileFile.getParent(), FileUtilities.getFileName(decompileFile) + ".java");
 		if (toFile.getName().contains("$")) {
 			System.out.println("Skipping nested class: " + toFile.getName());
@@ -39,8 +40,7 @@ public class ClassDecompiler {
 				System.out.println(" - Reading binary data...");
 				Class c = loadClass(decompileFile);
 				System.out.println(" - Parsing...");
-				System.out.println(" - Converting...");
-				System.out.println(" - Writing...");
+				parser.parseClass(c, System.out);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -77,11 +77,11 @@ public class ClassDecompiler {
 			FieldData[] fields = new FieldData[din.readUnsignedShort()];
 			for (int i = 0; i < fields.length; i++) {
 				fields[i] = FieldData.loadFieldInfo(din);
-				System.out.println("Field: " + fields[i].getName(constantPool));
 			}
 			MethodData[] methods = new MethodData[din.readUnsignedShort()];
 			for (int i = 0; i < methods.length; i++) {
 				methods[i] = MethodData.loadMethodInfo(din);
+				System.out.println("Return type for " + methods[i].getName(constantPool) + ": " + methods[i].getReturnType(constantPool).getClassName());
 			}
 			Attribute[] attributes = new Attribute[din.readUnsignedShort()];
 			for (int i = 0; i < attributes.length; i++) {

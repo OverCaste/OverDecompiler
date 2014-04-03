@@ -9,8 +9,10 @@ import user.theovercaste.overdecompiler.codeinternals.ClassPath;
 public class TestClassPath {
 	@Test
 	public void testSingleArrayClass( ) {
-		ClassPath p = new ClassPath("[Ljava/lang/Class");
-		assertEquals("the depth of a single [ must be 1.", p.getArrayDepth(), 1);
+		ClassPath p = ClassPath.getMangledPath("[Ljava/lang/Class");
+		assertEquals("the depth of a single [ must be 1.", 1, p.getArrayDepth());
+		assertEquals("the package should be java.lang", "java.lang", p.getClassPackage());
+		assertEquals("the class name should be Class", "Class", p.getClassName());
 	}
 
 	@Test
@@ -18,13 +20,8 @@ public class TestClassPath {
 		String basicClass = "java/lang/Class";
 		String brackets = "[[[[[[[[[[";
 		for (int i = 0; i < 10; i++) {
-			ClassPath p = new ClassPath(brackets.substring(0, i) + "L" + basicClass);
+			ClassPath p = ClassPath.getMangledPath(brackets.substring(0, i) + "L" + basicClass);
 			assertEquals("the depth of this array path must be " + i + ".", p.getArrayDepth(), i);
 		}
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void testInvalidClass( ) {
-		new ClassPath("Class");
 	}
 }

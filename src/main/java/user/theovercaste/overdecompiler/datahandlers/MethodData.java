@@ -3,19 +3,20 @@ package user.theovercaste.overdecompiler.datahandlers;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Stack;
 
 import user.theovercaste.overdecompiler.attributes.Attribute;
 import user.theovercaste.overdecompiler.attributes.Attributes;
 import user.theovercaste.overdecompiler.attributes.CodeAttribute;
+import user.theovercaste.overdecompiler.codeinternals.ClassPath;
 import user.theovercaste.overdecompiler.codeinternals.Method;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntry;
+import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryUtf8;
 import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
 import user.theovercaste.overdecompiler.exceptions.InvalidInstructionException;
+import user.theovercaste.overdecompiler.exceptions.PoolPreconditions;
 import user.theovercaste.overdecompiler.instructions.Instruction;
-import user.theovercaste.overdecompiler.instructions.InstructionReturn;
-import user.theovercaste.overdecompiler.instructions.Instructions;
+import user.theovercaste.overdecompiler.instructions.InstructionFactory;
 
 public class MethodData {
 	private final MethodFlagHandler flags;
@@ -56,56 +57,6 @@ public class MethodData {
 		return constantPool[descriptorIndex].toString();
 	}
 
-	/**
-	 * Creates a method header string based on it's defined attributes.
-	 * 
-	 * @param flags
-	 * @return (public/protected/private) (static) (abstract) (synchronized) (final) (native) [type] [name] ([args]) {
-	 */
-	public String getMethodDefinitionString(ConstantPoolEntry[] constantPool, ImportList imports) {
-		StringBuilder s = new StringBuilder();
-		if (flags.isPublic()) {
-			s.append("public ");
-		} else if (flags.isProtected()) {
-			s.append("protected ");
-		} else if (flags.isPrivate()) {
-			s.append("private ");
-		}
-		if (flags.isStatic()) {
-			s.append("static ");
-		}
-		if (flags.isAbstract()) {
-			s.append("abstract ");
-		}
-		if (flags.isSynchronized()) {
-			s.append("synchronized ");
-		}
-		if (flags.isFinal()) {
-			s.append("final ");
-		}
-		if (flags.isNative()) {
-			s.append("native ");
-		}
-		try {
-			processStack(constantPool);
-			s.append(getReturnType(constantPool)).append(" ");
-			s.append(getName(constantPool));
-			s.append("(");
-			boolean first = true;
-			for (String param : getParams(constantPool)) {
-				if (!first) {
-					s.append(", ");
-				}
-				s.append(param);
-				first = false;
-			}
-			s.append(") {");
-		} catch (InvalidConstantPoolPointerException e) {
-			e.printStackTrace();
-		}
-		return s.toString();
-	}
-
 	private void processStack(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
 		Attribute a = null;
 		for (Attribute ai : attributes) {
@@ -132,7 +83,7 @@ public class MethodData {
 		try (DataInputStream din = new DataInputStream(new ByteArrayInputStream(code.getCode()))) {
 			Stack<Instruction> stack = new Stack<Instruction>();
 			while (din.available() > 0) {
-				Instruction instruction = Instructions.loadInstruction(din.readUnsignedByte(), din);
+				Instruction instruction = InstructionFactory.loadInstruction(din.readUnsignedByte(), din);
 				stack.push(instruction);
 				System.out.println("Instruction: " + instruction.getClass().getName());
 			}
@@ -143,40 +94,15 @@ public class MethodData {
 		}
 	}
 
-	public String getReturnType(ConstantPoolEntry[] constantPool) {
-		for (Instruction i : stack) {
-			if (i instanceof InstructionReturn) {
-				return "void";
-			}
+	public ClassPath getReturnType(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
+		PoolPreconditions.assertPoolRange(descriptorIndex, constantPool.length);
+		ConstantPoolEntry e = constantPool[descriptorIndex];
+		if (e instanceof ConstantPoolEntryUtf8) {
+			String descriptor = e.toString();
+			int closingParenIndex = descriptor.indexOf(')');
+			return ClassPath.getMangledPath(descriptor.substring(closingParenIndex + 1, descriptor.length()));
 		}
-		return null;
-	}
-
-	public String[] getParams(ConstantPoolEntry[] constantPool) {
-		return new String[] {"String removeThis"};
-	}
-
-	public String[] getBody(ConstantPoolEntry[] constantPool) {
-		ArrayList<String> ret = new ArrayList<String>();
-		while (!stack.isEmpty()) {
-			Instruction i = stack.pop();
-			String value = i.toJava(imports, constantPool, stack);
-			if (i.printable()) {
-				ret.add(value);
-			}
-		}
-		return ret.toArray(new String[ret.size()]);
-	}
-
-	public static MethodData loadMethodInfo(DataInputStream din) throws IOException {
-		MethodFlagHandler flagHandler = new MethodFlagHandler(din.readUnsignedShort());
-		int nameIndex = din.readUnsignedShort();
-		int descriptorIndex = din.readUnsignedShort();
-		Attribute[] attributes = new Attribute[din.readUnsignedShort()];
-		for (int i = 0; i < attributes.length; i++) {
-			attributes[i] = Attributes.loadAttribute(din);
-		}
-		return new MethodData(flagHandler, nameIndex, descriptorIndex, attributes);
+		throw PoolPreconditions.getInvalidType(constantPool, descriptorIndex);
 	}
 
 	/**
@@ -189,6 +115,17 @@ public class MethodData {
 	public Method toMethod(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
 		processStack(constantPool);
 		Method ret = new Method(null, getName(constantPool), flags);
-		return null;
+		return ret;
+	}
+
+	public static MethodData loadMethodInfo(DataInputStream din) throws IOException {
+		MethodFlagHandler flagHandler = new MethodFlagHandler(din.readUnsignedShort());
+		int nameIndex = din.readUnsignedShort();
+		int descriptorIndex = din.readUnsignedShort();
+		Attribute[] attributes = new Attribute[din.readUnsignedShort()];
+		for (int i = 0; i < attributes.length; i++) {
+			attributes[i] = Attributes.loadAttribute(din);
+		}
+		return new MethodData(flagHandler, nameIndex, descriptorIndex, attributes);
 	}
 }

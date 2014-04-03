@@ -49,7 +49,7 @@ public class InstructionGetStatic extends Instruction {
 
 	public static class Factory extends Instruction.Factory {
 		@Override
-		public InstructionGetStatic load(DataInputStream din) throws IOException {
+		public InstructionGetStatic load(int opcode, DataInputStream din) throws IOException {
 			int nameIndex = din.readUnsignedShort();
 			return new InstructionGetStatic(nameIndex);
 		}
