@@ -8,11 +8,11 @@ import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryUtf8;
 import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
 import user.theovercaste.overdecompiler.exceptions.PoolPreconditions;
 
-public class Attribute {
+public class AttributeData {
 	protected final int nameIndex;
 	protected final byte[] data;
 
-	public Attribute(int nameIndex, byte[] data) {
+	public AttributeData(int nameIndex, byte[] data) {
 		this.nameIndex = nameIndex;
 		this.data = data;
 	}
@@ -26,14 +26,14 @@ public class Attribute {
 		throw PoolPreconditions.getInvalidType(constantPool, this.nameIndex);
 	}
 
-	public static Attribute readAttribute(DataInputStream din) throws IOException {
+	public static AttributeData readAttribute(DataInputStream din) throws IOException {
 		int nameIndex = din.readUnsignedShort();
 		byte[] data = new byte[din.readInt()];
 		din.readFully(data);
-		return new Attribute(nameIndex, data);
+		return new AttributeData(nameIndex, data);
 	}
 
-	public static abstract class Wrapper<T extends Attribute> {
-		public abstract T wrap(Attribute a, ConstantPoolEntry[] constantPool);
+	public static abstract class Wrapper<T extends AttributeData> {
+		public abstract T wrap(AttributeData a, ConstantPoolEntry[] constantPool);
 	}
 }

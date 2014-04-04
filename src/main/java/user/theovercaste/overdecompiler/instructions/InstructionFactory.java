@@ -27,7 +27,7 @@ public class InstructionFactory {
 		loadInstruction(InstructionLoadReferenceNumbered.getOpcodes(), InstructionLoadReferenceNumbered.factory());
 
 		// Array load instructions: These push values from an array at the specified index onto the stack.
-		loadInstruction(InstructionLoadArrayByte.getOpcodes(), InstructionLoadArrayByte.factory());
+		loadInstruction(InstructionLoadArrayValue.getOpcodes(), InstructionLoadArrayValue.factory());
 		loadInstruction(InstructionLoadArrayChar.getOpcodes(), InstructionLoadArrayChar.factory());
 		loadInstruction(InstructionLoadArrayDouble.getOpcodes(), InstructionLoadArrayDouble.factory());
 		loadInstruction(InstructionLoadArrayFloat.getOpcodes(), InstructionLoadArrayFloat.factory());

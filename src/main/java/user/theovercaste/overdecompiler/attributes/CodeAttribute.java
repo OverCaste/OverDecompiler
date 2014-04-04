@@ -6,14 +6,14 @@ import java.io.IOException;
 
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntry;
 
-public class CodeAttribute extends Attribute {
+public class CodeAttribute extends AttributeData {
 	private final int maxStacks;
 	private final int maxLocals;
 	private final byte[] code;
 	private final ExceptionAttribute[] exceptions;
-	private final Attribute[] attributes;
+	private final AttributeData[] attributes;
 
-	public CodeAttribute(int nameIndex, byte[] data, int maxStacks, int maxLocals, byte[] code, ExceptionAttribute[] exceptions, Attribute[] attributes) {
+	public CodeAttribute(int nameIndex, byte[] data, int maxStacks, int maxLocals, byte[] code, ExceptionAttribute[] exceptions, AttributeData[] attributes) {
 		super(nameIndex, data);
 		this.maxStacks = maxStacks;
 		this.maxLocals = maxLocals;
@@ -38,7 +38,7 @@ public class CodeAttribute extends Attribute {
 		return this.exceptions;
 	}
 
-	public Attribute[] getAttributes( ) {
+	public AttributeData[] getAttributes( ) {
 		return this.attributes;
 	}
 
@@ -60,9 +60,9 @@ public class CodeAttribute extends Attribute {
 		}
 	}
 
-	public static class Wrapper extends Attribute.Wrapper<CodeAttribute> {
+	public static class Wrapper extends AttributeData.Wrapper<CodeAttribute> {
 		@Override
-		public CodeAttribute wrap(Attribute a, ConstantPoolEntry[] constantPool) {
+		public CodeAttribute wrap(AttributeData a, ConstantPoolEntry[] constantPool) {
 			try (DataInputStream din = new DataInputStream(new ByteArrayInputStream(a.data))) {
 				int maxStack = din.readUnsignedShort();
 				int maxLocals = din.readUnsignedShort();
@@ -72,7 +72,7 @@ public class CodeAttribute extends Attribute {
 				for (int i = 0; i < exceptions.length; i++) {
 					exceptions[i] = new ExceptionAttribute(din.readUnsignedShort(), din.readUnsignedShort(), din.readUnsignedShort(), din.readUnsignedShort());
 				}
-				Attribute[] attributes = new Attribute[din.readUnsignedShort()];
+				AttributeData[] attributes = new AttributeData[din.readUnsignedShort()];
 				for (int i = 0; i < attributes.length; i++) {
 					attributes[i] = Attributes.loadAttribute(din);
 				}

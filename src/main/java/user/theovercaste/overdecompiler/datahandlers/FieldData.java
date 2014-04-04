@@ -3,7 +3,7 @@ package user.theovercaste.overdecompiler.datahandlers;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import user.theovercaste.overdecompiler.attributes.Attribute;
+import user.theovercaste.overdecompiler.attributes.AttributeData;
 import user.theovercaste.overdecompiler.attributes.Attributes;
 import user.theovercaste.overdecompiler.codeinternals.ClassPath;
 import user.theovercaste.overdecompiler.codeinternals.Field;
@@ -16,9 +16,9 @@ public class FieldData {
 	private final AccessFlagHandler flagHandler;
 	private final int nameIndex;
 	private final int descriptorIndex;
-	private final Attribute[] attributes;
+	private final AttributeData[] attributes;
 
-	public FieldData(AccessFlagHandler flagHandler, int nameIndex, int descriptorIndex, Attribute[] attributes) {
+	public FieldData(AccessFlagHandler flagHandler, int nameIndex, int descriptorIndex, AttributeData[] attributes) {
 		this.flagHandler = flagHandler;
 		this.nameIndex = nameIndex;
 		this.descriptorIndex = descriptorIndex;
@@ -37,7 +37,7 @@ public class FieldData {
 		return descriptorIndex;
 	}
 
-	public Attribute[] getAttributes( ) {
+	public AttributeData[] getAttributes( ) {
 		return attributes;
 	}
 
@@ -63,7 +63,7 @@ public class FieldData {
 		AccessFlagHandler flagHandler = new AccessFlagHandler(din.readUnsignedShort());
 		int nameIndex = din.readUnsignedShort();
 		int descriptorIndex = din.readUnsignedShort();
-		Attribute[] attributes = new Attribute[din.readUnsignedShort()];
+		AttributeData[] attributes = new AttributeData[din.readUnsignedShort()];
 		for (int i = 0; i < attributes.length; i++) {
 			attributes[i] = Attributes.loadAttribute(din);
 		}

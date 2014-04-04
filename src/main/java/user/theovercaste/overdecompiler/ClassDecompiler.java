@@ -7,30 +7,32 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
 
-import user.theovercaste.overdecompiler.attributes.Attribute;
+import user.theovercaste.overdecompiler.attributes.AttributeData;
 import user.theovercaste.overdecompiler.attributes.Attributes;
-import user.theovercaste.overdecompiler.codeinternals.Class;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntries;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntry;
-import user.theovercaste.overdecompiler.datahandlers.AccessFlagHandler;
-import user.theovercaste.overdecompiler.datahandlers.ClassBuilder;
+import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.datahandlers.FieldData;
 import user.theovercaste.overdecompiler.datahandlers.MethodData;
 import user.theovercaste.overdecompiler.exceptions.InvalidClassException;
 import user.theovercaste.overdecompiler.parsers.AbstractParser;
+import user.theovercaste.overdecompiler.parsers.AbstractParserFactory;
+import user.theovercaste.overdecompiler.parsers.ParsedClass;
+import user.theovercaste.overdecompiler.printers.AbstractPrinter;
+import user.theovercaste.overdecompiler.printers.AbstractPrinterFactory;
 
 import com.google.common.base.CharMatcher;
 
 public class ClassDecompiler {
 	public static final int CLASS_MAGIC = 0xCAFEBABE;
 
-	public void decompileFiles(Collection<File> files, AbstractParser parser) {
+	public void decompileFiles(Collection<File> files, AbstractParserFactory parserFactory, AbstractPrinterFactory printerFactory) {
 		for (File f : files) {
-			decompileFile(f, parser);
+			decompileFile(f, parserFactory.createParser(), printerFactory.createPrinter());
 		}
 	}
 
-	public void decompileFile(File decompileFile, AbstractParser parser) {
+	public void decompileFile(File decompileFile, AbstractParser parser, AbstractPrinter printer) {
 		File toFile = new File(decompileFile.getParent(), FileUtilities.getFileName(decompileFile) + ".java");
 		if (toFile.getName().contains("$")) {
 			System.out.println("Skipping nested class: " + toFile.getName());
@@ -38,9 +40,11 @@ public class ClassDecompiler {
 			System.out.println("Decompiling: " + toFile.getName());
 			try {
 				System.out.println(" - Reading binary data...");
-				Class c = loadClass(decompileFile);
+				ClassData c = loadClass(decompileFile);
 				System.out.println(" - Parsing...");
-				parser.parseClass(c, System.out);
+				ParsedClass parsed = parser.parseClass(c);
+				System.out.println(" - Writing...");
+				printer.print(parsed, System.out);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -51,7 +55,7 @@ public class ClassDecompiler {
 		}
 	}
 
-	private Class loadClass(File file) throws FileNotFoundException, IOException, Exception {
+	private ClassData loadClass(File file) throws FileNotFoundException, IOException, Exception {
 		try (DataInputStream din = new DataInputStream(new FileInputStream(file))) {
 			int magicVersion = din.readInt();
 			if (magicVersion != CLASS_MAGIC) {
@@ -66,7 +70,7 @@ public class ClassDecompiler {
 			for (int i = 1; i < constantPoolCount; i++) {
 				constantPool[i] = ConstantPoolEntries.readEntry(din);
 			}
-			AccessFlagHandler accessFlags = new AccessFlagHandler(din.readUnsignedShort());
+			int classFlags = din.readUnsignedShort();
 			int thisClassId = din.readUnsignedShort();
 			int superClassId = din.readUnsignedShort();
 
@@ -77,25 +81,29 @@ public class ClassDecompiler {
 			FieldData[] fields = new FieldData[din.readUnsignedShort()];
 			for (int i = 0; i < fields.length; i++) {
 				fields[i] = FieldData.loadFieldInfo(din);
+				System.out.println("Field " + fields[i].getName(constantPool) + ", " + fields[i].getDescription(constantPool));
+				for (AttributeData d : fields[i].getAttributes()) {
+					System.out.println("Attribute: " + d.getName(constantPool));
+				}
 			}
 			MethodData[] methods = new MethodData[din.readUnsignedShort()];
 			for (int i = 0; i < methods.length; i++) {
-				methods[i] = MethodData.loadMethodInfo(din);
-				System.out.println("Return type for " + methods[i].getName(constantPool) + ": " + methods[i].getReturnType(constantPool).getClassName());
+				methods[i] = MethodData.loadMethodData(din);
+				System.out.println(constantPool[methods[i].getNameIndex()]);
 			}
-			Attribute[] attributes = new Attribute[din.readUnsignedShort()];
+			AttributeData[] attributes = new AttributeData[din.readUnsignedShort()];
 			for (int i = 0; i < attributes.length; i++) {
 				attributes[i] = Attributes.loadAttribute(din);
 			}
-			ClassBuilder classBuilder = new ClassBuilder(constantPool);
-			classBuilder.setName(thisClassId);
-			classBuilder.setParent(superClassId);
-			classBuilder.loadFlags(accessFlags);
+			ClassData classData = new ClassData();
+			classData.setClassId(thisClassId);
+			classData.setParentId(superClassId);
+			classData.setFlags(classFlags);
 			for (MethodData m : methods) {
-				classBuilder.addMethod(m.toMethod(constantPool));
+				classData.addMethod(m);
 			}
 			for (FieldData f : fields) {
-				classBuilder.addField(f.toField(constantPool));
+				classData.addField(f);
 			}
 			String currentFileName = FileUtilities.getFileName(file);
 			CharMatcher dollarSignMatcher = CharMatcher.is('$');
@@ -103,12 +111,12 @@ public class ClassDecompiler {
 				String name = otherFile.getName();
 				if (name.startsWith(currentFileName) && (name.length() > file.getName().toString().length()) && (name.charAt(currentFileName.length()) == '$') && name.endsWith(".class")) { // Ex: HelloWorld$Inner.class
 					if (((dollarSignMatcher.countIn(name)) - dollarSignMatcher.countIn(currentFileName)) == 1) { // Direct subclass, ex HelloWorld$Inner -> HelloWorld or HelloWorld$Inner$Inner2 -> HelloWorld$Inner
-						Class c = loadClass(otherFile);
-						classBuilder.addNestedClass(c);
+						ClassData c = loadClass(otherFile);
+						classData.addNestedClass(c);
 					}
 				}
 			}
-			return classBuilder.build();
+			return classData;
 		}
 	}
 }

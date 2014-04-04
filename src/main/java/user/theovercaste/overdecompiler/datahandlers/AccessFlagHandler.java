@@ -11,14 +11,14 @@ public class AccessFlagHandler {
 	private boolean flagEnum;
 
 	public AccessFlagHandler(int value) {
-		this.flagPublic = ((value & 0x0001) != 0);
-		this.flagFinal = ((value & 0x0010) != 0);
-		this.flagSuper = ((value & 0x0020) != 0);
-		this.flagInterface = ((value & 0x0200) != 0);
-		this.flagAbstract = ((value & 0x0400) != 0);
-		this.flagSynthetic = ((value & 0x1000) != 0);
-		this.flagAnnotation = ((value & 0x2000) != 0);
-		this.flagEnum = ((value & 0x4000) != 0);
+		flagPublic = ((value & 0x0001) != 0);
+		flagFinal = ((value & 0x0010) != 0);
+		flagSuper = ((value & 0x0020) != 0);
+		flagInterface = ((value & 0x0200) != 0);
+		flagAbstract = ((value & 0x0400) != 0);
+		flagSynthetic = ((value & 0x1000) != 0);
+		flagAnnotation = ((value & 0x2000) != 0);
+		flagEnum = ((value & 0x4000) != 0);
 	}
 
 	public AccessFlagHandler( ) {
@@ -58,34 +58,40 @@ public class AccessFlagHandler {
 	}
 
 	public boolean isPublic( ) {
-		return this.flagPublic;
+		return flagPublic;
 	}
 
 	public boolean isFinal( ) {
-		return this.flagFinal;
+		return flagFinal;
 	}
 
 	public boolean isSuper( ) {
-		return this.flagSuper;
+		return flagSuper;
 	}
 
 	public boolean isInterface( ) {
-		return this.flagInterface;
+		return flagInterface;
 	}
 
 	public boolean isAbstract( ) {
-		return this.flagAbstract;
+		return flagAbstract;
 	}
 
 	public boolean isSynthetic( ) {
-		return this.flagSynthetic;
+		return flagSynthetic;
 	}
 
 	public boolean isAnnotation( ) {
-		return this.flagAnnotation;
+		return flagAnnotation;
 	}
 
 	public boolean isEnum( ) {
-		return this.flagEnum;
+		return flagEnum;
+	}
+
+	@Override
+	public String toString( ) {
+		return "AccessFlagHandler [flagPublic=" + flagPublic + ", flagFinal=" + flagFinal + ", flagSuper=" + flagSuper + ", flagInterface=" + flagInterface + ", flagAbstract=" + flagAbstract
+				+ ", flagSynthetic=" + flagSynthetic + ", flagAnnotation=" + flagAnnotation + ", flagEnum=" + flagEnum + "]";
 	}
 }

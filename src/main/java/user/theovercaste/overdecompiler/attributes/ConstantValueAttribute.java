@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntry;
 
-public class ConstantValueAttribute extends Attribute {
+public class ConstantValueAttribute extends AttributeData {
 	private final int attributeIndex;
 
 	public ConstantValueAttribute(int nameIndex, byte[] data, int attributeIndex) {
@@ -36,9 +36,9 @@ public class ConstantValueAttribute extends Attribute {
 		}
 	}
 
-	public static class Wrapper extends Attribute.Wrapper<ConstantValueAttribute> {
+	public static class Wrapper extends AttributeData.Wrapper<ConstantValueAttribute> {
 		@Override
-		public ConstantValueAttribute wrap(Attribute a, ConstantPoolEntry[] constantPool) {
+		public ConstantValueAttribute wrap(AttributeData a, ConstantPoolEntry[] constantPool) {
 			try (DataInputStream din = new DataInputStream(new ByteArrayInputStream(a.data))) {
 				return new ConstantValueAttribute(a.nameIndex, a.data, din.readUnsignedShort());
 			} catch (IOException e) {

@@ -13,8 +13,10 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import user.theovercaste.overdecompiler.exceptions.InvalidArgumentException;
-import user.theovercaste.overdecompiler.parsers.AbstractParser;
-import user.theovercaste.overdecompiler.parsers.JavaParser;
+import user.theovercaste.overdecompiler.parsers.AbstractParserFactory;
+import user.theovercaste.overdecompiler.parsers.JavaParserFactory;
+import user.theovercaste.overdecompiler.printers.AbstractPrinterFactory;
+import user.theovercaste.overdecompiler.printers.PrettyPrinterFactory;
 
 public class OverDecompiler {
 	public static void main(String[] args) {
@@ -24,8 +26,9 @@ public class OverDecompiler {
 				return;
 			}
 			OverDecompiler d = new OverDecompiler();
-			AbstractParser parser = getAbstractParser(args);
-			d.decompile(args[0], parser);
+			AbstractParserFactory parserFactory = getParserFactory(args);
+			AbstractPrinterFactory printerFactory = getPrinterFactory(args);
+			d.decompile(args[args.length - 1], parserFactory, printerFactory);
 		} catch (InvalidArgumentException e) {
 			System.out.println(e.getMessage());
 			sendUsageMessage();
@@ -37,9 +40,10 @@ public class OverDecompiler {
 		System.out.println("where possible options include:");
 		System.out.println("  -help  --help  -?\t\tPrint this usage message");
 		System.out.println("  -parser (class)\t\tSpecify a parser to be used.");
+		System.out.println("  -printer (class)\t\tSpecify the printer to be used.");
 	}
 
-	public static AbstractParser getAbstractParser(String[] args) throws InvalidArgumentException {
+	public static AbstractParserFactory getParserFactory(String[] args) throws InvalidArgumentException {
 		for (int i = 0; i < args.length; i++) {
 			String s = args[i];
 			if ("-parser".equalsIgnoreCase(s) || "--parser".equalsIgnoreCase(s)) {
@@ -52,9 +56,9 @@ public class OverDecompiler {
 				}
 				try {
 					Class<?> clazz = Class.forName(parserName);
-					if (clazz.isAssignableFrom(AbstractParser.class)) {
-						Method createMethod = clazz.getMethod("createParser");
-						return (AbstractParser) createMethod.invoke(null);
+					if (clazz.isAssignableFrom(AbstractParserFactory.class)) {
+						Method getInstanceMethod = clazz.getMethod("getInstance");
+						return (AbstractParserFactory) getInstanceMethod.invoke(null);
 					}
 				} catch (ClassNotFoundException e) { // Reflection gives you a lot of errors.
 					e.printStackTrace();
@@ -72,10 +76,46 @@ public class OverDecompiler {
 				throw new InvalidArgumentException("The -parser flag's value isn't a valid JavaParser.");
 			}
 		}
-		return JavaParser.createParser();
+		return JavaParserFactory.getInstance();
 	}
 
-	public void decompile(String filePath, AbstractParser parser) {
+	public static AbstractPrinterFactory getPrinterFactory(String[] args) throws InvalidArgumentException {
+		for (int i = 0; i < args.length; i++) {
+			String s = args[i];
+			if ("-printer".equalsIgnoreCase(s) || "--printer".equalsIgnoreCase(s)) {
+				if ((i + 1) >= args.length) {
+					throw new InvalidArgumentException("The -printer must not be at the end of the arguments.");
+				}
+				String parserName = args[i + 1];
+				if (!parserName.contains(".")) {
+					parserName = "user.theovercaste.overdecompiler.printers." + parserName;
+				}
+				try {
+					Class<?> clazz = Class.forName(parserName);
+					if (clazz.isAssignableFrom(AbstractPrinterFactory.class)) {
+						Method getInstanceMethod = clazz.getMethod("getInstance");
+						return (AbstractPrinterFactory) getInstanceMethod.invoke(null);
+					}
+				} catch (ClassNotFoundException e) { // Reflection gives you a lot of errors.
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				} catch (IllegalArgumentException e) {
+					e.printStackTrace();
+				} catch (InvocationTargetException e) {
+					e.printStackTrace();
+				} catch (NoSuchMethodException e) {
+					e.printStackTrace();
+				} catch (SecurityException e) {
+					e.printStackTrace();
+				}
+				throw new InvalidArgumentException("The -parser flag's value isn't a valid JavaParser.");
+			}
+		}
+		return PrettyPrinterFactory.getInstance();
+	}
+
+	public void decompile(String filePath, AbstractParserFactory parserFactory, AbstractPrinterFactory printerFactory) {
 		File f = new File(filePath);
 		if (!f.exists()) {
 			System.err.println("The file to decompile is missing or invalid.");
@@ -84,7 +124,7 @@ public class OverDecompiler {
 		ClassDecompiler decompiler = new ClassDecompiler();
 		if (f.isDirectory()) {
 			System.out.println("Directory detected. Decompiling...");
-			decompiler.decompileFiles(seekClasses(f), parser);
+			decompiler.decompileFiles(seekClasses(f), parserFactory, printerFactory);
 		} else {
 			String extension = FileUtilities.getFileExtention(f);
 			switch (extension) {
@@ -93,12 +133,12 @@ public class OverDecompiler {
 					File dir = new File(f.getParentFile(), FileUtilities.getFileName(f));
 					System.out.println("Decompiling...");
 					extractJar(f, dir);
-					decompiler.decompileFiles(seekClasses(dir), parser);
+					decompiler.decompileFiles(seekClasses(dir), parserFactory, printerFactory);
 					break;
 				}
 				case "class": {
 					System.out.println("Class file detected... Decompiling.");
-					decompiler.decompileFiles(Arrays.asList(f), parser);
+					decompiler.decompileFiles(Arrays.asList(f), parserFactory, printerFactory);
 					break;
 				}
 				default:
