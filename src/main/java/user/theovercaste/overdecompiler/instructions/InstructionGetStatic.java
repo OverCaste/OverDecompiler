@@ -26,7 +26,6 @@ public class InstructionGetStatic extends Instruction {
 		try {
 			ConstantPoolEntryFieldReference f = getField(constantPool);
 			imports.addQualifiedPath(f.getClassName(constantPool));
-			System.out.println("Derp: " + f.getClassName(constantPool));
 			return imports.getQualifiedName(f.getClassName(constantPool)) + "." + f.getName(constantPool);
 		} catch (InvalidConstantPoolPointerException e) {
 			e.printStackTrace();

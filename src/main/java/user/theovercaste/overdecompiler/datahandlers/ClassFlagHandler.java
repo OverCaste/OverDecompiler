@@ -1,6 +1,6 @@
 package user.theovercaste.overdecompiler.datahandlers;
 
-public class AccessFlagHandler {
+public class ClassFlagHandler {
 	private boolean flagPublic; // flag prefixes because these are all keywords. Go figure.
 	private boolean flagFinal;
 	private boolean flagSuper;
@@ -10,7 +10,7 @@ public class AccessFlagHandler {
 	private boolean flagAnnotation;
 	private boolean flagEnum;
 
-	public AccessFlagHandler(int value) {
+	public ClassFlagHandler(int value) {
 		flagPublic = ((value & 0x0001) != 0);
 		flagFinal = ((value & 0x0010) != 0);
 		flagSuper = ((value & 0x0020) != 0);
@@ -21,7 +21,7 @@ public class AccessFlagHandler {
 		flagEnum = ((value & 0x4000) != 0);
 	}
 
-	public AccessFlagHandler( ) {
+	public ClassFlagHandler( ) {
 		this(0);
 	}
 

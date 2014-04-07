@@ -1,5 +1,8 @@
 package user.theovercaste.overdecompiler.codeinternals;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 public class ClassPath {
 	public static final ClassPath VOID = new ClassPath("void", "", 0, false);
 	public static final ClassPath BOOLEAN = new ClassPath("boolean", "", 0, false);
@@ -11,6 +14,7 @@ public class ClassPath {
 	public static final ClassPath FLOAT = new ClassPath("float", "", 0, false);
 	public static final ClassPath DOUBLE = new ClassPath("double", "", 0, false);
 	public static final ClassPath OBJECT = new ClassPath("Object", "java.lang", 0, true);
+	public static final ClassPath OBJECT_ENUM = new ClassPath("Enum", "java.lang", 0, true);
 
 	private final String className;
 	private final String classPackage;
@@ -51,7 +55,7 @@ public class ClassPath {
 	}
 
 	/**
-	 * Returns a simple representation of what this class is. Example: java.lang.Object[]
+	 * Returns a simple representation of what this class is. Example: java.lang.Object
 	 * 
 	 * @return
 	 */
@@ -85,7 +89,7 @@ public class ClassPath {
 	}
 
 	public boolean isObject( ) {
-		return true;
+		return isObject;
 	}
 
 	public ClassPath asArray(int depth) {
@@ -102,16 +106,38 @@ public class ClassPath {
 	 * @return
 	 */
 	public static ClassPath getMangledPath(String mangledPath) {
+		if (mangledPath.endsWith(";")) {
+			mangledPath = mangledPath.substring(0, mangledPath.length() - 1);
+		}
+		return demangle(mangledPath);
+	}
+
+	public static Collection<ClassPath> getMangledPaths(String input) {
+		if (input.length() == 0) {
+			return new ArrayList<ClassPath>(0);
+		}
+		String[] split = input.split(";");
+		ArrayList<ClassPath> ret = new ArrayList<ClassPath>(split.length);
+		for (String s : split) {
+			ret.add(demangle(s));
+		}
+		return ret;
+	}
+
+	private static ClassPath demangle(String mangled) {
+		if (mangled.length() == 0) {
+			return VOID;
+		}
 		int arrayDepth = 0;
-		for (int i = 0; mangledPath.charAt(i) == '['; i++) {
+		for (int i = 0; mangled.charAt(i) == '['; i++) {
 			arrayDepth++;
 		}
 		if (arrayDepth > 0) {
-			mangledPath = mangledPath.substring(arrayDepth);
+			mangled = mangled.substring(arrayDepth);
 		}
-		char descriptor = mangledPath.charAt(0);
+		char descriptor = mangled.charAt(0);
 		if (descriptor == 'L') { // Object
-			return new ClassPath(mangledPath.substring(1).replace("/", "."), arrayDepth);
+			return new ClassPath(mangled.substring(1).replace("/", "."), arrayDepth);
 		}
 		// Otherwise it's a primitive
 		switch (descriptor) {
@@ -134,7 +160,7 @@ public class ClassPath {
 			case 'V':
 				return VOID.asArray(arrayDepth);
 		}
-		throw new IllegalArgumentException("That path isn't a valid, mangled path!");
+		throw new IllegalArgumentException("The path \"" + mangled + "\" isn't a valid, mangled path!");
 	}
 
 	@Override

@@ -1,13 +1,13 @@
 package user.theovercaste.overdecompiler.codeinternals;
 
-import user.theovercaste.overdecompiler.datahandlers.AccessFlagHandler;
+import user.theovercaste.overdecompiler.datahandlers.ClassFlagHandler;
 
 public class Field {
 	private final String name;
 	private final ClassPath type;
-	private final AccessFlagHandler flags;
+	private final ClassFlagHandler flags;
 
-	public Field(String name, ClassPath type, AccessFlagHandler flags) {
+	public Field(String name, ClassPath type, ClassFlagHandler flags) {
 		this.name = name;
 		this.type = type;
 		this.flags = flags;
@@ -21,7 +21,7 @@ public class Field {
 		return type;
 	}
 
-	public AccessFlagHandler getFlags( ) {
+	public ClassFlagHandler getFlags( ) {
 		return flags;
 	}
 }

@@ -5,27 +5,25 @@ import java.io.IOException;
 
 import user.theovercaste.overdecompiler.attributes.AttributeData;
 import user.theovercaste.overdecompiler.attributes.Attributes;
-import user.theovercaste.overdecompiler.codeinternals.ClassPath;
-import user.theovercaste.overdecompiler.codeinternals.Field;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntry;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryUtf8;
 import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
 import user.theovercaste.overdecompiler.exceptions.PoolPreconditions;
 
 public class FieldData {
-	private final AccessFlagHandler flagHandler;
+	private final FieldFlagHandler flagHandler;
 	private final int nameIndex;
 	private final int descriptorIndex;
 	private final AttributeData[] attributes;
 
-	public FieldData(AccessFlagHandler flagHandler, int nameIndex, int descriptorIndex, AttributeData[] attributes) {
+	public FieldData(FieldFlagHandler flagHandler, int nameIndex, int descriptorIndex, AttributeData[] attributes) {
 		this.flagHandler = flagHandler;
 		this.nameIndex = nameIndex;
 		this.descriptorIndex = descriptorIndex;
 		this.attributes = attributes;
 	}
 
-	public AccessFlagHandler getFlagHandler( ) {
+	public FieldFlagHandler getFlagHandler( ) {
 		return flagHandler;
 	}
 
@@ -60,7 +58,7 @@ public class FieldData {
 	}
 
 	public static FieldData loadFieldInfo(DataInputStream din) throws IOException {
-		AccessFlagHandler flagHandler = new AccessFlagHandler(din.readUnsignedShort());
+		FieldFlagHandler flagHandler = new FieldFlagHandler(din.readUnsignedShort());
 		int nameIndex = din.readUnsignedShort();
 		int descriptorIndex = din.readUnsignedShort();
 		AttributeData[] attributes = new AttributeData[din.readUnsignedShort()];
@@ -68,10 +66,5 @@ public class FieldData {
 			attributes[i] = Attributes.loadAttribute(din);
 		}
 		return new FieldData(flagHandler, nameIndex, descriptorIndex, attributes);
-	}
-
-	public Field toField(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
-		Field ret = new Field(getName(constantPool), new ClassPath("java.lang.Object"), flagHandler);
-		return ret;
 	}
 }

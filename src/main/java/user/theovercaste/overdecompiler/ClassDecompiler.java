@@ -64,7 +64,9 @@ public class ClassDecompiler {
 			}
 			int minorVersion = din.readUnsignedShort();
 			int majorVersion = din.readUnsignedShort();
-			System.out.println("Major/minor: " + majorVersion + "." + minorVersion);
+			if ((majorVersion != 52) || (minorVersion != 0)) {
+				System.out.println("Warning: This class file's version is " + majorVersion + "." + minorVersion + ". OverDecompiler is only tested with classes of version 52.0");
+			}
 			int constantPoolCount = din.readUnsignedShort();
 			ConstantPoolEntry[] constantPool = new ConstantPoolEntry[constantPoolCount];
 			for (int i = 1; i < constantPoolCount; i++) {
@@ -81,21 +83,16 @@ public class ClassDecompiler {
 			FieldData[] fields = new FieldData[din.readUnsignedShort()];
 			for (int i = 0; i < fields.length; i++) {
 				fields[i] = FieldData.loadFieldInfo(din);
-				System.out.println("Field " + fields[i].getName(constantPool) + ", " + fields[i].getDescription(constantPool));
-				for (AttributeData d : fields[i].getAttributes()) {
-					System.out.println("Attribute: " + d.getName(constantPool));
-				}
 			}
 			MethodData[] methods = new MethodData[din.readUnsignedShort()];
 			for (int i = 0; i < methods.length; i++) {
 				methods[i] = MethodData.loadMethodData(din);
-				System.out.println(constantPool[methods[i].getNameIndex()]);
 			}
 			AttributeData[] attributes = new AttributeData[din.readUnsignedShort()];
 			for (int i = 0; i < attributes.length; i++) {
 				attributes[i] = Attributes.loadAttribute(din);
 			}
-			ClassData classData = new ClassData();
+			ClassData classData = new ClassData(constantPool);
 			classData.setClassId(thisClassId);
 			classData.setParentId(superClassId);
 			classData.setFlags(classFlags);
@@ -104,6 +101,9 @@ public class ClassDecompiler {
 			}
 			for (FieldData f : fields) {
 				classData.addField(f);
+			}
+			for (int i : interfaces) {
+				classData.addInterface(i);
 			}
 			String currentFileName = FileUtilities.getFileName(file);
 			CharMatcher dollarSignMatcher = CharMatcher.is('$');

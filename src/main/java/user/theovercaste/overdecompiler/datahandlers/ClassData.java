@@ -1,20 +1,25 @@
 package user.theovercaste.overdecompiler.datahandlers;
 
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
-import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
+import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntry;
+
+import com.google.common.collect.Lists;
 
 public class ClassData {
+	private final ConstantPoolEntry[] constantPool;
 	private int classId;
 	private int parentId;
 	private int flags;
-	private final List<MethodData> methods = new ArrayList<>();
-	private final List<FieldData> fields = new ArrayList<>();
-	private final List<ClassData> nestedClasses = new ArrayList<>();
+	private final List<MethodData> methods = Lists.newArrayList();
+	private final List<FieldData> fields = Lists.newArrayList();
+	private final List<Integer> interfaces = Lists.newArrayList();
+	private final List<ClassData> nestedClasses = Lists.newArrayList();
 
-	public void setName(int nameId) throws InvalidConstantPoolPointerException {
-		classId = nameId;
+	public ClassData(ConstantPoolEntry[] constantPool) {
+		this.constantPool = constantPool;
 	}
 
 	public void addMethod(MethodData m) {
@@ -23,6 +28,10 @@ public class ClassData {
 
 	public void addField(FieldData f) {
 		fields.add(f);
+	}
+
+	public void addInterface(int i) {
+		interfaces.add(i);
 	}
 
 	public void addNestedClass(ClassData c) {
@@ -41,6 +50,18 @@ public class ClassData {
 		return flags;
 	}
 
+	public Collection<Integer> getInterfaces( ) {
+		return Collections.unmodifiableCollection(interfaces);
+	}
+
+	public Collection<FieldData> getFields( ) {
+		return Collections.unmodifiableCollection(fields);
+	}
+
+	public Collection<MethodData> getMethods( ) {
+		return Collections.unmodifiableCollection(methods);
+	}
+
 	public void setClassId(int classId) {
 		this.classId = classId;
 	}
@@ -51,5 +72,9 @@ public class ClassData {
 
 	public void setFlags(int flags) {
 		this.flags = flags;
+	}
+
+	public ConstantPoolEntry[] getConstantPool( ) {
+		return constantPool;
 	}
 }
