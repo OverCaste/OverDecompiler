@@ -21,7 +21,6 @@ public class FieldFlagHandler {
 		flagTransient = (value & 0x0080) != 0;
 		flagSynthetic = (value & 0x1000) != 0;
 		flagEnum = (value & 0x4000) != 0;
-		System.out.println("Field flags: " + Integer.toHexString(value) + ", " + toString());
 	}
 
 	public boolean isPublic( ) {

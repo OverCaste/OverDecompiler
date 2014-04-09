@@ -15,9 +15,9 @@ import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.datahandlers.FieldData;
 import user.theovercaste.overdecompiler.datahandlers.MethodData;
 import user.theovercaste.overdecompiler.exceptions.InvalidClassException;
+import user.theovercaste.overdecompiler.parserdata.ParsedClass;
 import user.theovercaste.overdecompiler.parsers.AbstractParser;
 import user.theovercaste.overdecompiler.parsers.AbstractParserFactory;
-import user.theovercaste.overdecompiler.parsers.ParsedClass;
 import user.theovercaste.overdecompiler.printers.AbstractPrinter;
 import user.theovercaste.overdecompiler.printers.AbstractPrinterFactory;
 

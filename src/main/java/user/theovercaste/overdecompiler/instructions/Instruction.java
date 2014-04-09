@@ -2,14 +2,26 @@ package user.theovercaste.overdecompiler.instructions;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.Collection;
+import java.util.Stack;
 
-import user.theovercaste.overdecompiler.instructiontypes.InstructionType;
+import user.theovercaste.overdecompiler.datahandlers.ClassData;
+import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
+import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
 
 public abstract class Instruction {
-	public abstract Collection<InstructionType> getInstructionTypes(int opcode);
+	protected final int opcode;
 
-	public abstract Collection<Integer> getInstructionOpcodes(InstructionType t);
+	protected Instruction(int opcode) {
+		this.opcode = opcode;
+	}
+
+	public abstract boolean isAction( );
+
+	public abstract MethodAction getAction(ClassData originClass, Stack<Instruction> stack) throws InstructionParsingException;
+
+	public int getOpcode( ) {
+		return opcode;
+	}
 
 	public static abstract class Factory {
 		public abstract Instruction load(int opcode, DataInputStream din) throws IOException;

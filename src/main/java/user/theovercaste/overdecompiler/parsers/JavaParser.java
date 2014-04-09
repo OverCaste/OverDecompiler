@@ -1,8 +1,5 @@
 package user.theovercaste.overdecompiler.parsers;
 
-import java.util.Collection;
-import java.util.List;
-
 import user.theovercaste.overdecompiler.codeinternals.ClassFlag;
 import user.theovercaste.overdecompiler.codeinternals.ClassPath;
 import user.theovercaste.overdecompiler.codeinternals.ClassType;
@@ -18,17 +15,16 @@ import user.theovercaste.overdecompiler.datahandlers.MethodData;
 import user.theovercaste.overdecompiler.datahandlers.MethodFlagHandler;
 import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
 import user.theovercaste.overdecompiler.exceptions.PoolPreconditions;
-import user.theovercaste.overdecompiler.parsersteps.ParserStep;
-
-import com.google.common.collect.ImmutableList;
+import user.theovercaste.overdecompiler.parserdata.ParsedClass;
+import user.theovercaste.overdecompiler.parserdata.ParsedField;
+import user.theovercaste.overdecompiler.parserdata.ParsedMethod;
+import user.theovercaste.overdecompiler.parsers.methodparsers.AbstractMethodParser;
+import user.theovercaste.overdecompiler.parsers.methodparsers.JavaMethodParser;
 
 public class JavaParser extends AbstractParser {
-	private final List<ParserStep> steps;
-	private ParsedClass parsedClass;
+	private static final JavaMethodParser methodParser = new JavaMethodParser();
 
-	protected JavaParser( ) {
-		steps = ImmutableList.of();
-	}
+	private ParsedClass parsedClass;
 
 	public ClassType getClassType(ClassData c) {
 		ClassFlagHandler flagHandler = new ClassFlagHandler(c.getFlags());
@@ -118,53 +114,58 @@ public class JavaParser extends AbstractParser {
 
 	public void parseMethods(ClassData origin, ParsedClass value) throws InvalidConstantPoolPointerException {
 		for (MethodData m : origin.getMethods()) {
-			String descriptor = m.getDescription(origin.getConstantPool());
-			int closingBraceIndex = descriptor.indexOf(")");
-			String parameterDescriptor = (closingBraceIndex < 0 ? "" : descriptor.substring(1, closingBraceIndex));
-			String returnDescriptor = (closingBraceIndex < 0 ? descriptor : descriptor.substring(closingBraceIndex + 1, descriptor.length()));
-			ClassPath returnClassPath = ClassPath.getMangledPath(returnDescriptor);
-			addImport(value, returnClassPath);
-			ParsedMethod parsed = new ParsedMethod(returnClassPath, m.getName(origin.getConstantPool()));
-			for (ClassPath arg : ClassPath.getMangledPaths(parameterDescriptor)) {
-				parsed.addArgument(arg);
-			}
-			MethodFlagHandler flagHandler = m.getFlagHandler();
-			if (flagHandler.isPublic()) {
-				parsed.addFlag(MethodFlag.PUBLIC);
-			} else if (flagHandler.isProtected()) {
-				parsed.addFlag(MethodFlag.PROTECTED);
-			} else if (flagHandler.isPrivate()) {
-				parsed.addFlag(MethodFlag.PRIVATE);
-			}
-			if (flagHandler.isFinal()) {
-				parsed.addFlag(MethodFlag.FINAL);
-			}
-			if (flagHandler.isStatic()) {
-				parsed.addFlag(MethodFlag.STATIC);
-			}
-			if (flagHandler.isSynthetic()) {
-				parsed.addFlag(MethodFlag.SYNTHETIC);
-			}
-			if (flagHandler.isSynchronized()) {
-				parsed.addFlag(MethodFlag.SYNCHRONIZED);
-			}
-			if (flagHandler.isAbstract()) {
-				parsed.addFlag(MethodFlag.ABSTRACT);
-			}
-			if (flagHandler.isBridge()) {
-				parsed.addFlag(MethodFlag.BRIDGE);
-			}
-			if (flagHandler.isNative()) {
-				parsed.addFlag(MethodFlag.NATIVE);
-			}
-			if (flagHandler.isStrict()) {
-				parsed.addFlag(MethodFlag.STRICT);
-			}
-			if (flagHandler.isVarargs()) {
-				parsed.addFlag(MethodFlag.VARARGS);
-			}
-			value.addMethod(parsed);
+			value.addMethod(parseMethod(origin, value, m));
 		}
+	}
+
+	public ParsedMethod parseMethod(ClassData fromClass, ParsedClass toClass, MethodData data) throws InvalidConstantPoolPointerException {
+		String descriptor = data.getDescription(fromClass.getConstantPool());
+		int closingBraceIndex = descriptor.indexOf(")");
+		String parameterDescriptor = (closingBraceIndex < 0 ? "" : descriptor.substring(1, closingBraceIndex));
+		String returnDescriptor = (closingBraceIndex < 0 ? descriptor : descriptor.substring(closingBraceIndex + 1, descriptor.length()));
+		ClassPath returnClassPath = ClassPath.getMangledPath(returnDescriptor);
+		addImport(toClass, returnClassPath);
+		ParsedMethod parsed = new ParsedMethod(returnClassPath, data.getName(fromClass.getConstantPool()));
+		for (ClassPath arg : ClassPath.getMangledPaths(parameterDescriptor)) {
+			parsed.addArgument(arg);
+		}
+		MethodFlagHandler flagHandler = data.getFlagHandler();
+		if (flagHandler.isPublic()) {
+			parsed.addFlag(MethodFlag.PUBLIC);
+		} else if (flagHandler.isProtected()) {
+			parsed.addFlag(MethodFlag.PROTECTED);
+		} else if (flagHandler.isPrivate()) {
+			parsed.addFlag(MethodFlag.PRIVATE);
+		}
+		if (flagHandler.isFinal()) {
+			parsed.addFlag(MethodFlag.FINAL);
+		}
+		if (flagHandler.isStatic()) {
+			parsed.addFlag(MethodFlag.STATIC);
+		}
+		if (flagHandler.isSynthetic()) {
+			parsed.addFlag(MethodFlag.SYNTHETIC);
+		}
+		if (flagHandler.isSynchronized()) {
+			parsed.addFlag(MethodFlag.SYNCHRONIZED);
+		}
+		if (flagHandler.isAbstract()) {
+			parsed.addFlag(MethodFlag.ABSTRACT);
+		}
+		if (flagHandler.isBridge()) {
+			parsed.addFlag(MethodFlag.BRIDGE);
+		}
+		if (flagHandler.isNative()) {
+			parsed.addFlag(MethodFlag.NATIVE);
+		}
+		if (flagHandler.isStrict()) {
+			parsed.addFlag(MethodFlag.STRICT);
+		}
+		if (flagHandler.isVarargs()) {
+			parsed.addFlag(MethodFlag.VARARGS);
+		}
+		getMethodParser(fromClass).parseMethodActions(fromClass, toClass, data, parsed);
+		return parsed;
 	}
 
 	protected void addImport(ParsedClass c, ClassPath i) {
@@ -185,7 +186,7 @@ public class JavaParser extends AbstractParser {
 	}
 
 	@Override
-	public Collection<ParserStep> getSteps( ) {
-		return steps;
+	public AbstractMethodParser getMethodParser(ClassData c) {
+		return methodParser;
 	}
 }

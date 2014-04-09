@@ -10,4 +10,12 @@ public class InvalidAttributeException extends RuntimeException {
 	public InvalidAttributeException(String message) {
 		super(message);
 	}
+
+	public InvalidAttributeException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public InvalidAttributeException(Throwable cause) {
+		super(cause);
+	}
 }

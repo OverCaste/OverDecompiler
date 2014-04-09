@@ -1,4 +1,4 @@
-package user.theovercaste.overdecompiler.parsers;
+package user.theovercaste.overdecompiler.parserdata;
 
 import java.util.Collection;
 import java.util.Collections;

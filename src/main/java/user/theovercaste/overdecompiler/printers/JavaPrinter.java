@@ -6,9 +6,10 @@ import user.theovercaste.overdecompiler.codeinternals.ClassFlag;
 import user.theovercaste.overdecompiler.codeinternals.ClassPath;
 import user.theovercaste.overdecompiler.codeinternals.FieldFlag;
 import user.theovercaste.overdecompiler.codeinternals.MethodFlag;
-import user.theovercaste.overdecompiler.parsers.ParsedClass;
-import user.theovercaste.overdecompiler.parsers.ParsedField;
-import user.theovercaste.overdecompiler.parsers.ParsedMethod;
+import user.theovercaste.overdecompiler.parserdata.ParsedClass;
+import user.theovercaste.overdecompiler.parserdata.ParsedField;
+import user.theovercaste.overdecompiler.parserdata.ParsedMethod;
+import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -138,11 +139,22 @@ public abstract class JavaPrinter extends AbstractPrinter {
 		int count = 0;
 		for (ParsedMethod m : clazz.getMethods()) {
 			if (printMethodHeader(clazz, m, out)) {
+				printMethodCode(clazz, m, out);
 				printFooter(clazz, out);
 				count++;
 			}
 		}
 		return count > 0;
+	}
+
+	protected void printMethodCode(ParsedClass clazz, ParsedMethod m, PrintStream out) {
+		for (MethodAction action : m.getActions()) {
+			printMethodAction(clazz, m, action, out);
+		}
+	}
+
+	protected void printMethodAction(ParsedClass clazz, ParsedMethod m, MethodAction action, PrintStream out) {
+		out.println(action.getStringValue(clazz, m) + ";");
 	}
 
 	protected boolean printMethodHeader(final ParsedClass clazz, final ParsedMethod m, PrintStream out) {

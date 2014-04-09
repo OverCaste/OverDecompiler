@@ -6,9 +6,10 @@ import java.io.PrintStream;
 
 import user.theovercaste.overdecompiler.codeinternals.FieldFlag;
 import user.theovercaste.overdecompiler.codeinternals.MethodFlag;
-import user.theovercaste.overdecompiler.parsers.ParsedClass;
-import user.theovercaste.overdecompiler.parsers.ParsedField;
-import user.theovercaste.overdecompiler.parsers.ParsedMethod;
+import user.theovercaste.overdecompiler.parserdata.ParsedClass;
+import user.theovercaste.overdecompiler.parserdata.ParsedField;
+import user.theovercaste.overdecompiler.parserdata.ParsedMethod;
+import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
 
 import com.google.common.base.Strings;
 
@@ -75,6 +76,7 @@ public class PrettyPrinter extends EnumCompatiblePrinter {
 					out.println();
 				}
 				if (printMethodHeader(clazz, m, out)) {
+					printMethodCode(clazz, m, out);
 					printFooter(clazz, out);
 					first = false;
 					count++;
@@ -82,6 +84,12 @@ public class PrettyPrinter extends EnumCompatiblePrinter {
 			}
 		}
 		return count > 0;
+	}
+
+	@Override
+	protected void printMethodAction(ParsedClass clazz, ParsedMethod m, MethodAction action, PrintStream out) {
+		out.print(getIndent(currentIndent));
+		super.printMethodAction(clazz, m, action, out);
 	}
 
 	@Override

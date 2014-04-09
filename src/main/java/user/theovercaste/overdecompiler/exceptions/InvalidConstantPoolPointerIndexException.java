@@ -10,4 +10,12 @@ public class InvalidConstantPoolPointerIndexException extends InvalidConstantPoo
 	public InvalidConstantPoolPointerIndexException(String message) {
 		super(message);
 	}
+
+	public InvalidConstantPoolPointerIndexException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public InvalidConstantPoolPointerIndexException(Throwable cause) {
+		super(cause);
+	}
 }

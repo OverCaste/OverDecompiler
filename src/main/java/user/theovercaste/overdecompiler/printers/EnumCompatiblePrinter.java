@@ -3,8 +3,8 @@ package user.theovercaste.overdecompiler.printers;
 import java.io.PrintStream;
 
 import user.theovercaste.overdecompiler.codeinternals.FieldFlag;
-import user.theovercaste.overdecompiler.parsers.ParsedClass;
-import user.theovercaste.overdecompiler.parsers.ParsedField;
+import user.theovercaste.overdecompiler.parserdata.ParsedClass;
+import user.theovercaste.overdecompiler.parserdata.ParsedField;
 
 public abstract class EnumCompatiblePrinter extends JavaPrinter {
 

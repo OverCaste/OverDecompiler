@@ -2,10 +2,10 @@ package user.theovercaste.overdecompiler.instructions;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.Collection;
+import java.util.Stack;
 
 import user.theovercaste.overdecompiler.instructiontypes.ArrayLoad;
-import user.theovercaste.overdecompiler.instructiontypes.InstructionType;
+import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
 
 /**
  * Equivalent to <a href="http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.baload">baload</a>
@@ -27,13 +27,13 @@ public class InstructionLoadArrayValue extends Instruction implements ArrayLoad 
 	}
 
 	@Override
-	public Collection<InstructionType> getInstructionTypes(int opcode) {
+	public boolean isAction( ) {
 		// TODO Auto-generated method stub
-		return null;
+		return false;
 	}
 
 	@Override
-	public Collection<Integer> getInstructionOpcodes(InstructionType t) {
+	public MethodAction getAction(Stack<Instruction> stack, DataInputStream din) {
 		// TODO Auto-generated method stub
 		return null;
 	}

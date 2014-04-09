@@ -10,4 +10,12 @@ public class InvalidConstantPoolPointerException extends Exception {
 	public InvalidConstantPoolPointerException(String message) {
 		super(message);
 	}
+
+	public InvalidConstantPoolPointerException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public InvalidConstantPoolPointerException(Throwable cause) {
+		super(cause);
+	}
 }

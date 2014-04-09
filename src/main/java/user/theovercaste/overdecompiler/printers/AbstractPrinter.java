@@ -5,8 +5,8 @@ import java.io.OutputStream;
 
 import user.theovercaste.overdecompiler.codeinternals.ClassPath;
 import user.theovercaste.overdecompiler.codeinternals.ClassType;
-import user.theovercaste.overdecompiler.parsers.ParsedClass;
-import user.theovercaste.overdecompiler.parsers.ParsedMethod;
+import user.theovercaste.overdecompiler.parserdata.ParsedClass;
+import user.theovercaste.overdecompiler.parserdata.ParsedMethod;
 
 public abstract class AbstractPrinter {
 	public abstract void print(ParsedClass c, OutputStream out) throws IOException;
