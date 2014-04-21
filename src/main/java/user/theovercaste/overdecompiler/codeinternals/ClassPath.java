@@ -2,9 +2,14 @@ package user.theovercaste.overdecompiler.codeinternals;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
+
+import com.google.common.collect.Iterables;
 
 public class ClassPath {
+	/** Equivalent to the 'void' keyword. */
 	public static final ClassPath VOID = new ClassPath("void", "", 0, false);
+	/** Equivalent to the 'boolean' keyword. */
 	public static final ClassPath BOOLEAN = new ClassPath("boolean", "", 0, false);
 	public static final ClassPath BYTE = new ClassPath("byte", "", 0, false);
 	public static final ClassPath CHAR = new ClassPath("char", "", 0, false);
@@ -13,8 +18,17 @@ public class ClassPath {
 	public static final ClassPath LONG = new ClassPath("long", "", 0, false);
 	public static final ClassPath FLOAT = new ClassPath("float", "", 0, false);
 	public static final ClassPath DOUBLE = new ClassPath("double", "", 0, false);
+
 	public static final ClassPath OBJECT = new ClassPath("Object", "java.lang", 0, true);
 	public static final ClassPath OBJECT_ENUM = new ClassPath("Enum", "java.lang", 0, true);
+	public static final ClassPath OBJECT_LONG = new ClassPath("Long", "java.lang", 0, true);
+	public static final ClassPath OBJECT_INTEGER = new ClassPath("Integer", "java.lang", 0, true);
+	public static final ClassPath OBJECT_SHORT = new ClassPath("Short", "java.lang", 0, true);
+	public static final ClassPath OBJECT_BYTE = new ClassPath("Byte", "java.lang", 0, true);
+	public static final ClassPath OBJECT_CHARACTER = new ClassPath("Character", "java.lang", 0, true);
+	public static final ClassPath OBJECT_FLOAT = new ClassPath("Float", "java.lang", 0, true);
+	public static final ClassPath OBJECT_DOUBLE = new ClassPath("Double", "java.lang", 0, true);
+	public static final ClassPath OBJECT_STRING = new ClassPath("String", "java.lang", 0, true);
 
 	private final String className;
 	private final String classPackage;
@@ -37,6 +51,9 @@ public class ClassPath {
 	public ClassPath(String qualifiedName, int arrayDepth) {
 		if (qualifiedName == null) {
 			throw new NullPointerException("Qualified name is null!");
+		}
+		if (qualifiedName.indexOf("/") > 0) { // Remove slashes
+			qualifiedName = qualifiedName.replace("/", ".");
 		}
 		int lastPeriodIndex = qualifiedName.lastIndexOf(".");
 		if (lastPeriodIndex != -1) {
@@ -88,6 +105,15 @@ public class ClassPath {
 		return arrayDepth;
 	}
 
+	/**
+	 * Checks whether {@link #getArrayDepth()} returns one or more.
+	 * 
+	 * @return True if this classpath represents an array, false otherwise.
+	 */
+	public boolean isArray( ) {
+		return arrayDepth > 0;
+	}
+
 	public boolean isObject( ) {
 		return isObject;
 	}
@@ -106,10 +132,7 @@ public class ClassPath {
 	 * @return
 	 */
 	public static ClassPath getMangledPath(String mangledPath) {
-		if (mangledPath.endsWith(";")) {
-			mangledPath = mangledPath.substring(0, mangledPath.length() - 1);
-		}
-		return demangle(mangledPath);
+		return Iterables.getOnlyElement(getMangledPaths(mangledPath));
 	}
 
 	public static Collection<ClassPath> getMangledPaths(String input) {
@@ -124,6 +147,36 @@ public class ClassPath {
 		return ret;
 	}
 
+	/**
+	 * Retrieves the classpaths from a method's descriptor, for example ([Ljava/lang/String;)V would return a single depth array of java.lang.String paths.
+	 * 
+	 * @param descriptor The method's internal descriptor.
+	 * @return The argument classpaths.
+	 */
+	public static Collection<ClassPath> getMethodArguments(String descriptor) {
+		int closingBraceIndex = descriptor.indexOf(")");
+		String parameterDescriptor = (closingBraceIndex < 0 ? "" : descriptor.substring(1, closingBraceIndex));
+		return getMangledPaths(parameterDescriptor);
+	}
+
+	/**
+	 * Retrieves the classpath from a method's return type, for example ([Ljava/lang/String;)V would return {@link #VOID}
+	 * 
+	 * @param descriptor The method's internal descriptor.
+	 * @return The return classpath.
+	 */
+	public static ClassPath getMethodReturnType(String descriptor) {
+		int closingBraceIndex = descriptor.indexOf(")");
+		String returnDescriptor = (closingBraceIndex < 0 ? descriptor : descriptor.substring(closingBraceIndex + 1, descriptor.length()));
+		return demangle(returnDescriptor);
+	}
+
+	/**
+	 * An internal method to generate a classpath from a path without any separators.
+	 * 
+	 * @param mangled The mangled path to retrieve the classpath from.
+	 * @return
+	 */
 	private static ClassPath demangle(String mangled) {
 		if (mangled.length() == 0) {
 			return VOID;
@@ -137,7 +190,7 @@ public class ClassPath {
 		}
 		char descriptor = mangled.charAt(0);
 		if (descriptor == 'L') { // Object
-			return new ClassPath(mangled.substring(1).replace("/", "."), arrayDepth);
+			return new ClassPath(mangled.substring(1), arrayDepth);
 		}
 		// Otherwise it's a primitive
 		switch (descriptor) {
@@ -172,6 +225,10 @@ public class ClassPath {
 		result = (prime * result) + ((classPackage == null) ? 0 : classPackage.hashCode());
 		result = (prime * result) + (isObject ? 1231 : 1237);
 		return result;
+	}
+
+	public boolean equalsType(ClassPath other) {
+		return Objects.equals(other.className, className) && Objects.equals(other.classPackage, classPackage) && (other.isObject == isObject);
 	}
 
 	@Override

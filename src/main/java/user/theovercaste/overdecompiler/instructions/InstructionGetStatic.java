@@ -22,10 +22,6 @@ public class InstructionGetStatic extends Instruction {
 		this.nameIndex = nameIndex;
 	}
 
-	public static int[] getOpcodes( ) {
-		return new int[] {0xb2};
-	}
-
 	public ConstantPoolEntryFieldReference getField(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
 		PoolPreconditions.assertPoolRange(nameIndex, constantPool.length);
 		ConstantPoolEntry e = constantPool[nameIndex];
@@ -41,7 +37,7 @@ public class InstructionGetStatic extends Instruction {
 	}
 
 	@Override
-	public MethodAction getAction(ClassData originClass, Stack<Instruction> stack) throws InstructionParsingException {
+	public MethodAction getAction(ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
 		ConstantPoolEntryFieldReference f;
 		try {
 			f = getField(originClass.getConstantPool());
@@ -49,6 +45,10 @@ public class InstructionGetStatic extends Instruction {
 		} catch (InvalidConstantPoolPointerException e) {
 			throw new InstructionParsingException(e);
 		}
+	}
+
+	public static int[] getOpcodes( ) {
+		return new int[] {0xb2};
 	}
 
 	public static Factory factory( ) {

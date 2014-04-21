@@ -10,6 +10,7 @@ import user.theovercaste.overdecompiler.parserdata.ParsedClass;
 import user.theovercaste.overdecompiler.parserdata.ParsedField;
 import user.theovercaste.overdecompiler.parserdata.ParsedMethod;
 import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
+import user.theovercaste.overdecompiler.parserdata.method.MethodActionReturnVoid;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -148,8 +149,15 @@ public abstract class JavaPrinter extends AbstractPrinter {
 	}
 
 	protected void printMethodCode(ParsedClass clazz, ParsedMethod m, PrintStream out) {
+		int size = m.getActions().size();
+		int count = 0;
 		for (MethodAction action : m.getActions()) {
-			printMethodAction(clazz, m, action, out);
+			if ((count == (size - 1)) && (action instanceof MethodActionReturnVoid)) {
+				// A exception to printing. If the action is a return void and it's the last action it's implicit. Don't print.
+			} else {
+				printMethodAction(clazz, m, action, out);
+			}
+			count++;
 		}
 	}
 
@@ -201,7 +209,7 @@ public abstract class JavaPrinter extends AbstractPrinter {
 			out.print(Joiner.on(", ").join(Iterables.transform(m.getArguments(), new Function<ClassPath, String>() {
 				@Override
 				public String apply(ClassPath input) {
-					return input.getClassName() + " " + getArgumentName(clazz, m, input);
+					return input.getDefinition() + " " + getArgumentName(clazz, m, input);
 				}
 			})));
 		}

@@ -120,13 +120,11 @@ public class JavaParser extends AbstractParser {
 
 	public ParsedMethod parseMethod(ClassData fromClass, ParsedClass toClass, MethodData data) throws InvalidConstantPoolPointerException {
 		String descriptor = data.getDescription(fromClass.getConstantPool());
-		int closingBraceIndex = descriptor.indexOf(")");
-		String parameterDescriptor = (closingBraceIndex < 0 ? "" : descriptor.substring(1, closingBraceIndex));
-		String returnDescriptor = (closingBraceIndex < 0 ? descriptor : descriptor.substring(closingBraceIndex + 1, descriptor.length()));
-		ClassPath returnClassPath = ClassPath.getMangledPath(returnDescriptor);
+		ClassPath returnClassPath = ClassPath.getMethodReturnType(descriptor);
 		addImport(toClass, returnClassPath);
 		ParsedMethod parsed = new ParsedMethod(returnClassPath, data.getName(fromClass.getConstantPool()));
-		for (ClassPath arg : ClassPath.getMangledPaths(parameterDescriptor)) {
+		for (ClassPath arg : ClassPath.getMethodArguments(descriptor)) {
+			addImport(toClass, arg);
 			parsed.addArgument(arg);
 		}
 		MethodFlagHandler flagHandler = data.getFlagHandler();

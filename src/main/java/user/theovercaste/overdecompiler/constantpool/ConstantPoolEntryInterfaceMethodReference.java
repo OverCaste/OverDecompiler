@@ -3,6 +3,8 @@ package user.theovercaste.overdecompiler.constantpool;
 import java.io.DataInputStream;
 import java.io.IOException;
 
+import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
+
 public class ConstantPoolEntryInterfaceMethodReference extends ConstantPoolEntry {
 	protected final int classIndex;
 	protected final int nameAndTypeIndex;
@@ -14,11 +16,23 @@ public class ConstantPoolEntryInterfaceMethodReference extends ConstantPoolEntry
 	}
 
 	public int getClassIndex( ) {
-		return this.classIndex;
+		return classIndex;
 	}
 
 	public int getNameAndTypeIndex( ) {
-		return this.nameAndTypeIndex;
+		return nameAndTypeIndex;
+	}
+
+	public String getName(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
+		return ConstantPoolValueRetriever.getInstance().getNameAndTypeName(constantPool, nameAndTypeIndex);
+	}
+
+	public String getDescription(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
+		return ConstantPoolValueRetriever.getInstance().getNameAndTypeDescription(constantPool, nameAndTypeIndex);
+	}
+
+	public String getClassName(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
+		return ConstantPoolValueRetriever.getInstance().getClassName(constantPool, classIndex);
 	}
 
 	public static Factory factory( ) {
@@ -32,13 +46,13 @@ public class ConstantPoolEntryInterfaceMethodReference extends ConstantPoolEntry
 		@Override
 		public void read(int tag, DataInputStream din) throws IOException {
 			super.read(tag, din);
-			this.classIndex = din.readUnsignedShort();
-			this.nameAndTypeIndex = din.readUnsignedShort();
+			classIndex = din.readUnsignedShort();
+			nameAndTypeIndex = din.readUnsignedShort();
 		}
 
 		@Override
 		public ConstantPoolEntry build( ) {
-			return new ConstantPoolEntryInterfaceMethodReference(this.tag, this.classIndex, this.nameAndTypeIndex);
+			return new ConstantPoolEntryInterfaceMethodReference(tag, classIndex, nameAndTypeIndex);
 		}
 	}
 }

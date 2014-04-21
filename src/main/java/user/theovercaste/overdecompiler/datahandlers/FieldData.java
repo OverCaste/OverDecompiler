@@ -6,9 +6,8 @@ import java.io.IOException;
 import user.theovercaste.overdecompiler.attributes.AttributeData;
 import user.theovercaste.overdecompiler.attributes.Attributes;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntry;
-import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryUtf8;
+import user.theovercaste.overdecompiler.constantpool.ConstantPoolValueRetriever;
 import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
-import user.theovercaste.overdecompiler.exceptions.PoolPreconditions;
 
 public class FieldData {
 	private final FieldFlagHandler flagHandler;
@@ -40,21 +39,11 @@ public class FieldData {
 	}
 
 	public String getName(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
-		PoolPreconditions.assertPoolRange(nameIndex, constantPool.length);
-		ConstantPoolEntry e = constantPool[nameIndex];
-		if (e instanceof ConstantPoolEntryUtf8) {
-			return ((ConstantPoolEntryUtf8) e).toString();
-		}
-		throw PoolPreconditions.getInvalidType(constantPool, nameIndex);
+		return ConstantPoolValueRetriever.getInstance().getString(constantPool, nameIndex);
 	}
 
 	public String getDescription(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
-		PoolPreconditions.assertPoolRange(descriptorIndex, constantPool.length);
-		ConstantPoolEntry e = constantPool[descriptorIndex];
-		if (e instanceof ConstantPoolEntryUtf8) {
-			return ((ConstantPoolEntryUtf8) e).toString();
-		}
-		throw PoolPreconditions.getInvalidType(constantPool, descriptorIndex);
+		return ConstantPoolValueRetriever.getInstance().getString(constantPool, descriptorIndex);
 	}
 
 	public static FieldData loadFieldInfo(DataInputStream din) throws IOException {

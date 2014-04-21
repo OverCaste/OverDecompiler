@@ -4,7 +4,6 @@ import java.io.DataInputStream;
 import java.io.IOException;
 
 import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
-import user.theovercaste.overdecompiler.exceptions.PoolPreconditions;
 
 public class ConstantPoolEntryNameAndType extends ConstantPoolEntry {
 	protected final int nameIndex;
@@ -17,7 +16,7 @@ public class ConstantPoolEntryNameAndType extends ConstantPoolEntry {
 	}
 
 	public int getNameIndex( ) {
-		return this.nameIndex;
+		return nameIndex;
 	}
 
 	public static Factory factory( ) {
@@ -25,21 +24,11 @@ public class ConstantPoolEntryNameAndType extends ConstantPoolEntry {
 	}
 
 	public String getName(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
-		PoolPreconditions.assertPoolRange(this.nameIndex, constantPool.length);
-		ConstantPoolEntry e = constantPool[this.nameIndex];
-		if (e instanceof ConstantPoolEntryUtf8) {
-			return ((ConstantPoolEntryUtf8) e).toString();
-		}
-		throw PoolPreconditions.getInvalidType(constantPool, this.nameIndex);
+		return ConstantPoolValueRetriever.getInstance().getString(constantPool, nameIndex);
 	}
 
 	public String getDescription(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
-		PoolPreconditions.assertPoolRange(this.descriptorIndex, constantPool.length);
-		ConstantPoolEntry e = constantPool[this.descriptorIndex];
-		if (e instanceof ConstantPoolEntryUtf8) {
-			return ((ConstantPoolEntryUtf8) e).toString();
-		}
-		throw PoolPreconditions.getInvalidType(constantPool, this.descriptorIndex);
+		return ConstantPoolValueRetriever.getInstance().getString(constantPool, descriptorIndex);
 	}
 
 	public static class Factory extends ConstantPoolEntry.Factory {
@@ -49,13 +38,13 @@ public class ConstantPoolEntryNameAndType extends ConstantPoolEntry {
 		@Override
 		public void read(int tag, DataInputStream din) throws IOException {
 			super.read(tag, din);
-			this.nameIndex = din.readUnsignedShort();
-			this.descriptorIndex = din.readUnsignedShort();
+			nameIndex = din.readUnsignedShort();
+			descriptorIndex = din.readUnsignedShort();
 		}
 
 		@Override
 		public ConstantPoolEntry build( ) {
-			return new ConstantPoolEntryNameAndType(this.tag, this.nameIndex, this.descriptorIndex);
+			return new ConstantPoolEntryNameAndType(tag, nameIndex, descriptorIndex);
 		}
 	}
 }

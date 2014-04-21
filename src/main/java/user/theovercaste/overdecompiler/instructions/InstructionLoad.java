@@ -7,19 +7,22 @@ import java.util.Stack;
 import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
 import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
-import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetConstant;
-import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetConstant.ConstantType;
+import user.theovercaste.overdecompiler.parserdata.method.MethodActionLoadVariable;
 
-/**
- * Equivalent to <a href="http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.aconst_null">aconst_null</a>
- */
-public class InstructionConstantNull extends Instruction {
-	public InstructionConstantNull(int opcode) {
+public class InstructionLoad extends Instruction {
+	private final int referenceIndex;
+
+	public InstructionLoad(int opcode, int referenceIndex) {
 		super(opcode);
+		this.referenceIndex = referenceIndex;
 	}
 
 	public static int[] getOpcodes( ) {
-		return new int[] {0x1};
+		return new int[] {0x15, 0x16, 0x17, 0x18, 0x19};
+	}
+
+	public int getNumber( ) {
+		return referenceIndex;
 	}
 
 	@Override
@@ -29,7 +32,7 @@ public class InstructionConstantNull extends Instruction {
 
 	@Override
 	public MethodAction getAction(ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
-		return new MethodActionGetConstant(null, ConstantType.NULL);
+		return new MethodActionLoadVariable(referenceIndex);
 	}
 
 	public static Factory factory( ) {
@@ -38,8 +41,9 @@ public class InstructionConstantNull extends Instruction {
 
 	public static class Factory extends Instruction.Factory {
 		@Override
-		public InstructionConstantNull load(int opcode, DataInputStream din) throws IOException {
-			return new InstructionConstantNull(opcode);
+		public InstructionLoad load(int opcode, DataInputStream din) throws IOException {
+			int referenceIndex = din.readUnsignedByte();
+			return new InstructionLoad(opcode, referenceIndex);
 		}
 	}
 }

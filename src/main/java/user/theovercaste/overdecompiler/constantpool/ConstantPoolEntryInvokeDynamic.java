@@ -3,6 +3,8 @@ package user.theovercaste.overdecompiler.constantpool;
 import java.io.DataInputStream;
 import java.io.IOException;
 
+import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
+
 public class ConstantPoolEntryInvokeDynamic extends ConstantPoolEntry {
 	protected final int methodAttributeIndex;
 	protected final int nameAndTypeIndex;
@@ -14,11 +16,19 @@ public class ConstantPoolEntryInvokeDynamic extends ConstantPoolEntry {
 	}
 
 	public int getMethodAttributeIndex( ) {
-		return this.methodAttributeIndex;
+		return methodAttributeIndex;
 	}
 
 	public int getNameAndTypeIndex( ) {
-		return this.nameAndTypeIndex;
+		return nameAndTypeIndex;
+	}
+
+	public String getName(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
+		return ConstantPoolValueRetriever.getInstance().getNameAndTypeName(constantPool, nameAndTypeIndex);
+	}
+
+	public String getDescription(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
+		return ConstantPoolValueRetriever.getInstance().getNameAndTypeDescription(constantPool, nameAndTypeIndex);
 	}
 
 	public static Factory factory( ) {
@@ -32,13 +42,13 @@ public class ConstantPoolEntryInvokeDynamic extends ConstantPoolEntry {
 		@Override
 		public void read(int tag, DataInputStream din) throws IOException {
 			super.read(tag, din);
-			this.methodAttributeIndex = din.readUnsignedShort();
-			this.nameAndTypeIndex = din.readUnsignedShort();
+			methodAttributeIndex = din.readUnsignedShort();
+			nameAndTypeIndex = din.readUnsignedShort();
 		}
 
 		@Override
 		public ConstantPoolEntry build( ) {
-			return new ConstantPoolEntryInvokeDynamic(this.tag, this.methodAttributeIndex, this.nameAndTypeIndex);
+			return new ConstantPoolEntryInvokeDynamic(tag, methodAttributeIndex, nameAndTypeIndex);
 		}
 	}
 }

@@ -9,8 +9,10 @@ import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryClass;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryFloat;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryInteger;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryString;
+import user.theovercaste.overdecompiler.constantpool.ConstantPoolValueRetriever;
 import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
+import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
 import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
 import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetConstant;
 import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetConstant.ConstantType;
@@ -44,7 +46,7 @@ public class InstructionLoadConstant extends Instruction {
 	}
 
 	@Override
-	public MethodAction getAction(ClassData originClass, Stack<Instruction> stack) throws InstructionParsingException {
+	public MethodAction getAction(ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
 		ConstantPoolEntry e = getValue(originClass.getConstantPool());
 		if (e instanceof ConstantPoolEntryInteger) {
 			return new MethodActionGetConstant(String.valueOf(((ConstantPoolEntryInteger) e).getValue()), ConstantType.INT);
@@ -53,10 +55,18 @@ public class InstructionLoadConstant extends Instruction {
 			return new MethodActionGetConstant(String.valueOf(((ConstantPoolEntryFloat) e).getValue()), ConstantType.FLOAT);
 		}
 		else if (e instanceof ConstantPoolEntryString) {
-			return new MethodActionGetConstant(((ConstantPoolEntryString) e).getValue(originClass.getConstantPool()), ConstantType.STRING);
+			try {
+				return new MethodActionGetConstant(ConstantPoolValueRetriever.getInstance().getString(originClass.getConstantPool(), constantIndex), ConstantType.STRING);
+			} catch (InvalidConstantPoolPointerException ex) {
+				// Do nothing, fail through
+			}
 		}
 		else if (e instanceof ConstantPoolEntryClass) {
-			throw new InstructionParsingException("Parsing class LDC hasn't been implemented yet. Forward this to the developer: " + ((ConstantPoolEntryClass) e).getName(originClass.getConstantPool()));
+			try {
+				throw new InstructionParsingException("Parsing class LDC hasn't been implemented yet. Forward this to the developer: " + ((ConstantPoolEntryClass) e).getName(originClass.getConstantPool()));
+			} catch (InvalidConstantPoolPointerException ex) {
+				ex.printStackTrace();
+			}
 		}
 		throw new InstructionParsingException(("Invalid type for LDC: " + e) == null ? "null" : e.getClass().getName());
 	}

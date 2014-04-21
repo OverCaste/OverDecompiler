@@ -2,7 +2,8 @@ package user.theovercaste.overdecompiler.constantpool;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+
+import com.google.common.base.Charsets;
 
 public class ConstantPoolEntryUtf8 extends ConstantPoolEntry {
 	protected final byte[] data;
@@ -13,21 +14,15 @@ public class ConstantPoolEntryUtf8 extends ConstantPoolEntry {
 	}
 
 	public byte[] getData( ) {
-		return this.data;
+		return data;
 	}
 
 	public static Factory factory( ) {
 		return new Factory();
 	}
 
-	@Override
-	public String toString( ) {
-		try {
-			return new String(this.data, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		return "";
+	public String getValue( ) {
+		return new String(data, Charsets.UTF_8);
 	}
 
 	public static class Factory extends ConstantPoolEntry.Factory {
@@ -37,14 +32,14 @@ public class ConstantPoolEntryUtf8 extends ConstantPoolEntry {
 		@Override
 		public void read(int tag, DataInputStream din) throws IOException {
 			super.read(tag, din);
-			this.length = din.readUnsignedShort();
-			this.data = new byte[this.length];
-			din.readFully(this.data);
+			length = din.readUnsignedShort();
+			data = new byte[length];
+			din.readFully(data);
 		}
 
 		@Override
 		public ConstantPoolEntry build( ) {
-			return new ConstantPoolEntryUtf8(this.tag, this.data);
+			return new ConstantPoolEntryUtf8(tag, data);
 		}
 	}
 }

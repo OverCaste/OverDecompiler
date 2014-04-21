@@ -12,15 +12,7 @@ public class ConstantPoolEntryString extends ConstantPoolEntry {
 	}
 
 	public int getStringIndex( ) {
-		return this.stringIndex;
-	}
-
-	public String getValue(ConstantPoolEntry[] constantPool) {
-		ConstantPoolEntry e = constantPool[this.stringIndex];
-		if (e instanceof ConstantPoolEntryUtf8) {
-			return ((ConstantPoolEntryUtf8) e).toString();
-		}
-		return "Invalid pointer for constant pool string: " + e.getClass().getName();
+		return stringIndex;
 	}
 
 	public static Factory factory( ) {
@@ -33,12 +25,12 @@ public class ConstantPoolEntryString extends ConstantPoolEntry {
 		@Override
 		public void read(int tag, DataInputStream din) throws IOException {
 			super.read(tag, din);
-			this.stringIndex = din.readUnsignedShort();
+			stringIndex = din.readUnsignedShort();
 		}
 
 		@Override
 		public ConstantPoolEntry build( ) {
-			return new ConstantPoolEntryString(this.tag, this.stringIndex);
+			return new ConstantPoolEntryString(tag, stringIndex);
 		}
 	}
 }

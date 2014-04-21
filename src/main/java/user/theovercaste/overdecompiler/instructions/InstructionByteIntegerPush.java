@@ -10,16 +10,12 @@ import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
 import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetConstant;
 import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetConstant.ConstantType;
 
-/**
- * Equivalent to <a href="http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.aconst_null">aconst_null</a>
- */
-public class InstructionConstantNull extends Instruction {
-	public InstructionConstantNull(int opcode) {
-		super(opcode);
-	}
+public class InstructionByteIntegerPush extends Instruction {
+	private final int byteValue;
 
-	public static int[] getOpcodes( ) {
-		return new int[] {0x1};
+	public InstructionByteIntegerPush(int opcode, int byteValue) {
+		super(opcode);
+		this.byteValue = byteValue;
 	}
 
 	@Override
@@ -29,7 +25,11 @@ public class InstructionConstantNull extends Instruction {
 
 	@Override
 	public MethodAction getAction(ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
-		return new MethodActionGetConstant(null, ConstantType.NULL);
+		return new MethodActionGetConstant(String.valueOf(byteValue), ConstantType.INT);
+	}
+
+	public static int[] getOpcodes( ) {
+		return new int[] {0x10};
 	}
 
 	public static Factory factory( ) {
@@ -38,8 +38,9 @@ public class InstructionConstantNull extends Instruction {
 
 	public static class Factory extends Instruction.Factory {
 		@Override
-		public InstructionConstantNull load(int opcode, DataInputStream din) throws IOException {
-			return new InstructionConstantNull(opcode);
+		public InstructionByteIntegerPush load(int opcode, DataInputStream din) throws IOException {
+			int b = din.readByte();
+			return new InstructionByteIntegerPush(opcode, b);
 		}
 	}
 }

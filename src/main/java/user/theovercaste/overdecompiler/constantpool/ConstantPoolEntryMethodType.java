@@ -3,6 +3,8 @@ package user.theovercaste.overdecompiler.constantpool;
 import java.io.DataInputStream;
 import java.io.IOException;
 
+import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
+
 public class ConstantPoolEntryMethodType extends ConstantPoolEntry {
 	protected final int descriptorIndex;
 
@@ -12,7 +14,11 @@ public class ConstantPoolEntryMethodType extends ConstantPoolEntry {
 	}
 
 	public int getDescriptorIndex( ) {
-		return this.descriptorIndex;
+		return descriptorIndex;
+	}
+
+	public String getDescription(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
+		return ConstantPoolValueRetriever.getInstance().getString(constantPool, descriptorIndex);
 	}
 
 	public static Factory factory( ) {
@@ -25,12 +31,12 @@ public class ConstantPoolEntryMethodType extends ConstantPoolEntry {
 		@Override
 		public void read(int tag, DataInputStream din) throws IOException {
 			super.read(tag, din);
-			this.descriptorIndex = din.readInt();
+			descriptorIndex = din.readInt();
 		}
 
 		@Override
 		public ConstantPoolEntry build( ) {
-			return new ConstantPoolEntryMethodType(this.tag, this.descriptorIndex);
+			return new ConstantPoolEntryMethodType(tag, descriptorIndex);
 		}
 	}
 }

@@ -13,6 +13,10 @@ public class PoolPreconditions {
 	}
 
 	public static WrongConstantPoolPointerException getInvalidType(ConstantPoolEntry[] pool, int index) throws WrongConstantPoolPointerException {
-		return new WrongConstantPoolPointerException("The constant pool entry at " + index + "(" + (pool[index].getClass().getName()) + ") has an invalid type.");
+		return new WrongConstantPoolPointerException("The constant pool entry at " + index + " (" + (pool[index].getClass().getName()) + ") has an invalid type.");
+	}
+
+	public static WrongConstantPoolPointerException getInvalidType(ConstantPoolEntry e) throws WrongConstantPoolPointerException {
+		return new WrongConstantPoolPointerException("The constant pool entry has an invalid type. (" + e.getClass().getName() + ")");
 	}
 }
