@@ -4,11 +4,12 @@ import user.theovercaste.overdecompiler.codeinternals.ClassPath;
 import user.theovercaste.overdecompiler.parserdata.ParsedClass;
 import user.theovercaste.overdecompiler.parserdata.ParsedMethod;
 
-public class MethodActionGetStaticField implements MethodActionGetter {
+public class MethodActionGetStaticField extends MethodActionGetter {
 	private String field;
 	private ClassPath staticClass;
 
-	public MethodActionGetStaticField(String field, ClassPath staticClass) {
+	public MethodActionGetStaticField(int lineNumber, String field, ClassPath staticClass) {
+		super(lineNumber);
 		this.field = field;
 		this.staticClass = staticClass;
 	}

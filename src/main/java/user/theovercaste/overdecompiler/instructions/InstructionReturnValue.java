@@ -22,13 +22,18 @@ public class InstructionReturnValue extends Instruction {
 	}
 
 	@Override
-	public MethodAction getAction(ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
+	public MethodAction getAction(int lineNumber, ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
 		MethodAction value = stack.pop();
 		if (value instanceof MethodActionGetter) {
-			return new MethodActionReturnValue((MethodActionGetter) value);
+			return new MethodActionReturnValue(lineNumber, (MethodActionGetter) value);
 		} else {
 			throw new InvalidStackTypeException(value);
 		}
+	}
+
+	@Override
+	public int getByteSize( ) {
+		return 0;
 	}
 
 	public static int[] getOpcodes( ) {

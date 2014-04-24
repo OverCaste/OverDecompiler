@@ -37,14 +37,19 @@ public class InstructionGetStatic extends Instruction {
 	}
 
 	@Override
-	public MethodAction getAction(ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
+	public MethodAction getAction(int lineNumber, ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
 		ConstantPoolEntryFieldReference f;
 		try {
 			f = getField(originClass.getConstantPool());
-			return new MethodActionGetStaticField(f.getName(originClass.getConstantPool()), new ClassPath(f.getClassName(originClass.getConstantPool()).replace("/", ".")));
+			return new MethodActionGetStaticField(lineNumber, f.getName(originClass.getConstantPool()), new ClassPath(f.getClassName(originClass.getConstantPool()).replace("/", ".")));
 		} catch (InvalidConstantPoolPointerException e) {
 			throw new InstructionParsingException(e);
 		}
+	}
+
+	@Override
+	public int getByteSize( ) {
+		return 2;
 	}
 
 	public static int[] getOpcodes( ) {

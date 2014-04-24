@@ -3,10 +3,11 @@ package user.theovercaste.overdecompiler.parserdata.method;
 import user.theovercaste.overdecompiler.parserdata.ParsedClass;
 import user.theovercaste.overdecompiler.parserdata.ParsedMethod;
 
-public class MethodActionLoadVariable implements MethodActionGetter {
+public class MethodActionLoadVariable extends MethodActionGetter {
 	private int variableIndex;
 
-	public MethodActionLoadVariable(int variableIndex) {
+	public MethodActionLoadVariable(int lineNumber, int variableIndex) {
+		super(lineNumber);
 		this.variableIndex = variableIndex;
 	}
 

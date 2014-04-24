@@ -28,8 +28,13 @@ public class InstructionConstantNull extends Instruction {
 	}
 
 	@Override
-	public MethodAction getAction(ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
-		return new MethodActionGetConstant(null, ConstantType.NULL);
+	public MethodAction getAction(int lineNumber, ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
+		return new MethodActionGetConstant(lineNumber, null, ConstantType.NULL);
+	}
+
+	@Override
+	public int getByteSize( ) {
+		return 0;
 	}
 
 	public static Factory factory( ) {

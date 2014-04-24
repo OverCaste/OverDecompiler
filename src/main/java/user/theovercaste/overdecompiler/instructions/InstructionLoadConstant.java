@@ -46,17 +46,17 @@ public class InstructionLoadConstant extends Instruction {
 	}
 
 	@Override
-	public MethodAction getAction(ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
+	public MethodAction getAction(int lineNumber, ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
 		ConstantPoolEntry e = getValue(originClass.getConstantPool());
 		if (e instanceof ConstantPoolEntryInteger) {
-			return new MethodActionGetConstant(String.valueOf(((ConstantPoolEntryInteger) e).getValue()), ConstantType.INT);
+			return new MethodActionGetConstant(lineNumber, String.valueOf(((ConstantPoolEntryInteger) e).getValue()), ConstantType.INT);
 		}
 		else if (e instanceof ConstantPoolEntryFloat) {
-			return new MethodActionGetConstant(String.valueOf(((ConstantPoolEntryFloat) e).getValue()), ConstantType.FLOAT);
+			return new MethodActionGetConstant(lineNumber, String.valueOf(((ConstantPoolEntryFloat) e).getValue()), ConstantType.FLOAT);
 		}
 		else if (e instanceof ConstantPoolEntryString) {
 			try {
-				return new MethodActionGetConstant(ConstantPoolValueRetriever.getInstance().getString(originClass.getConstantPool(), constantIndex), ConstantType.STRING);
+				return new MethodActionGetConstant(lineNumber, ConstantPoolValueRetriever.getInstance().getString(originClass.getConstantPool(), constantIndex), ConstantType.STRING);
 			} catch (InvalidConstantPoolPointerException ex) {
 				// Do nothing, fail through
 			}
@@ -69,6 +69,11 @@ public class InstructionLoadConstant extends Instruction {
 			}
 		}
 		throw new InstructionParsingException(("Invalid type for LDC: " + e) == null ? "null" : e.getClass().getName());
+	}
+
+	@Override
+	public int getByteSize( ) {
+		return 1;
 	}
 
 	public static class Factory extends Instruction.Factory {

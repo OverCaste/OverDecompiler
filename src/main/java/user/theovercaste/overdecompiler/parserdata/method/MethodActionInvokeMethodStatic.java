@@ -10,12 +10,13 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 
-public class MethodActionInvokeMethodStatic implements MethodActionGetter {
+public class MethodActionInvokeMethodStatic extends MethodActionGetter {
 	private ClassPath path;
 	private String method;
 	private MethodAction[] arguments;
 
-	public MethodActionInvokeMethodStatic(ClassPath path, String method, MethodAction... arguments) {
+	public MethodActionInvokeMethodStatic(int lineNumber, ClassPath path, String method, MethodAction... arguments) {
+		super(lineNumber);
 		this.path = path;
 		this.method = method;
 		this.arguments = arguments;

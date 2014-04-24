@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
-import user.theovercaste.overdecompiler.codeinternals.FieldFlag;
-import user.theovercaste.overdecompiler.codeinternals.MethodFlag;
 import user.theovercaste.overdecompiler.parserdata.ParsedClass;
 import user.theovercaste.overdecompiler.parserdata.ParsedField;
 import user.theovercaste.overdecompiler.parserdata.ParsedMethod;
@@ -44,11 +42,11 @@ public class PrettyPrinter extends EnumCompatiblePrinter {
 
 	@Override
 	protected boolean printField(ParsedClass clazz, ParsedField f, PrintStream out) {
-		if (!f.getFlags().contains(FieldFlag.SYNTHETIC)) {
-			out.print(getIndent(currentIndent));
-			return super.printField(clazz, f, out);
-		}
-		return false;
+		// if (!f.getFlags().contains(FieldFlag.SYNTHETIC)) { //This can be abused by nefarious people setting the synthetic flag to hide elements.
+		out.print(getIndent(currentIndent));
+		return super.printField(clazz, f, out);
+		// }
+		// return false;
 	}
 
 	@Override
@@ -71,17 +69,17 @@ public class PrettyPrinter extends EnumCompatiblePrinter {
 		int count = 0;
 		boolean first = true;
 		for (ParsedMethod m : clazz.getMethods()) {
-			if (!m.getFlags().contains(MethodFlag.SYNTHETIC)) {
-				if (!first) {
-					out.println();
-				}
-				if (printMethodHeader(clazz, m, out)) {
-					printMethodCode(clazz, m, out);
-					printFooter(clazz, out);
-					first = false;
-					count++;
-				}
+			// if (!m.getFlags().contains(MethodFlag.SYNTHETIC)) { //This can be abused by nefarious people setting the synthetic flag to hide elements.
+			if (!first) {
+				out.println();
 			}
+			if (printMethodHeader(clazz, m, out)) {
+				printMethodCode(clazz, m, out);
+				printFooter(clazz, out);
+				first = false;
+				count++;
+			}
+			// }
 		}
 		return count > 0;
 	}
@@ -94,11 +92,11 @@ public class PrettyPrinter extends EnumCompatiblePrinter {
 
 	@Override
 	protected boolean printMethodHeader(ParsedClass clazz, ParsedMethod m, PrintStream out) {
-		if (!m.getFlags().contains(MethodFlag.SYNTHETIC)) {
-			out.print(getIndent(currentIndent++));
-			return super.printMethodHeader(clazz, m, out);
-		}
-		return false;
+		// if (!m.getFlags().contains(MethodFlag.SYNTHETIC)) { //This can be abused by nefarious people setting the synthetic flag to hide elements.
+		out.print(getIndent(currentIndent++));
+		return super.printMethodHeader(clazz, m, out);
+		// }
+		// return false;
 	}
 
 	@Override
@@ -118,5 +116,22 @@ public class PrettyPrinter extends EnumCompatiblePrinter {
 			return "";
 		}
 		return INDENT_LONG.substring(0, level * INDENT_CHAR.length());
+	}
+
+	public static class Factory implements AbstractPrinterFactory {
+		private static final Factory instance = new Factory();
+
+		private Factory( ) {
+			// do nothing
+		}
+
+		@Override
+		public AbstractPrinter createPrinter( ) {
+			return new PrettyPrinter();
+		}
+
+		public static Factory getInstance( ) {
+			return instance;
+		}
 	}
 }

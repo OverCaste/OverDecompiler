@@ -120,6 +120,7 @@ public class JavaParser extends AbstractParser {
 
 	public ParsedMethod parseMethod(ClassData fromClass, ParsedClass toClass, MethodData data) throws InvalidConstantPoolPointerException {
 		String descriptor = data.getDescription(fromClass.getConstantPool());
+		System.out.println("Descriptor: " + descriptor);
 		ClassPath returnClassPath = ClassPath.getMethodReturnType(descriptor);
 		addImport(toClass, returnClassPath);
 		ParsedMethod parsed = new ParsedMethod(returnClassPath, data.getName(fromClass.getConstantPool()));
@@ -186,5 +187,22 @@ public class JavaParser extends AbstractParser {
 	@Override
 	public AbstractMethodParser getMethodParser(ClassData c) {
 		return methodParser;
+	}
+
+	public static class Factory implements AbstractParserFactory {
+		private static final Factory instance = new Factory();
+
+		private Factory( ) {
+			// do nothing
+		}
+
+		@Override
+		public AbstractParser createParser( ) {
+			return new JavaParser();
+		}
+
+		public static Factory getInstance( ) {
+			return instance;
+		}
 	}
 }

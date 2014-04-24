@@ -5,7 +5,7 @@ import user.theovercaste.overdecompiler.parserdata.ParsedMethod;
 
 import com.google.common.base.Preconditions;
 
-public class MethodActionGetConstant implements MethodActionGetter {
+public class MethodActionGetConstant extends MethodActionGetter {
 	public enum ConstantType {
 		CHAR,
 		BYTE,
@@ -21,7 +21,8 @@ public class MethodActionGetConstant implements MethodActionGetter {
 	private String value;
 	private ConstantType type;
 
-	public MethodActionGetConstant(String value, ConstantType type) {
+	public MethodActionGetConstant(int lineNumber, String value, ConstantType type) {
+		super(lineNumber);
 		Preconditions.checkNotNull(type);
 		if (type == ConstantType.NULL) {
 			Preconditions.checkArgument(value == null, "If type is 'null', value must be null!");

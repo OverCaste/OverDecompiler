@@ -27,16 +27,21 @@ public class InstructionStoreNumbered extends Instruction {
 	}
 
 	@Override
-	public MethodAction getAction(ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
+	public MethodAction getAction(int lineNumber, ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
 		if (stack.isEmpty()) {
 			throw new EndOfStackException();
 		}
 		MethodAction a = stack.pop();
 		if (a instanceof MethodActionGetter) {
-			return new MethodActionSetVariable(getNumber(), (MethodActionGetter) a);
+			return new MethodActionSetVariable(lineNumber, getNumber(), (MethodActionGetter) a);
 		} else {
 			throw new InvalidStackTypeException(a);
 		}
+	}
+
+	@Override
+	public int getByteSize( ) {
+		return 0;
 	}
 
 	public static int[] getOpcodes( ) {

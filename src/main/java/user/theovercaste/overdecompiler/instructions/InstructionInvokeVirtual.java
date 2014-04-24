@@ -38,7 +38,7 @@ public class InstructionInvokeVirtual extends Instruction {
 	}
 
 	@Override
-	public MethodAction getAction(ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
+	public MethodAction getAction(int lineNumber, ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
 		try {
 			String descriptor = getMethod(originClass.getConstantPool()).getDescription(originClass.getConstantPool());
 			Collection<ClassPath> arguments = ClassPath.getMethodArguments(descriptor);
@@ -55,13 +55,18 @@ public class InstructionInvokeVirtual extends Instruction {
 			}
 			MethodAction a = stack.pop();
 			if (a instanceof MethodActionGetter) {
-				return new MethodActionInvokeMethod((MethodActionGetter) a, getMethod(originClass.getConstantPool()).getName(originClass.getConstantPool()), actions);
+				return new MethodActionInvokeMethod(lineNumber, (MethodActionGetter) a, getMethod(originClass.getConstantPool()).getName(originClass.getConstantPool()), actions);
 			} else {
 				throw new InstructionParsingException("The instruction which owns this invoker isn't a proper type! (" + a.getClass().getName() + ")");
 			}
 		} catch (InvalidConstantPoolPointerException e) {
 			throw new InstructionParsingException(e);
 		}
+	}
+
+	@Override
+	public int getByteSize( ) {
+		return 2;
 	}
 
 	public static int[] getOpcodes( ) {

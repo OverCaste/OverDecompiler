@@ -24,8 +24,13 @@ public class InstructionLoadNumbered extends Instruction {
 	}
 
 	@Override
-	public MethodAction getAction(ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
-		return new MethodActionLoadVariable(getNumber());
+	public MethodAction getAction(int lineNumber, ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
+		return new MethodActionLoadVariable(lineNumber, getNumber());
+	}
+
+	@Override
+	public int getByteSize( ) {
+		return 0;
 	}
 
 	public static int[] getOpcodes( ) {

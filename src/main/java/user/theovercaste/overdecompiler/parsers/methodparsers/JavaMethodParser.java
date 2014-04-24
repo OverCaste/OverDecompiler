@@ -26,16 +26,19 @@ public class JavaMethodParser extends AbstractMethodParser {
 		}
 		try (DataInputStream din = new DataInputStream(new ByteArrayInputStream(code.getCode()))) {
 			Stack<MethodAction> stack = new Stack<MethodAction>();
+			int lineNumberCounter = 0;
 			for (int opcode = din.read(); opcode >= 0; opcode = din.read()) {
 				Instruction i = InstructionFactory.loadInstruction(opcode, din);
 				if (i.isAction()) {
 					try {
-						MethodAction a = i.getAction(fromClass, stack);
+						MethodAction a = i.getAction(lineNumberCounter, fromClass, stack);
 						stack.push(a);
 					} catch (InstructionParsingException e) {
 						e.printStackTrace();
 					}
 				}
+				lineNumberCounter += i.getByteSize();
+				lineNumberCounter++;
 			}
 			for (MethodAction a : stack) {
 				value.addAction(a);

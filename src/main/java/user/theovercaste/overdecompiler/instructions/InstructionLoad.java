@@ -31,8 +31,13 @@ public class InstructionLoad extends Instruction {
 	}
 
 	@Override
-	public MethodAction getAction(ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
-		return new MethodActionLoadVariable(referenceIndex);
+	public MethodAction getAction(int lineNumber, ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
+		return new MethodActionLoadVariable(lineNumber, referenceIndex);
+	}
+
+	@Override
+	public int getByteSize( ) {
+		return 1;
 	}
 
 	public static Factory factory( ) {

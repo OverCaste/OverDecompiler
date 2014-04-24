@@ -24,8 +24,13 @@ public class InstructionByteIntegerPush extends Instruction {
 	}
 
 	@Override
-	public MethodAction getAction(ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
-		return new MethodActionGetConstant(String.valueOf(byteValue), ConstantType.INT);
+	public MethodAction getAction(int lineNumber, ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
+		return new MethodActionGetConstant(lineNumber, String.valueOf(byteValue), ConstantType.INT);
+	}
+
+	@Override
+	public int getByteSize( ) {
+		return 1;
 	}
 
 	public static int[] getOpcodes( ) {

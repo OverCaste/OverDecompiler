@@ -32,7 +32,7 @@ public class InstructionConstantNumber extends Instruction {
 	}
 
 	@Override
-	public MethodAction getAction(ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
+	public MethodAction getAction(int lineNumber, ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
 		switch (getOpcode()) {
 			case 0x02:
 			case 0x03:
@@ -41,20 +41,25 @@ public class InstructionConstantNumber extends Instruction {
 			case 0x06:
 			case 0x07:
 			case 0x08:
-				return new MethodActionGetConstant(String.valueOf(getOpcode() - 0x03), ConstantType.INT); // iconst_m1's opcode is 02, and it's value is -1. (2--1 = 3) All other values are sequential.
+				return new MethodActionGetConstant(lineNumber, String.valueOf(getOpcode() - 0x03), ConstantType.INT); // iconst_m1's opcode is 02, and it's value is -1. (2--1 = 3) All other values are sequential.
 			case 0x09:
 			case 0x0A:
-				return new MethodActionGetConstant(String.valueOf(getOpcode() - 0x09), ConstantType.LONG); // lconst_0's opcode is 09, and it's value is 0. (9-0 = 9) The only other value is sequential.
+				return new MethodActionGetConstant(lineNumber, String.valueOf(getOpcode() - 0x09), ConstantType.LONG); // lconst_0's opcode is 09, and it's value is 0. (9-0 = 9) The only other value is sequential.
 			case 0x0B:
 			case 0x0C:
 			case 0x0D:
-				return new MethodActionGetConstant(String.valueOf(getOpcode() - 0x0B), ConstantType.FLOAT); // fconst_0's opcode is 0x0B and it's value is 0. (0B-0 = 0B) All other values are sequential.
+				return new MethodActionGetConstant(lineNumber, String.valueOf(getOpcode() - 0x0B), ConstantType.FLOAT); // fconst_0's opcode is 0x0B and it's value is 0. (0B-0 = 0B) All other values are sequential.
 			case 0x0E:
 			case 0x0F:
-				return new MethodActionGetConstant(String.valueOf(getOpcode() - 0x0E), ConstantType.DOUBLE); // dconst_0's opcode is 0x0E, and it's value is 0. (0E-0 = 0E) The only other value is sequential.
+				return new MethodActionGetConstant(lineNumber, String.valueOf(getOpcode() - 0x0E), ConstantType.DOUBLE); // dconst_0's opcode is 0x0E, and it's value is 0. (0E-0 = 0E) The only other value is sequential.
 			default:
 				throw new InstructionParsingException("ConstantNumber's opcode is invalid! (" + opcode + ")");
 		}
+	}
+
+	@Override
+	public int getByteSize( ) {
+		return 0;
 	}
 
 	public static Factory factory( ) {

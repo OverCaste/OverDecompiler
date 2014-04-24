@@ -27,7 +27,7 @@ public class InstructionAdd extends Instruction {
 	}
 
 	@Override
-	public MethodAction getAction(ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
+	public MethodAction getAction(int lineNumber, ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
 		if (stack.isEmpty()) {
 			throw new EndOfStackException();
 		}
@@ -35,13 +35,18 @@ public class InstructionAdd extends Instruction {
 		MethodAction valueTwo = stack.pop();
 		if (valueOne instanceof MethodActionGetter) {
 			if (valueTwo instanceof MethodActionGetter) {
-				return new MethodActionAdd((MethodActionGetter) valueOne, (MethodActionGetter) valueTwo);
+				return new MethodActionAdd(lineNumber, (MethodActionGetter) valueOne, (MethodActionGetter) valueTwo);
 			} else {
 				throw new InvalidStackTypeException(valueTwo);
 			}
 		} else {
 			throw new InvalidStackTypeException(valueOne);
 		}
+	}
+
+	@Override
+	public int getByteSize( ) {
+		return 0;
 	}
 
 	public static Factory factory( ) {

@@ -23,8 +23,13 @@ public class InstructionReturnVoid extends Instruction {
 	}
 
 	@Override
-	public MethodAction getAction(ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
-		return new MethodActionReturnVoid();
+	public MethodAction getAction(int lineNumber, ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
+		return new MethodActionReturnVoid(lineNumber);
+	}
+
+	@Override
+	public int getByteSize( ) {
+		return 0;
 	}
 
 	public static int[] getOpcodes( ) {

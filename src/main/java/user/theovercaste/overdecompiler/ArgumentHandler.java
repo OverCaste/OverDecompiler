@@ -13,17 +13,19 @@ public class ArgumentHandler {
 	private final ImmutableList<String> argumentList;
 	private final ImmutableSet<Character> booleanValues;
 	private final ImmutableMap<String, String> argumentValues;
+	private final ImmutableSet<String> argumentFlags;
 
 	public ArgumentHandler(String[] args) throws ArgumentParsingException {
 		ImmutableList.Builder<String> argumentListBuilder = ImmutableList.<String> builder();
 		ImmutableSet.Builder<Character> booleanValuesBuilder = ImmutableSet.<Character> builder();
 		ImmutableMap.Builder<String, String> argumentValuesBuilder = ImmutableMap.<String, String> builder();
+		ImmutableSet.Builder<String> argumentFlagsBuilder = ImmutableSet.<String> builder();
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].startsWith("--")) {
-				if (i == (args.length - 1)) { // It's the last argument
-					throw new ArgumentParsingException("The argument \"" + args[i] + "\" doesn't have a defined value!");
+				if (i != (args.length - 1)) { // It's the last argument
+					argumentValuesBuilder.put(args[i].substring(2), args[i + 1]);
 				}
-				argumentValuesBuilder.put(args[i].substring(2), args[i + 1]);
+				argumentFlagsBuilder.add(args[i].substring(2));
 			} else if (args[i].startsWith("-")) {
 				char[] chars = args[i].toCharArray();
 				for (int j = 1; j < chars.length; j++) { // Skip the first character (the -)
@@ -36,19 +38,30 @@ public class ArgumentHandler {
 		argumentList = argumentListBuilder.build();
 		booleanValues = booleanValuesBuilder.build();
 		argumentValues = argumentValuesBuilder.build();
+		argumentFlags = argumentFlagsBuilder.build();
 	}
 
-	public static void sendUsageMessage( ) {
-		System.out.println("Usage: overdecompiler (options) [file]");
-		System.out.println("where possible options include:");
-		System.out.println("  -help  --help  -?\t\tPrint this usage message");
-		System.out.println("  --parser (class)\t\tSpecify a parser to be used.");
-		System.out.println("  --printer (class)\t\tSpecify the printer to be used.");
+	public static void sendDefaultUsageMessage( ) {
+		for (String s : getDefaultUsage()) {
+			System.out.println(s);
+		}
+	}
+
+	public static String[] getDefaultUsage( ) {
+		return new String[] {
+				"Usage: overdecompiler (options) [file]",
+				"where possible options include:",
+				"  --help  -?\t\tPrint this usage message",
+				"  --action [class]\t\tSpecify the action to be performed."
+		};
 	}
 
 	@SuppressWarnings("unchecked")
 	// Actually checked by isAssignableFrom
 	public <T> T getClassArgument(String key, String defaultPackage, T def, Class<T> type) throws ArgumentParsingException {
+		if (!argumentFlags.contains(key)) {
+			return def;
+		}
 		if (!argumentValues.containsKey(key)) {
 			return def;
 		}
@@ -75,11 +88,15 @@ public class ArgumentHandler {
 		} catch (SecurityException e) {
 			e.printStackTrace();
 		}
-		throw new ArgumentParsingException("The -" + key + " flag's value isn't an instance of " + type.getName() + ".");
+		throw new ArgumentParsingException("The " + key + " flag's value isn't an instance of " + type.getName() + ".");
 	}
 
 	public boolean checkFlagExists(char c) {
 		return booleanValues.contains(c);
+	}
+
+	public boolean checkFlagExists(String s) {
+		return argumentFlags.contains(s);
 	}
 
 	public int getArgumentsSize( ) {

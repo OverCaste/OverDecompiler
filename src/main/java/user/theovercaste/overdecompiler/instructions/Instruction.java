@@ -17,7 +17,7 @@ public abstract class Instruction {
 
 	public abstract boolean isAction( );
 
-	public abstract MethodAction getAction(ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException;
+	public abstract MethodAction getAction(int lineNumber, ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException;
 
 	public int getOpcode( ) {
 		return opcode;
@@ -26,4 +26,6 @@ public abstract class Instruction {
 	public static abstract class Factory {
 		public abstract Instruction load(int opcode, DataInputStream din) throws IOException;
 	}
+
+	public abstract int getByteSize( );
 }

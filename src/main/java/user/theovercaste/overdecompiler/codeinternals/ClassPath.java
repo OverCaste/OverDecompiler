@@ -166,6 +166,7 @@ public class ClassPath {
 	 * @return The return classpath.
 	 */
 	public static ClassPath getMethodReturnType(String descriptor) {
+		System.out.println("Getting return type for: " + descriptor);
 		int closingBraceIndex = descriptor.indexOf(")");
 		String returnDescriptor = (closingBraceIndex < 0 ? descriptor : descriptor.substring(closingBraceIndex + 1, descriptor.length()));
 		return demangle(returnDescriptor);

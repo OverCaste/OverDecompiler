@@ -105,10 +105,9 @@ public abstract class JavaPrinter extends AbstractPrinter {
 	}
 
 	protected boolean printField(ParsedClass clazz, ParsedField f, PrintStream out) {
-		if (f.getFlags().contains(FieldFlag.SYNTHETIC)) {
-			// don't print
-			return false;
-		}
+		// if (f.getFlags().contains(FieldFlag.SYNTHETIC)) { This can be abused by nefarious people setting the synthetic flag to hide elements.
+		// return false;// don't print
+		// }
 		if (f.getFlags().contains(FieldFlag.PUBLIC)) {
 			out.print("public ");
 		} else if (f.getFlags().contains(FieldFlag.PRIVATE)) {
@@ -166,9 +165,9 @@ public abstract class JavaPrinter extends AbstractPrinter {
 	}
 
 	protected boolean printMethodHeader(final ParsedClass clazz, final ParsedMethod m, PrintStream out) {
-		if (m.getFlags().contains(MethodFlag.SYNTHETIC)) {
-			return false;
-		}
+		// if (m.getFlags().contains(MethodFlag.SYNTHETIC)) { This can be abused by nefarious people setting the synthetic flag to hide elements.
+		// return false;// don't print
+		// }
 		if (m.getFlags().contains(MethodFlag.PUBLIC)) {
 			out.print("public ");
 		} else if (m.getFlags().contains(MethodFlag.PRIVATE)) {
@@ -213,7 +212,12 @@ public abstract class JavaPrinter extends AbstractPrinter {
 				}
 			})));
 		}
-		out.print(") {");
+		out.print(")");
+		if (m.getFlags().contains(MethodFlag.NATIVE) || m.getFlags().contains(MethodFlag.ABSTRACT)) {
+			out.print(";");
+		} else {
+			out.print(" {");
+		}
 		out.println();
 		return true;
 	}
