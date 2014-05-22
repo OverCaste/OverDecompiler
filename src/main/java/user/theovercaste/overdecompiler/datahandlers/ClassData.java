@@ -6,12 +6,12 @@ import java.util.List;
 
 import user.theovercaste.overdecompiler.attributes.AttributableElement;
 import user.theovercaste.overdecompiler.attributes.AttributeData;
-import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntry;
+import user.theovercaste.overdecompiler.constantpool.ConstantPool;
 
 import com.google.common.collect.Lists;
 
 public class ClassData implements AttributableElement {
-    private final ConstantPoolEntry[] constantPool;
+    private final ConstantPool constantPool;
     private int classId;
     private int parentId;
     private int flags;
@@ -21,7 +21,7 @@ public class ClassData implements AttributableElement {
     private final List<ClassData> nestedClasses = Lists.newArrayList();
     private final List<AttributeData> attributes = Lists.newArrayList();
 
-    public ClassData(ConstantPoolEntry[] constantPool) {
+    public ClassData(ConstantPool constantPool) {
         this.constantPool = constantPool;
     }
 
@@ -87,7 +87,7 @@ public class ClassData implements AttributableElement {
         this.flags = flags;
     }
 
-    public ConstantPoolEntry[] getConstantPool( ) {
+    public ConstantPool getConstantPool( ) {
         return constantPool;
     }
 }

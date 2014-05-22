@@ -4,7 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntry;
+import user.theovercaste.overdecompiler.constantpool.ConstantPool;
 import user.theovercaste.overdecompiler.exceptions.InvalidAttributeException;
 
 public class LineNumberTableAttribute extends ParsedAttribute {
@@ -46,7 +46,7 @@ public class LineNumberTableAttribute extends ParsedAttribute {
 
     public static class Parser extends ParsedAttribute.Parser<LineNumberTableAttribute> {
         @Override
-        public LineNumberTableAttribute parse(AttributeData a, ConstantPoolEntry[] constantPool) throws InvalidAttributeException {
+        public LineNumberTableAttribute parse(AttributeData a, ConstantPool constantPool) throws InvalidAttributeException {
             try (DataInputStream din = new DataInputStream(new ByteArrayInputStream(a.data))) {
                 LineNumberTableValue[] table = new LineNumberTableValue[din.readUnsignedShort()];
                 for (int i = 0; i < table.length; i++) {

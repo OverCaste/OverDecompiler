@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.util.Collection;
 
 import user.theovercaste.overdecompiler.attributes.AttributeData;
+import user.theovercaste.overdecompiler.constantpool.ConstantPool;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntries;
-import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntry;
 import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.datahandlers.FieldData;
 import user.theovercaste.overdecompiler.datahandlers.MethodData;
@@ -68,10 +68,10 @@ public class ClassDecompiler {
                 System.out.println("Warning: This class file's version is " + majorVersion + "." + minorVersion + ". OverDecompiler is only tested with classes of version 52.0");
             }
             int constantPoolCount = din.readUnsignedShort();
-            ConstantPoolEntry[] constantPool = new ConstantPoolEntry[constantPoolCount];
+            ConstantPool constantPool = new ConstantPool(constantPoolCount);
             for (int i = 1; i < constantPoolCount; i++) {
                 try {
-                    constantPool[i] = ConstantPoolEntries.readEntry(din);
+                    constantPool.set(i, ConstantPoolEntries.readEntry(din));
                 } catch (InvalidConstantPoolEntryException e) {
                     System.out.println("Warning: invalid constant pool entry found at index " + i + ".");
                 }

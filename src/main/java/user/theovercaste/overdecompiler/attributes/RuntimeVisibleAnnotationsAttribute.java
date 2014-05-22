@@ -4,7 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntry;
+import user.theovercaste.overdecompiler.constantpool.ConstantPool;
 import user.theovercaste.overdecompiler.exceptions.InvalidAttributeException;
 
 import com.google.common.collect.ImmutableList;
@@ -60,7 +60,7 @@ public class RuntimeVisibleAnnotationsAttribute extends ParsedAttribute {
 
     public static class Parser extends ParsedAttribute.Parser<RuntimeVisibleAnnotationsAttribute> {
         @Override
-        public RuntimeVisibleAnnotationsAttribute parse(AttributeData a, ConstantPoolEntry[] constantPool) throws InvalidAttributeException {
+        public RuntimeVisibleAnnotationsAttribute parse(AttributeData a, ConstantPool constantPool) throws InvalidAttributeException {
             try (DataInputStream din = new DataInputStream(new ByteArrayInputStream(a.data))) {
                 Annotation[] annotations = new Annotation[din.readUnsignedShort()];
                 for (int i = 0; i < annotations.length; i++) {

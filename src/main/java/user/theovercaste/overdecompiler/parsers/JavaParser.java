@@ -21,7 +21,7 @@ import user.theovercaste.overdecompiler.datahandlers.MethodData;
 import user.theovercaste.overdecompiler.datahandlers.MethodFlagHandler;
 import user.theovercaste.overdecompiler.exceptions.InvalidAttributeException;
 import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
-import user.theovercaste.overdecompiler.exceptions.PoolPreconditions;
+import user.theovercaste.overdecompiler.exceptions.WrongConstantPoolPointerTypeException;
 import user.theovercaste.overdecompiler.parserdata.ParsedClass;
 import user.theovercaste.overdecompiler.parserdata.ParsedField;
 import user.theovercaste.overdecompiler.parserdata.ParsedMethod;
@@ -70,35 +70,32 @@ public class JavaParser extends AbstractParser {
     }
 
     public ClassPath getClassParent(ClassData c) throws InvalidConstantPoolPointerException {
-        PoolPreconditions.assertPoolRange(c.getParentId(), c.getConstantPool().length);
-        ConstantPoolEntry poolEntry = c.getConstantPool()[c.getParentId()];
+        ConstantPoolEntry poolEntry = c.getConstantPool().get(c.getParentId());
         if (poolEntry instanceof ConstantPoolEntryClass) {
             return new ClassPath(((ConstantPoolEntryClass) poolEntry).getName(c.getConstantPool()).replace("/", "."));
         } else {
-            throw PoolPreconditions.getInvalidType(c.getConstantPool(), c.getParentId());
+            throw WrongConstantPoolPointerTypeException.constructException(c.getParentId(), c.getConstantPool(), ConstantPoolEntryClass.class);
         }
     }
 
     public ClassPath getClassPath(ClassData c) throws InvalidConstantPoolPointerException {
-        PoolPreconditions.assertPoolRange(c.getClassId(), c.getConstantPool().length);
-        ConstantPoolEntry poolEntry = c.getConstantPool()[c.getClassId()];
+        ConstantPoolEntry poolEntry = c.getConstantPool().get(c.getClassId());
         if (poolEntry instanceof ConstantPoolEntryClass) {
             return new ClassPath(((ConstantPoolEntryClass) poolEntry).getName(c.getConstantPool()).replace("/", "."));
         } else {
-            throw PoolPreconditions.getInvalidType(c.getConstantPool(), c.getClassId());
+            throw WrongConstantPoolPointerTypeException.constructException(c.getClassId(), c.getConstantPool(), ConstantPoolEntryClass.class);
         }
     }
 
     public void parseInterfaces(ClassData origin, ParsedClass value) throws InvalidConstantPoolPointerException {
         for (int i : origin.getInterfaces()) {
-            PoolPreconditions.assertPoolRange(i, origin.getConstantPool().length);
-            ConstantPoolEntry poolEntry = origin.getConstantPool()[i];
+            ConstantPoolEntry poolEntry = origin.getConstantPool().get(i);
             if (poolEntry instanceof ConstantPoolEntryClass) {
                 ClassPath classPath = new ClassPath(((ConstantPoolEntryClass) poolEntry).getName(origin.getConstantPool()).replace("/", "."));
                 addImport(value, classPath);
                 value.addInterface(classPath);
             } else {
-                throw PoolPreconditions.getInvalidType(origin.getConstantPool(), origin.getParentId());
+                throw WrongConstantPoolPointerTypeException.constructException(origin.getParentId(), origin.getConstantPool(), ConstantPoolEntryClass.class);
             }
         }
     }

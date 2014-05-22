@@ -5,12 +5,13 @@ import java.io.IOException;
 import java.util.Stack;
 
 import user.theovercaste.overdecompiler.codeinternals.ClassPath;
+import user.theovercaste.overdecompiler.constantpool.ConstantPool;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntry;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryFieldReference;
 import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
 import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
-import user.theovercaste.overdecompiler.exceptions.PoolPreconditions;
+import user.theovercaste.overdecompiler.exceptions.WrongConstantPoolPointerTypeException;
 import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
 import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetStaticField;
 import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
@@ -28,13 +29,12 @@ public class InstructionGetStatic extends Instruction {
         this.nameIndex = nameIndex;
     }
 
-    public ConstantPoolEntryFieldReference getField(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
-        PoolPreconditions.assertPoolRange(nameIndex, constantPool.length);
-        ConstantPoolEntry e = constantPool[nameIndex];
+    public ConstantPoolEntryFieldReference getField(ConstantPool constantPool) throws InvalidConstantPoolPointerException {
+        ConstantPoolEntry e = constantPool.get(nameIndex);
         if (e instanceof ConstantPoolEntryFieldReference) {
             return (ConstantPoolEntryFieldReference) e;
         }
-        throw PoolPreconditions.getInvalidType(constantPool, nameIndex);
+        throw WrongConstantPoolPointerTypeException.constructException(nameIndex, constantPool, ConstantPoolEntryFieldReference.class);
     }
 
     @Override

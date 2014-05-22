@@ -17,7 +17,7 @@ public class ConstantPoolEntryMethodType extends ConstantPoolEntry {
         return descriptorIndex;
     }
 
-    public String getDescription(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
+    public String getDescription(ConstantPool constantPool) throws InvalidConstantPoolPointerException {
         return ConstantPoolValueRetriever.getString(constantPool, descriptorIndex);
     }
 

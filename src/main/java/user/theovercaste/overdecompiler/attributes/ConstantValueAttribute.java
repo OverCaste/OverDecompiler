@@ -4,7 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntry;
+import user.theovercaste.overdecompiler.constantpool.ConstantPool;
 import user.theovercaste.overdecompiler.exceptions.InvalidAttributeException;
 
 public class ConstantValueAttribute extends ParsedAttribute {
@@ -42,7 +42,7 @@ public class ConstantValueAttribute extends ParsedAttribute {
 
     public static class Parser extends ParsedAttribute.Parser<ConstantValueAttribute> {
         @Override
-        public ConstantValueAttribute parse(AttributeData a, ConstantPoolEntry[] constantPool) throws InvalidAttributeException {
+        public ConstantValueAttribute parse(AttributeData a, ConstantPool constantPool) throws InvalidAttributeException {
             try (DataInputStream din = new DataInputStream(new ByteArrayInputStream(a.data))) {
                 return new ConstantValueAttribute(din.readUnsignedShort());
             } catch (IOException e) {

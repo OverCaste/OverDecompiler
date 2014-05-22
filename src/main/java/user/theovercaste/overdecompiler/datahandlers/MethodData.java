@@ -8,7 +8,7 @@ import java.util.List;
 
 import user.theovercaste.overdecompiler.attributes.AttributableElement;
 import user.theovercaste.overdecompiler.attributes.AttributeData;
-import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntry;
+import user.theovercaste.overdecompiler.constantpool.ConstantPool;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolValueRetriever;
 import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
 
@@ -48,11 +48,11 @@ public class MethodData implements AttributableElement {
         return Collections.unmodifiableCollection(attributes);
     }
 
-    public String getName(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
+    public String getName(ConstantPool constantPool) throws InvalidConstantPoolPointerException {
         return ConstantPoolValueRetriever.getString(constantPool, nameIndex);
     }
 
-    public String getDescription(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
+    public String getDescription(ConstantPool constantPool) throws InvalidConstantPoolPointerException {
         return ConstantPoolValueRetriever.getString(constantPool, descriptorIndex);
     }
 

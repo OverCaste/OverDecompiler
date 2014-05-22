@@ -1,6 +1,6 @@
 package user.theovercaste.overdecompiler.attributes;
 
-import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntry;
+import user.theovercaste.overdecompiler.constantpool.ConstantPool;
 import user.theovercaste.overdecompiler.exceptions.InvalidAttributeException;
 import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
 
@@ -41,14 +41,14 @@ public enum AttributeTypes {
         return builder.build();
     }
 
-    public static ParsedAttribute parseAttribute(AttributeData parent, ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException, InvalidAttributeException {
+    public static ParsedAttribute parseAttribute(AttributeData parent, ConstantPool constantPool) throws InvalidConstantPoolPointerException, InvalidAttributeException {
         String name = parent.getName(constantPool);
         ParsedAttribute.Parser<?> w = nameParserMap.get(name);
         return w.parse(parent, constantPool);
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends ParsedAttribute> T wrapAttribute(AttributeData a, ConstantPoolEntry[] constantPool, Class<T> clazz) throws InvalidConstantPoolPointerException, InvalidAttributeException {
+    public static <T extends ParsedAttribute> T wrapAttribute(AttributeData a, ConstantPool constantPool, Class<T> clazz) throws InvalidConstantPoolPointerException, InvalidAttributeException {
         ParsedAttribute wrapped = parseAttribute(a, constantPool);
         if (clazz.isInstance(wrapped)) {
             return (T) wrapped;
@@ -56,7 +56,7 @@ public enum AttributeTypes {
         throw new InvalidAttributeException("Attribute isn't expected type: " + wrapped.getClass().getSimpleName() + ". Expected: " + clazz.getSimpleName());
     }
 
-    public static Optional<ParsedAttribute> getWrappedAttribute(Iterable<AttributeData> attributes, ConstantPoolEntry[] constantPool, String name) throws InvalidConstantPoolPointerException,
+    public static Optional<ParsedAttribute> getWrappedAttribute(Iterable<AttributeData> attributes, ConstantPool constantPool, String name) throws InvalidConstantPoolPointerException,
             InvalidAttributeException {
         for (AttributeData a : attributes) {
             if (a.getName(constantPool).equals(name)) {
@@ -66,7 +66,7 @@ public enum AttributeTypes {
         return Optional.absent();
     }
 
-    public static <T extends ParsedAttribute> Optional<T> getWrappedAttribute(Iterable<AttributeData> attributes, ConstantPoolEntry[] constantPool, Class<T> clazz)
+    public static <T extends ParsedAttribute> Optional<T> getWrappedAttribute(Iterable<AttributeData> attributes, ConstantPool constantPool, Class<T> clazz)
             throws InvalidConstantPoolPointerException, InvalidAttributeException {
         String name = classNameMap.get(clazz);
         for (AttributeData a : attributes) {

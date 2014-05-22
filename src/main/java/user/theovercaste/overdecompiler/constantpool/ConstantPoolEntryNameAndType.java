@@ -23,11 +23,11 @@ public class ConstantPoolEntryNameAndType extends ConstantPoolEntry {
         return new Factory();
     }
 
-    public String getName(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
+    public String getName(ConstantPool constantPool) throws InvalidConstantPoolPointerException {
         return ConstantPoolValueRetriever.getString(constantPool, nameIndex);
     }
 
-    public String getDescription(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
+    public String getDescription(ConstantPool constantPool) throws InvalidConstantPoolPointerException {
         return ConstantPoolValueRetriever.getString(constantPool, descriptorIndex);
     }
 

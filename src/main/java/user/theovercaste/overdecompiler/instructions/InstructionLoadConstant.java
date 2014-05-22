@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Stack;
 
+import user.theovercaste.overdecompiler.constantpool.ConstantPool;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntry;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryClass;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryFloat;
@@ -38,8 +39,8 @@ public class InstructionLoadConstant extends Instruction {
         return new int[] {0x12};
     }
 
-    public ConstantPoolEntry getValue(ConstantPoolEntry[] constantPool) {
-        return constantPool[constantIndex];
+    public ConstantPoolEntry getValue(ConstantPool constantPool) {
+        return constantPool.get(constantIndex);
     }
 
     public static Factory factory( ) {

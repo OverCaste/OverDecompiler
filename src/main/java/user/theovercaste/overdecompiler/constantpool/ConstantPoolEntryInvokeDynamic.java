@@ -23,11 +23,11 @@ public class ConstantPoolEntryInvokeDynamic extends ConstantPoolEntry {
         return nameAndTypeIndex;
     }
 
-    public String getName(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
+    public String getName(ConstantPool constantPool) throws InvalidConstantPoolPointerException {
         return ConstantPoolValueRetriever.getNameAndTypeName(constantPool, nameAndTypeIndex);
     }
 
-    public String getDescription(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
+    public String getDescription(ConstantPool constantPool) throws InvalidConstantPoolPointerException {
         return ConstantPoolValueRetriever.getNameAndTypeDescription(constantPool, nameAndTypeIndex);
     }
 

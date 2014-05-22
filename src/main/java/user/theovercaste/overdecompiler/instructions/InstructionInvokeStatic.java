@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Stack;
 
 import user.theovercaste.overdecompiler.codeinternals.ClassPath;
+import user.theovercaste.overdecompiler.constantpool.ConstantPool;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntry;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryMethodReference;
 import user.theovercaste.overdecompiler.datahandlers.ClassData;
@@ -29,8 +30,8 @@ public class InstructionInvokeStatic extends Instruction {
         this.methodIndex = methodIndex;
     }
 
-    public ConstantPoolEntryMethodReference getMethod(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
-        ConstantPoolEntry e = constantPool[methodIndex];
+    public ConstantPoolEntryMethodReference getMethod(ConstantPool constantPool) throws InvalidConstantPoolPointerException {
+        ConstantPoolEntry e = constantPool.get(methodIndex);
         if (e instanceof ConstantPoolEntryMethodReference) {
             return (ConstantPoolEntryMethodReference) e;
         }

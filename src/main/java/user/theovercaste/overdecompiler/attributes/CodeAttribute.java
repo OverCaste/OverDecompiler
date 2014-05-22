@@ -4,7 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntry;
+import user.theovercaste.overdecompiler.constantpool.ConstantPool;
 import user.theovercaste.overdecompiler.exceptions.InvalidAttributeException;
 
 public class CodeAttribute extends ParsedAttribute {
@@ -66,7 +66,7 @@ public class CodeAttribute extends ParsedAttribute {
 
     public static class Parser extends ParsedAttribute.Parser<CodeAttribute> {
         @Override
-        public CodeAttribute parse(AttributeData a, ConstantPoolEntry[] constantPool) throws InvalidAttributeException {
+        public CodeAttribute parse(AttributeData a, ConstantPool constantPool) throws InvalidAttributeException {
             try (DataInputStream din = new DataInputStream(new ByteArrayInputStream(a.data))) {
                 int maxStack = din.readUnsignedShort();
                 int maxLocals = din.readUnsignedShort();
