@@ -9,43 +9,49 @@ import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
 import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
 import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetConstant;
 import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetConstant.ConstantType;
+import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
 
 public class InstructionByteIntegerPush extends Instruction {
-	private final int byteValue;
+    private final int byteValue;
 
-	public InstructionByteIntegerPush(int opcode, int byteValue) {
-		super(opcode);
-		this.byteValue = byteValue;
-	}
+    public InstructionByteIntegerPush(int opcode, int byteIndex, int instructionIndex, int lineNumber, int byteValue) {
+        super(opcode, byteIndex, instructionIndex, lineNumber);
+        this.byteValue = byteValue;
+    }
 
-	@Override
-	public boolean isAction( ) {
-		return true;
-	}
+    public InstructionByteIntegerPush(int opcode, int byteIndex, int instructionIndex, int byteValue) {
+        super(opcode, byteIndex, instructionIndex);
+        this.byteValue = byteValue;
+    }
 
-	@Override
-	public MethodAction getAction(int lineNumber, ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
-		return new MethodActionGetConstant(lineNumber, String.valueOf(byteValue), ConstantType.INT);
-	}
+    @Override
+    public boolean isAction( ) {
+        return true;
+    }
 
-	@Override
-	public int getByteSize( ) {
-		return 1;
-	}
+    @Override
+    public MethodAction getAction(ClassData originClass, Stack<MethodMember> stack) throws InstructionParsingException {
+        return new MethodActionGetConstant(String.valueOf(byteValue), ConstantType.INT);
+    }
 
-	public static int[] getOpcodes( ) {
-		return new int[] {0x10};
-	}
+    @Override
+    public int getByteSize( ) {
+        return 1;
+    }
 
-	public static Factory factory( ) {
-		return new Factory();
-	}
+    public static int[] getOpcodes( ) {
+        return new int[] {0x10};
+    }
 
-	public static class Factory extends Instruction.Factory {
-		@Override
-		public InstructionByteIntegerPush load(int opcode, DataInputStream din) throws IOException {
-			int b = din.readByte();
-			return new InstructionByteIntegerPush(opcode, b);
-		}
-	}
+    public static Factory factory( ) {
+        return new Factory();
+    }
+
+    public static class Factory extends Instruction.Factory {
+        @Override
+        public InstructionByteIntegerPush load(int opcode, DataInputStream din) throws IOException {
+            int b = din.readByte();
+            return new InstructionByteIntegerPush(opcode, byteIndex, instructionIndex, lineNumber, b);
+        }
+    }
 }

@@ -7,25 +7,75 @@ import java.util.Stack;
 import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
 import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
+import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
 
 public abstract class Instruction {
-	protected final int opcode;
+    /**
+     * The byte ID of this instruction.
+     */
+    protected final int opcode;
+    /**
+     * The byte location in the instructions stack of this specific instruction. Used for goto and other statements.
+     */
+    protected final int byteIndex;
+    /**
+     * The index in the instruction stack of this specific instruction.
+     */
+    protected final int instructionIndex;
 
-	protected Instruction(int opcode) {
-		this.opcode = opcode;
-	}
+    protected final int lineNumber;
 
-	public abstract boolean isAction( );
+    protected final boolean hasLineNumber;
 
-	public abstract MethodAction getAction(int lineNumber, ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException;
+    protected Instruction(int opcode, int byteIndex, int instructionIndex, int lineNumber) {
+        this.opcode = opcode;
+        this.byteIndex = byteIndex;
+        this.instructionIndex = instructionIndex;
+        this.lineNumber = lineNumber;
+        hasLineNumber = lineNumber >= 0;
+    }
 
-	public int getOpcode( ) {
-		return opcode;
-	}
+    protected Instruction(int opcode, int byteIndex, int instructionIndex) {
+        this.opcode = opcode;
+        this.byteIndex = byteIndex;
+        this.instructionIndex = instructionIndex;
+        lineNumber = -1;
+        hasLineNumber = false;
+    }
 
-	public static abstract class Factory {
-		public abstract Instruction load(int opcode, DataInputStream din) throws IOException;
-	}
+    public abstract boolean isAction( );
 
-	public abstract int getByteSize( );
+    public abstract MethodAction getAction(ClassData originClass, Stack<MethodMember> stack) throws InstructionParsingException;
+
+    public int getOpcode( ) {
+        return opcode;
+    }
+
+    public static abstract class Factory {
+        protected int byteIndex;
+        protected int instructionIndex;
+        protected int lineNumber;
+        protected boolean hasLineNumber;
+
+        public void setByteIndex(int byteIndex) {
+            this.byteIndex = byteIndex;
+        }
+
+        public void setInstructionIndex(int instructionIndex) {
+            this.instructionIndex = instructionIndex;
+        }
+
+        public void setLineNumber(int lineNumber) {
+            this.lineNumber = lineNumber;
+            hasLineNumber = lineNumber >= 0;
+        }
+
+        public void setHasLineNumber(boolean hasLineNumber) {
+            this.hasLineNumber = hasLineNumber;
+        }
+
+        public abstract Instruction load(int opcode, DataInputStream din) throws IOException;
+    }
+
+    public abstract int getByteSize( );
 }

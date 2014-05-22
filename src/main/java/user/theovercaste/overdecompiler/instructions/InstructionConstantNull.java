@@ -9,42 +9,47 @@ import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
 import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
 import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetConstant;
 import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetConstant.ConstantType;
+import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
 
 /**
  * Equivalent to <a href="http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.aconst_null">aconst_null</a>
  */
 public class InstructionConstantNull extends Instruction {
-	public InstructionConstantNull(int opcode) {
-		super(opcode);
-	}
+    public InstructionConstantNull(int opcode, int byteIndex, int instructionIndex, int lineNumber) {
+        super(opcode, byteIndex, instructionIndex, lineNumber);
+    }
 
-	public static int[] getOpcodes( ) {
-		return new int[] {0x1};
-	}
+    public InstructionConstantNull(int opcode, int byteIndex, int instructionIndex) {
+        super(opcode, byteIndex, instructionIndex);
+    }
 
-	@Override
-	public boolean isAction( ) {
-		return true;
-	}
+    public static int[] getOpcodes( ) {
+        return new int[] {0x1};
+    }
 
-	@Override
-	public MethodAction getAction(int lineNumber, ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
-		return new MethodActionGetConstant(lineNumber, null, ConstantType.NULL);
-	}
+    @Override
+    public boolean isAction( ) {
+        return true;
+    }
 
-	@Override
-	public int getByteSize( ) {
-		return 0;
-	}
+    @Override
+    public MethodAction getAction(ClassData originClass, Stack<MethodMember> stack) throws InstructionParsingException {
+        return new MethodActionGetConstant(null, ConstantType.NULL);
+    }
 
-	public static Factory factory( ) {
-		return new Factory();
-	}
+    @Override
+    public int getByteSize( ) {
+        return 0;
+    }
 
-	public static class Factory extends Instruction.Factory {
-		@Override
-		public InstructionConstantNull load(int opcode, DataInputStream din) throws IOException {
-			return new InstructionConstantNull(opcode);
-		}
-	}
+    public static Factory factory( ) {
+        return new Factory();
+    }
+
+    public static class Factory extends Instruction.Factory {
+        @Override
+        public InstructionConstantNull load(int opcode, DataInputStream din) throws IOException {
+            return new InstructionConstantNull(opcode, byteIndex, instructionIndex, lineNumber);
+        }
+    }
 }

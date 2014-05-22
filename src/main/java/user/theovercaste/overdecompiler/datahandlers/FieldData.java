@@ -2,58 +2,69 @@ package user.theovercaste.overdecompiler.datahandlers;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
+import user.theovercaste.overdecompiler.attributes.AttributableElement;
 import user.theovercaste.overdecompiler.attributes.AttributeData;
-import user.theovercaste.overdecompiler.attributes.Attributes;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntry;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolValueRetriever;
 import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
 
-public class FieldData {
-	private final FieldFlagHandler flagHandler;
-	private final int nameIndex;
-	private final int descriptorIndex;
-	private final AttributeData[] attributes;
+import com.google.common.collect.Lists;
 
-	public FieldData(FieldFlagHandler flagHandler, int nameIndex, int descriptorIndex, AttributeData[] attributes) {
-		this.flagHandler = flagHandler;
-		this.nameIndex = nameIndex;
-		this.descriptorIndex = descriptorIndex;
-		this.attributes = attributes;
-	}
+public class FieldData implements AttributableElement {
+    private final FieldFlagHandler flagHandler;
+    private final int nameIndex;
+    private final int descriptorIndex;
+    private final List<AttributeData> attributes = Lists.newArrayList();
 
-	public FieldFlagHandler getFlagHandler( ) {
-		return flagHandler;
-	}
+    public FieldData(FieldFlagHandler flagHandler, int nameIndex, int descriptorIndex) {
+        this.flagHandler = flagHandler;
+        this.nameIndex = nameIndex;
+        this.descriptorIndex = descriptorIndex;
+    }
 
-	public int getNameIndex( ) {
-		return nameIndex;
-	}
+    @Override
+    public void addAttribute(AttributeData d) {
+        attributes.add(d);
+    }
 
-	public int getDescriptorIndex( ) {
-		return descriptorIndex;
-	}
+    public FieldFlagHandler getFlagHandler( ) {
+        return flagHandler;
+    }
 
-	public AttributeData[] getAttributes( ) {
-		return attributes;
-	}
+    public int getNameIndex( ) {
+        return nameIndex;
+    }
 
-	public String getName(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
-		return ConstantPoolValueRetriever.getInstance().getString(constantPool, nameIndex);
-	}
+    public int getDescriptorIndex( ) {
+        return descriptorIndex;
+    }
 
-	public String getDescription(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
-		return ConstantPoolValueRetriever.getInstance().getString(constantPool, descriptorIndex);
-	}
+    @Override
+    public Collection<AttributeData> getAttributes( ) {
+        return Collections.unmodifiableCollection(attributes);
+    }
 
-	public static FieldData loadFieldInfo(DataInputStream din) throws IOException {
-		FieldFlagHandler flagHandler = new FieldFlagHandler(din.readUnsignedShort());
-		int nameIndex = din.readUnsignedShort();
-		int descriptorIndex = din.readUnsignedShort();
-		AttributeData[] attributes = new AttributeData[din.readUnsignedShort()];
-		for (int i = 0; i < attributes.length; i++) {
-			attributes[i] = Attributes.loadAttribute(din);
-		}
-		return new FieldData(flagHandler, nameIndex, descriptorIndex, attributes);
-	}
+    public String getName(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
+        return ConstantPoolValueRetriever.getString(constantPool, nameIndex);
+    }
+
+    public String getDescription(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
+        return ConstantPoolValueRetriever.getString(constantPool, descriptorIndex);
+    }
+
+    public static FieldData loadFieldInfo(DataInputStream din) throws IOException {
+        FieldFlagHandler flagHandler = new FieldFlagHandler(din.readUnsignedShort());
+        int nameIndex = din.readUnsignedShort();
+        int descriptorIndex = din.readUnsignedShort();
+        int attributeCount = din.readUnsignedShort();
+        FieldData ret = new FieldData(flagHandler, nameIndex, descriptorIndex);
+        for (int i = 0; i < attributeCount; i++) {
+            ret.addAttribute(AttributeData.loadAttribute(din));
+        }
+        return ret;
+    }
 }

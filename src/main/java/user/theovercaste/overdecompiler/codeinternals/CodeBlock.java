@@ -7,13 +7,13 @@ package user.theovercaste.overdecompiler.codeinternals;
  *
  */
 public class CodeBlock {
-	protected final CodeBlockType type;
+    protected final CodeBlockType type;
 
-	public CodeBlock(CodeBlockType type) {
-		this.type = type;
-	}
+    public CodeBlock(CodeBlockType type) {
+        this.type = type;
+    }
 
-	public CodeBlockType getType( ) {
-		return type;
-	}
+    public CodeBlockType getType( ) {
+        return type;
+    }
 }

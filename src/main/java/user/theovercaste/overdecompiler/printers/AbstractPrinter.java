@@ -9,19 +9,19 @@ import user.theovercaste.overdecompiler.parserdata.ParsedClass;
 import user.theovercaste.overdecompiler.parserdata.ParsedMethod;
 
 public abstract class AbstractPrinter {
-	public abstract void print(ParsedClass c, OutputStream out) throws IOException;
+    public abstract void print(ParsedClass c, OutputStream out) throws IOException;
 
-	public boolean isEnum(ParsedClass c) {
-		if (c.getType().equals(ClassType.ENUM)) {
-			return true;
-		}
-		if (c.getParent().equals(ClassPath.OBJECT_ENUM)) {
-			return true;
-		}
-		return false;
-	}
+    public boolean isEnum(ParsedClass c) {
+        if (c.getType().equals(ClassType.ENUM)) {
+            return true;
+        }
+        if (c.getParent().equals(ClassPath.OBJECT_ENUM)) {
+            return true;
+        }
+        return false;
+    }
 
-	protected String getArgumentName(ParsedClass clazz, ParsedMethod m, ClassPath arg) {
-		return "derp";
-	}
+    protected String getArgumentName(ParsedClass clazz, ParsedMethod m, ClassPath arg) {
+        return "derp";
+    }
 }

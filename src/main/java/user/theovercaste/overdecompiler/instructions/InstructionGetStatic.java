@@ -13,58 +13,64 @@ import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerExc
 import user.theovercaste.overdecompiler.exceptions.PoolPreconditions;
 import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
 import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetStaticField;
+import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
 
 public class InstructionGetStatic extends Instruction {
-	private final int nameIndex;
+    private final int nameIndex;
 
-	public InstructionGetStatic(int opcode, int nameIndex) {
-		super(opcode);
-		this.nameIndex = nameIndex;
-	}
+    public InstructionGetStatic(int opcode, int byteIndex, int instructionIndex, int lineNumber, int nameIndex) {
+        super(opcode, byteIndex, instructionIndex, lineNumber);
+        this.nameIndex = nameIndex;
+    }
 
-	public ConstantPoolEntryFieldReference getField(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
-		PoolPreconditions.assertPoolRange(nameIndex, constantPool.length);
-		ConstantPoolEntry e = constantPool[nameIndex];
-		if (e instanceof ConstantPoolEntryFieldReference) {
-			return (ConstantPoolEntryFieldReference) e;
-		}
-		throw PoolPreconditions.getInvalidType(constantPool, nameIndex);
-	}
+    public InstructionGetStatic(int opcode, int byteIndex, int instructionIndex, int nameIndex) {
+        super(opcode, byteIndex, instructionIndex);
+        this.nameIndex = nameIndex;
+    }
 
-	@Override
-	public boolean isAction( ) {
-		return true;
-	}
+    public ConstantPoolEntryFieldReference getField(ConstantPoolEntry[] constantPool) throws InvalidConstantPoolPointerException {
+        PoolPreconditions.assertPoolRange(nameIndex, constantPool.length);
+        ConstantPoolEntry e = constantPool[nameIndex];
+        if (e instanceof ConstantPoolEntryFieldReference) {
+            return (ConstantPoolEntryFieldReference) e;
+        }
+        throw PoolPreconditions.getInvalidType(constantPool, nameIndex);
+    }
 
-	@Override
-	public MethodAction getAction(int lineNumber, ClassData originClass, Stack<MethodAction> stack) throws InstructionParsingException {
-		ConstantPoolEntryFieldReference f;
-		try {
-			f = getField(originClass.getConstantPool());
-			return new MethodActionGetStaticField(lineNumber, f.getName(originClass.getConstantPool()), new ClassPath(f.getClassName(originClass.getConstantPool()).replace("/", ".")));
-		} catch (InvalidConstantPoolPointerException e) {
-			throw new InstructionParsingException(e);
-		}
-	}
+    @Override
+    public boolean isAction( ) {
+        return true;
+    }
 
-	@Override
-	public int getByteSize( ) {
-		return 2;
-	}
+    @Override
+    public MethodAction getAction(ClassData originClass, Stack<MethodMember> stack) throws InstructionParsingException {
+        ConstantPoolEntryFieldReference f;
+        try {
+            f = getField(originClass.getConstantPool());
+            return new MethodActionGetStaticField(f.getName(originClass.getConstantPool()), new ClassPath(f.getClassName(originClass.getConstantPool()).replace("/", ".")));
+        } catch (InvalidConstantPoolPointerException e) {
+            throw new InstructionParsingException(e);
+        }
+    }
 
-	public static int[] getOpcodes( ) {
-		return new int[] {0xb2};
-	}
+    @Override
+    public int getByteSize( ) {
+        return 2;
+    }
 
-	public static Factory factory( ) {
-		return new Factory();
-	}
+    public static int[] getOpcodes( ) {
+        return new int[] {0xb2};
+    }
 
-	public static class Factory extends Instruction.Factory {
-		@Override
-		public InstructionGetStatic load(int opcode, DataInputStream din) throws IOException {
-			int nameIndex = din.readUnsignedShort();
-			return new InstructionGetStatic(opcode, nameIndex);
-		}
-	}
+    public static Factory factory( ) {
+        return new Factory();
+    }
+
+    public static class Factory extends Instruction.Factory {
+        @Override
+        public InstructionGetStatic load(int opcode, DataInputStream din) throws IOException {
+            int nameIndex = din.readUnsignedShort();
+            return new InstructionGetStatic(opcode, byteIndex, instructionIndex, lineNumber, nameIndex);
+        }
+    }
 }

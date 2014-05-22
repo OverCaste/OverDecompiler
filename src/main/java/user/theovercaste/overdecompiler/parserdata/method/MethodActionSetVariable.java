@@ -4,25 +4,24 @@ import user.theovercaste.overdecompiler.parserdata.ParsedClass;
 import user.theovercaste.overdecompiler.parserdata.ParsedMethod;
 
 public class MethodActionSetVariable extends MethodActionGetter {
-	private final int variableIndex;
-	private final MethodActionGetter expression;
+    private final int variableIndex;
+    private final MethodActionGetter expression;
 
-	public MethodActionSetVariable(int lineNumber, int variableIndex, MethodActionGetter expression) {
-		super(lineNumber);
-		this.variableIndex = variableIndex;
-		this.expression = expression;
-	}
+    public MethodActionSetVariable(int variableIndex, MethodActionGetter expression) {
+        this.variableIndex = variableIndex;
+        this.expression = expression;
+    }
 
-	@Override
-	public String getStringValue(ParsedClass c, ParsedMethod parent) {
-		return "v" + variableIndex + " = " + expression.getStringValue(c, parent); // TODO actual variable naming
-	}
+    @Override
+    public String getStringValue(ParsedClass c, ParsedMethod parent) {
+        return "v" + variableIndex + " = " + expression.getStringValue(c, parent); // TODO actual variable naming
+    }
 
-	public int getVariable( ) {
-		return variableIndex;
-	}
+    public int getVariable( ) {
+        return variableIndex;
+    }
 
-	public MethodAction getExpression( ) {
-		return expression;
-	}
+    public MethodMember getExpression( ) {
+        return expression;
+    }
 }

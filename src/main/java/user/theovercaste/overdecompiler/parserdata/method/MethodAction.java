@@ -1,28 +1,19 @@
 package user.theovercaste.overdecompiler.parserdata.method;
 
-import java.util.Collection;
+import java.io.PrintStream;
 
 import user.theovercaste.overdecompiler.parserdata.ParsedClass;
 import user.theovercaste.overdecompiler.parserdata.ParsedMethod;
 
-public abstract class MethodAction {
-	private final int lineNumber;
+public abstract class MethodAction extends MethodMember {
+    public MethodAction( ) {
+        super(Type.ACTION);
+    }
 
-	public MethodAction(int lineNumber) {
-		this.lineNumber = lineNumber;
-	}
+    public abstract String getStringValue(ParsedClass c, ParsedMethod parent);
 
-	public int getLineNumber( ) {
-		return lineNumber;
-	}
-
-	public boolean isContainer( ) {
-		return false;
-	}
-
-	public Collection<MethodAction> getContainerContents( ) {
-		throw new UnsupportedOperationException();
-	}
-
-	public abstract String getStringValue(ParsedClass c, ParsedMethod parent);
+    @Override
+    public void print(ParsedClass c, ParsedMethod parent, PrintStream out) {
+        out.print(getStringValue(c, parent));
+    }
 }
