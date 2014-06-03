@@ -8,20 +8,22 @@ import java.util.List;
 
 import user.theovercaste.overdecompiler.attributes.AttributableElement;
 import user.theovercaste.overdecompiler.attributes.AttributeData;
+import user.theovercaste.overdecompiler.codeinternals.FieldFlag;
 import user.theovercaste.overdecompiler.constantpool.ConstantPool;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolValueRetriever;
 import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
 public class FieldData implements AttributableElement {
-    private final FieldFlagHandler flagHandler;
+    private final ImmutableSet<FieldFlag> flags;
     private final int nameIndex;
     private final int descriptorIndex;
     private final List<AttributeData> attributes = Lists.newArrayList();
 
-    public FieldData(FieldFlagHandler flagHandler, int nameIndex, int descriptorIndex) {
-        this.flagHandler = flagHandler;
+    public FieldData(ImmutableSet<FieldFlag> flags, int nameIndex, int descriptorIndex) {
+        this.flags = flags;
         this.nameIndex = nameIndex;
         this.descriptorIndex = descriptorIndex;
     }
@@ -31,8 +33,8 @@ public class FieldData implements AttributableElement {
         attributes.add(d);
     }
 
-    public FieldFlagHandler getFlagHandler( ) {
-        return flagHandler;
+    public ImmutableSet<FieldFlag> getFlags( ) {
+        return flags;
     }
 
     public int getNameIndex( ) {

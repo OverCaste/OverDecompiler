@@ -9,4 +9,8 @@ public abstract class AbstractParser {
     public abstract ParsedClass parseClass(ClassData c) throws InvalidConstantPoolPointerException;
 
     public abstract AbstractMethodParser getMethodParser(ClassData c);
+
+    public abstract interface Factory {
+        public abstract AbstractParser createParser( );
+    }
 }

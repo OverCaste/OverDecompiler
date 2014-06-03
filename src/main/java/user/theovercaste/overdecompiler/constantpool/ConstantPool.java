@@ -11,7 +11,7 @@ public class ConstantPool {
         entries = new ArrayList<>(size);
     }
 
-    public ConstantPoolEntry get(int index) {
+    public ConstantPoolEntry get(int index) throws InvalidConstantPoolPointerIndexException {
         if (index < 0) {
             throw new InvalidConstantPoolPointerIndexException("Constant pool index is less than zero: " + index + ".");
         }
@@ -19,6 +19,10 @@ public class ConstantPool {
             throw new InvalidConstantPoolPointerIndexException("Constant pool index is larger than pool size: " + index + " > " + entries.size() + ".");
         }
         return entries.get(index - 1); // Start at index 0, pool starts at 1
+    }
+
+    public ConstantPoolEntry getUnsafe(int index) {
+        return entries.get(index - 1);
     }
 
     public void set(int index, ConstantPoolEntry e) {

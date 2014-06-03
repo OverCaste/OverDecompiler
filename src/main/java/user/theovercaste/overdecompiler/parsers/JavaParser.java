@@ -16,7 +16,6 @@ import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryClass;
 import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.datahandlers.ClassFlagHandler;
 import user.theovercaste.overdecompiler.datahandlers.FieldData;
-import user.theovercaste.overdecompiler.datahandlers.FieldFlagHandler;
 import user.theovercaste.overdecompiler.datahandlers.MethodData;
 import user.theovercaste.overdecompiler.datahandlers.MethodFlagHandler;
 import user.theovercaste.overdecompiler.exceptions.InvalidAttributeException;
@@ -105,7 +104,7 @@ public class JavaParser extends AbstractParser {
             ClassPath classPath = ClassPath.getMangledPath(f.getDescription(origin.getConstantPool()));
             addImport(value, classPath);
             ParsedField parsed = new ParsedField(classPath, f.getName(origin.getConstantPool()));
-            FieldFlagHandler flagHandler = f.getFlagHandler();
+            FieldFlagHandler flagHandler = f.getFlags();
             if (flagHandler.isPublic()) {
                 parsed.addFlag(FieldFlag.PUBLIC);
             } else if (flagHandler.isProtected()) {
@@ -213,22 +212,5 @@ public class JavaParser extends AbstractParser {
     @Override
     public AbstractMethodParser getMethodParser(ClassData c) {
         return methodParser;
-    }
-
-    public static class Factory implements AbstractParserFactory {
-        private static final Factory instance = new Factory();
-
-        private Factory( ) {
-            // do nothing
-        }
-
-        @Override
-        public AbstractParser createParser( ) {
-            return new JavaParser();
-        }
-
-        public static Factory getInstance( ) {
-            return instance;
-        }
     }
 }

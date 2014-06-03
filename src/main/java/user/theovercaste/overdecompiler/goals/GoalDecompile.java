@@ -1,6 +1,7 @@
 package user.theovercaste.overdecompiler.goals;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -11,10 +12,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import user.theovercaste.overdecompiler.ArgumentHandler;
-import user.theovercaste.overdecompiler.ClassDecompiler;
+import user.theovercaste.overdecompiler.classdataloaders.FileClassDataLoader;
+import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.ArgumentParsingException;
+import user.theovercaste.overdecompiler.exceptions.InvalidClassException;
+import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
+import user.theovercaste.overdecompiler.parserdata.ParsedClass;
 import user.theovercaste.overdecompiler.parsers.AbstractParser;
-import user.theovercaste.overdecompiler.parsers.AbstractParserFactory;
 import user.theovercaste.overdecompiler.parsers.JavaParser;
 import user.theovercaste.overdecompiler.printers.AbstractPrinter;
 import user.theovercaste.overdecompiler.printers.AbstractPrinterFactory;
@@ -23,11 +27,11 @@ import user.theovercaste.overdecompiler.printers.PrettyPrinter;
 import com.google.common.collect.ObjectArrays;
 
 public class GoalDecompile extends AbstractGoalByteEditor {
-    protected AbstractParserFactory parserFactory;
+    protected AbstractParser.Factory parserFactory;
     protected AbstractPrinterFactory printerFactory;
     protected boolean recursive;
     protected boolean threaded;
-    protected boolean matchLineNumbers;
+    protected boolean matchLineNumbers; // TODO
 
     @Override
     public void execute(ArgumentHandler h) throws ArgumentParsingException {
@@ -35,11 +39,11 @@ public class GoalDecompile extends AbstractGoalByteEditor {
             sendUsageMessage(System.out);
             return;
         }
-        parserFactory = h.getClassArgument("parser", "user.theovercaste.overdecompiler.parsers", JavaParser.Factory.getInstance(), AbstractParserFactory.class);
+        parserFactory = h.getClassArgument("parser", "user.theovercaste.overdecompiler.parsers", JavaParser.Factory.getInstance(), AbstractParser.Factory.class);
         printerFactory = h.getClassArgument("printer", "user.theovercaste.overdecompiler.printers", PrettyPrinter.Factory.getInstance(), AbstractPrinterFactory.class);
         recursive = h.checkFlagExists('r') || h.checkFlagExists("recursive");
         threaded = h.checkFlagExists('t') || h.checkFlagExists("threaded");
-        matchLineNumbers = h.checkFlagExists('m') || h.checkFlagExists("match-line-numbers");
+        matchLineNumbers = h.checkFlagExists('m') || h.checkFlagExists("match-line-numbers"); // TODO
         processData(h.getArgument(h.getArgumentsSize() - 1), recursive);
     }
 
@@ -81,8 +85,11 @@ public class GoalDecompile extends AbstractGoalByteEditor {
                 }
             }
         } else {
-            ClassDecompiler decompiler = new ClassDecompiler();
-            decompiler.decompileFiles(files, parserFactory, printerFactory);
+            DecompilerTask decompiler = new DecompilerTask(); // Do it all in one task
+            for (File f : files) {
+                decompiler.addFile(f);
+            }
+            decompiler.run(); // No point starting a new thread, execute blocking
         }
     }
 
@@ -93,7 +100,7 @@ public class GoalDecompile extends AbstractGoalByteEditor {
                 "  --printer (class)\t\tSpecify the printer to be used.",
                 "  --threaded  -t\t\tWhether classes should be decompiled concurrently.",
                 "  --recursive  -r\t\tSpecify that recursive checking should be done.",
-                "  --match-line-numbers -m\tTry to match each decompiled line with it's original location in the source."
+                // TODO "  --match-line-numbers -m\tTry to match each decompiled line with it's original location in the source."
         }, String.class);
     }
 
@@ -101,12 +108,22 @@ public class GoalDecompile extends AbstractGoalByteEditor {
         private final ArrayList<File> files = new ArrayList<File>();
         private final AbstractPrinter printer = printerFactory.createPrinter();
         private final AbstractParser parser = parserFactory.createParser();
-        private final ClassDecompiler decompiler = new ClassDecompiler();
 
         @Override
         public void run( ) {
             for (File f : files) {
-                decompiler.decompileFile(f, parser, printer);
+                System.out.println(" - Reading binary data...");
+                try (FileClassDataLoader loader = new FileClassDataLoader(f)) {
+                    ClassData c = loader.getClassData();
+                    System.out.println(" - Parsing...");
+                    ParsedClass parsed = parser.parseClass(c);
+                    System.out.println(" - Writing...");
+                    printer.print(parsed, System.out);
+                } catch (InvalidConstantPoolPointerException | InvalidClassException e) {
+                    System.err.println("Invalid class detected. (" + e.getMessage() + ")");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
 

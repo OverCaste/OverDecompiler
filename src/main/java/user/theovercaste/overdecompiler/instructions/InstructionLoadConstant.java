@@ -14,6 +14,7 @@ import user.theovercaste.overdecompiler.constantpool.ConstantPoolValueRetriever;
 import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
 import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
+import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerIndexException;
 import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
 import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetConstant;
 import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetConstant.ConstantType;
@@ -39,7 +40,7 @@ public class InstructionLoadConstant extends Instruction {
         return new int[] {0x12};
     }
 
-    public ConstantPoolEntry getValue(ConstantPool constantPool) {
+    public ConstantPoolEntry getValue(ConstantPool constantPool) throws InvalidConstantPoolPointerIndexException {
         return constantPool.get(constantIndex);
     }
 
@@ -54,7 +55,12 @@ public class InstructionLoadConstant extends Instruction {
 
     @Override
     public MethodAction getAction(ClassData originClass, Stack<MethodMember> stack) throws InstructionParsingException {
-        ConstantPoolEntry e = getValue(originClass.getConstantPool());
+        ConstantPoolEntry e;
+        try {
+            e = getValue(originClass.getConstantPool());
+        } catch (InvalidConstantPoolPointerIndexException ex) {
+            throw new InstructionParsingException(ex);
+        }
         if (e instanceof ConstantPoolEntryInteger) {
             return new MethodActionGetConstant(String.valueOf(((ConstantPoolEntryInteger) e).getValue()), ConstantType.INT);
         }

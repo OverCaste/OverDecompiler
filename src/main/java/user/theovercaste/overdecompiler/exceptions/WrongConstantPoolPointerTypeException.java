@@ -28,7 +28,7 @@ public class WrongConstantPoolPointerTypeException extends InvalidConstantPoolPo
     }
 
     public static WrongConstantPoolPointerTypeException constructException(int index, ConstantPool pool, Class<?>... expected) {
-        return new WrongConstantPoolPointerTypeException("The constant pool entry at " + index + " (" + (pool.get(index).getClass().getName()) + ") has an invalid type. Expected: " +
+        return new WrongConstantPoolPointerTypeException("The constant pool entry at " + index + " (" + (pool.getUnsafe(index).getClass().getName()) + ") has an invalid type. Expected: " +
                 Joiner.on(", ").join(Iterables.transform(Arrays.asList(expected), new Function<Class<?>, String>() {
                     @Override
                     public String apply(Class<?> input) {
