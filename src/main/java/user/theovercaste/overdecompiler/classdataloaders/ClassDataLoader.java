@@ -2,9 +2,9 @@ package user.theovercaste.overdecompiler.classdataloaders;
 
 import java.io.IOException;
 
-import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.InvalidClassException;
+import user.theovercaste.overdecompiler.parserdata.ParsedClass;
 
 public interface ClassDataLoader {
-    public abstract ClassData getClassData( ) throws InvalidClassException, IOException;
+    public abstract ParsedClass getClassData( ) throws InvalidClassException, IOException;
 }

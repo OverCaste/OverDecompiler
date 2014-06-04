@@ -3,14 +3,12 @@ package user.theovercaste.overdecompiler.constantpool;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
-
 public class ConstantPoolEntryInvokeDynamic extends ConstantPoolEntry {
     protected final int methodAttributeIndex;
     protected final int nameAndTypeIndex;
 
-    public ConstantPoolEntryInvokeDynamic(int tag, int methodAttributeIndex, int nameAndTypeIndex) {
-        super(tag);
+    public ConstantPoolEntryInvokeDynamic(int methodAttributeIndex, int nameAndTypeIndex) {
+        super(ConstantPoolEntries.INVOKE_DYNAMIC_TAG);
         this.methodAttributeIndex = methodAttributeIndex;
         this.nameAndTypeIndex = nameAndTypeIndex;
     }
@@ -23,14 +21,6 @@ public class ConstantPoolEntryInvokeDynamic extends ConstantPoolEntry {
         return nameAndTypeIndex;
     }
 
-    public String getName(ConstantPool constantPool) throws InvalidConstantPoolPointerException {
-        return ConstantPoolValueRetriever.getNameAndTypeName(constantPool, nameAndTypeIndex);
-    }
-
-    public String getDescription(ConstantPool constantPool) throws InvalidConstantPoolPointerException {
-        return ConstantPoolValueRetriever.getNameAndTypeDescription(constantPool, nameAndTypeIndex);
-    }
-
     public static Factory factory( ) {
         return new Factory();
     }
@@ -40,15 +30,14 @@ public class ConstantPoolEntryInvokeDynamic extends ConstantPoolEntry {
         protected int nameAndTypeIndex;
 
         @Override
-        public void read(int tag, DataInputStream din) throws IOException {
-            super.read(tag, din);
+        public void read(DataInputStream din) throws IOException {
             methodAttributeIndex = din.readUnsignedShort();
             nameAndTypeIndex = din.readUnsignedShort();
         }
 
         @Override
         public ConstantPoolEntry build( ) {
-            return new ConstantPoolEntryInvokeDynamic(tag, methodAttributeIndex, nameAndTypeIndex);
+            return new ConstantPoolEntryInvokeDynamic(methodAttributeIndex, nameAndTypeIndex);
         }
     }
 }

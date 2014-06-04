@@ -6,13 +6,13 @@ import java.io.IOException;
 public class ConstantPoolEntryFloat extends ConstantPoolEntry {
     protected final float value;
 
-    public ConstantPoolEntryFloat(int tag, float value) {
-        super(tag);
+    public ConstantPoolEntryFloat(float value) {
+        super(ConstantPoolEntries.FLOAT_TAG);
         this.value = value;
     }
 
     public float getValue( ) {
-        return this.value;
+        return value;
     }
 
     public static Factory factory( ) {
@@ -23,14 +23,13 @@ public class ConstantPoolEntryFloat extends ConstantPoolEntry {
         protected float value;
 
         @Override
-        public void read(int tag, DataInputStream din) throws IOException {
-            super.read(tag, din);
-            this.value = din.readFloat();
+        public void read(DataInputStream din) throws IOException {
+            value = din.readFloat();
         }
 
         @Override
         public ConstantPoolEntry build( ) {
-            return new ConstantPoolEntryFloat(this.tag, this.value);
+            return new ConstantPoolEntryFloat(value);
         }
     }
 }

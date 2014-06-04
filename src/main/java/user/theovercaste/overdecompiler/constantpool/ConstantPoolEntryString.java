@@ -6,8 +6,8 @@ import java.io.IOException;
 public class ConstantPoolEntryString extends ConstantPoolEntry {
     protected final int stringIndex;
 
-    public ConstantPoolEntryString(int tag, int stringIndex) {
-        super(tag);
+    public ConstantPoolEntryString(int stringIndex) {
+        super(ConstantPoolEntries.STRING_TAG);
         this.stringIndex = stringIndex;
     }
 
@@ -23,14 +23,13 @@ public class ConstantPoolEntryString extends ConstantPoolEntry {
         protected int stringIndex;
 
         @Override
-        public void read(int tag, DataInputStream din) throws IOException {
-            super.read(tag, din);
+        public void read(DataInputStream din) throws IOException {
             stringIndex = din.readUnsignedShort();
         }
 
         @Override
         public ConstantPoolEntry build( ) {
-            return new ConstantPoolEntryString(tag, stringIndex);
+            return new ConstantPoolEntryString(stringIndex);
         }
     }
 }

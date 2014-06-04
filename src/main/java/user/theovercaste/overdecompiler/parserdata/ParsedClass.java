@@ -107,11 +107,11 @@ public class ParsedClass implements AnnotatableElement {
     }
 
     public ClassPath getClassPath( ) {
-        StringBuilder currentObject = new StringBuilder(getPackage());
-        if (currentObject.length() > 0) {
-            currentObject.append(".");
+        StringBuilder builder = new StringBuilder(getPackage());
+        if (builder.length() > 0) {
+            builder.append(".");
         }
-        currentObject.append(getName());
-        return new ClassPath(currentObject.toString());
+        builder.append(getName());
+        return new ClassPath(builder.toString());
     }
 }

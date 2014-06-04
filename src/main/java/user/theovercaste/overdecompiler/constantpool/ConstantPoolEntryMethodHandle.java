@@ -45,8 +45,8 @@ public class ConstantPoolEntryMethodHandle extends ConstantPoolEntry {
     protected final int referenceKind;
     protected final int referenceIndex;
 
-    public ConstantPoolEntryMethodHandle(int tag, int referenceKind, int referenceIndex) {
-        super(tag);
+    public ConstantPoolEntryMethodHandle(int referenceKind, int referenceIndex) {
+        super(ConstantPoolEntries.METHOD_HANDLE_TAG);
         this.referenceKind = referenceKind;
         this.referenceIndex = referenceIndex;
     }
@@ -68,15 +68,14 @@ public class ConstantPoolEntryMethodHandle extends ConstantPoolEntry {
         protected int referenceIndex;
 
         @Override
-        public void read(int tag, DataInputStream din) throws IOException {
-            super.read(tag, din);
+        public void read(DataInputStream din) throws IOException {
             referenceKind = din.readUnsignedByte();
             referenceIndex = din.readUnsignedShort();
         }
 
         @Override
         public ConstantPoolEntry build( ) {
-            return new ConstantPoolEntryMethodHandle(tag, referenceKind, referenceIndex);
+            return new ConstantPoolEntryMethodHandle(referenceKind, referenceIndex);
         }
     }
 }

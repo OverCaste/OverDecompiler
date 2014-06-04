@@ -6,13 +6,13 @@ import java.io.IOException;
 public class ConstantPoolEntryDouble extends ConstantPoolEntry {
     protected final double value;
 
-    public ConstantPoolEntryDouble(int tag, double value) {
-        super(tag);
+    public ConstantPoolEntryDouble(double value) {
+        super(ConstantPoolEntries.DOUBLE_TAG);
         this.value = value;
     }
 
     public double getValue( ) {
-        return this.value;
+        return value;
     }
 
     public static Factory factory( ) {
@@ -23,14 +23,13 @@ public class ConstantPoolEntryDouble extends ConstantPoolEntry {
         protected double value;
 
         @Override
-        public void read(int tag, DataInputStream din) throws IOException {
-            super.read(tag, din);
-            this.value = din.readDouble();
+        public void read(DataInputStream din) throws IOException {
+            value = din.readDouble();
         }
 
         @Override
         public ConstantPoolEntry build( ) {
-            return new ConstantPoolEntryDouble(this.tag, this.value);
+            return new ConstantPoolEntryDouble(value);
         }
     }
 }

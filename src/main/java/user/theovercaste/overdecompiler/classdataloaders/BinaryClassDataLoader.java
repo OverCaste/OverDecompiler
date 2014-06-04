@@ -7,11 +7,10 @@ import java.io.InputStream;
 import user.theovercaste.overdecompiler.attributes.AttributeData;
 import user.theovercaste.overdecompiler.constantpool.ConstantPool;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntries;
-import user.theovercaste.overdecompiler.datahandlers.ClassData;
-import user.theovercaste.overdecompiler.datahandlers.FieldData;
-import user.theovercaste.overdecompiler.datahandlers.MethodData;
 import user.theovercaste.overdecompiler.exceptions.InvalidClassException;
 import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolEntryException;
+import user.theovercaste.overdecompiler.parserdata.ParsedClass;
+import user.theovercaste.overdecompiler.parserdata.ParsedField;
 
 public class BinaryClassDataLoader implements ClassDataLoader {
     public static final int CLASS_MAGIC = 0xCAFEBABE;
@@ -23,7 +22,7 @@ public class BinaryClassDataLoader implements ClassDataLoader {
     }
 
     @Override
-    public ClassData getClassData( ) throws InvalidClassException, IOException {
+    public ParsedClass getClassData( ) throws InvalidClassException, IOException {
         DataInputStream din = new DataInputStream(input);
         int magicVersion = din.readInt();
         if (magicVersion != CLASS_MAGIC) {
@@ -78,5 +77,14 @@ public class BinaryClassDataLoader implements ClassDataLoader {
             classData.addInterface(i);
         }
         return classData;
+    }
+
+    private ParsedField parseField(ConstantPool pool, DataInputStream din) {
+        int flags = din.readUnsignedShort();
+        int nameIndex = din.readUnsignedShort();
+        int descriptorIndex = din.readUnsignedShort();
+        int attributeCount = din.readUnsignedShort();
+        String name = pool.get
+        ParsedField ret = new ParsedField()
     }
 }

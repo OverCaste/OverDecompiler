@@ -3,13 +3,11 @@ package user.theovercaste.overdecompiler.constantpool;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
-
 public class ConstantPoolEntryClass extends ConstantPoolEntry {
     protected final int nameIndex;
 
-    public ConstantPoolEntryClass(int tag, int nameIndex) {
-        super(tag);
+    public ConstantPoolEntryClass(int nameIndex) {
+        super(ConstantPoolEntries.CLASS_TAG);
         this.nameIndex = nameIndex;
     }
 
@@ -21,22 +19,17 @@ public class ConstantPoolEntryClass extends ConstantPoolEntry {
         return new Factory();
     }
 
-    public String getName(ConstantPool constantPool) throws InvalidConstantPoolPointerException {
-        return ConstantPoolValueRetriever.getString(constantPool, nameIndex);
-    }
-
     public static class Factory extends ConstantPoolEntry.Factory {
         protected int nameIndex;
 
         @Override
-        public void read(int tag, DataInputStream din) throws IOException {
-            super.read(tag, din);
+        public void read(DataInputStream din) throws IOException {
             nameIndex = din.readUnsignedShort();
         }
 
         @Override
         public ConstantPoolEntry build( ) {
-            return new ConstantPoolEntryClass(tag, nameIndex);
+            return new ConstantPoolEntryClass(nameIndex);
         }
     }
 }

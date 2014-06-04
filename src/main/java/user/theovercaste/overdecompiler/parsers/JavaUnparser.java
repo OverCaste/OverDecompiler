@@ -13,7 +13,7 @@ public class JavaUnparser extends AbstractUnparser {
         ClassData unparsed = new ClassData(pool);
         // TODO annotations
         for (ParsedField f : c.getFields()) {
-            unparsed.addField(new FieldData(new FieldFlagHandler(f.getFlags()), pool.addString(f.getName()), pool.addString(f.getType().toMangled())));
+            unparsed.addField(new FieldData(new FieldFlagHandler(f.getFlags()), pool.addUtf8(f.getName()), pool.addUtf8(f.getType().toMangled())));
         }
         return null;
     }

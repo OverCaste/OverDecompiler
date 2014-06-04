@@ -3,7 +3,7 @@ package user.theovercaste.overdecompiler.constantpool;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-public class ConstantPoolEntry {
+public abstract class ConstantPoolEntry {
     protected final int tag;
 
     public ConstantPoolEntry(int tag) {
@@ -11,22 +11,12 @@ public class ConstantPoolEntry {
     }
 
     public int getTag( ) {
-        return this.tag;
+        return tag;
     }
 
-    public static Factory factory( ) {
-        return new Factory();
-    }
+    public abstract static class Factory {
+        public abstract void read(DataInputStream din) throws IOException;
 
-    public static class Factory {
-        protected int tag;
-
-        public void read(int tag, DataInputStream din) throws IOException {
-            this.tag = tag;
-        }
-
-        public ConstantPoolEntry build( ) {
-            return new ConstantPoolEntry(this.tag);
-        }
+        public abstract ConstantPoolEntry build( );
     }
 }

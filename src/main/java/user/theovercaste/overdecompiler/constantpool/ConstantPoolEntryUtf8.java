@@ -8,9 +8,13 @@ import com.google.common.base.Charsets;
 public class ConstantPoolEntryUtf8 extends ConstantPoolEntry {
     protected final byte[] data;
 
-    public ConstantPoolEntryUtf8(int tag, byte[] data) {
-        super(tag);
+    public ConstantPoolEntryUtf8(byte[] data) {
+        super(ConstantPoolEntries.UTF8_TAG);
         this.data = data;
+    }
+
+    public ConstantPoolEntryUtf8(String string) {
+        this(string.getBytes(Charsets.UTF_8));
     }
 
     public byte[] getData( ) {
@@ -30,8 +34,7 @@ public class ConstantPoolEntryUtf8 extends ConstantPoolEntry {
         protected int length;
 
         @Override
-        public void read(int tag, DataInputStream din) throws IOException {
-            super.read(tag, din);
+        public void read(DataInputStream din) throws IOException {
             length = din.readUnsignedShort();
             data = new byte[length];
             din.readFully(data);
@@ -39,7 +42,7 @@ public class ConstantPoolEntryUtf8 extends ConstantPoolEntry {
 
         @Override
         public ConstantPoolEntry build( ) {
-            return new ConstantPoolEntryUtf8(tag, data);
+            return new ConstantPoolEntryUtf8(data);
         }
     }
 }

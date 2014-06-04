@@ -8,20 +8,20 @@ import java.util.Map;
 import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolEntryException;
 
 public class ConstantPoolEntries {
-    private static final int UTF8_TAG = 1;
-    private static final int INTEGER_TAG = 3;
-    private static final int FLOAT_TAG = 4;
-    private static final int LONG_TAG = 5;
-    private static final int DOUBLE_TAG = 6;
-    private static final int CLASS_TAG = 7;
-    private static final int STRING_TAG = 8;
-    private static final int FIELD_REFERENCE_TAG = 9;
-    private static final int METHOD_REFERENCE_TAG = 10;
-    private static final int INTERFACE_METHOD_REFERENCE_TAG = 11;
-    private static final int NAME_AND_TYPE_TAG = 12;
-    private static final int METHOD_HANDLE_TAG = 15;
-    private static final int METHOD_TYPE_TAG = 16;
-    private static final int INVOKE_DYNAMIC_TAG = 18;
+    public static final int UTF8_TAG = 1;
+    public static final int INTEGER_TAG = 3;
+    public static final int FLOAT_TAG = 4;
+    public static final int LONG_TAG = 5;
+    public static final int DOUBLE_TAG = 6;
+    public static final int CLASS_TAG = 7;
+    public static final int STRING_TAG = 8;
+    public static final int FIELD_REFERENCE_TAG = 9;
+    public static final int METHOD_REFERENCE_TAG = 10;
+    public static final int INTERFACE_METHOD_REFERENCE_TAG = 11;
+    public static final int NAME_AND_TYPE_TAG = 12;
+    public static final int METHOD_HANDLE_TAG = 15;
+    public static final int METHOD_TYPE_TAG = 16;
+    public static final int INVOKE_DYNAMIC_TAG = 18;
 
     private static final Map<Integer, ConstantPoolEntry.Factory> factories = new HashMap<>();
 
@@ -49,7 +49,7 @@ public class ConstantPoolEntries {
                 throw new InvalidConstantPoolEntryException("Invalid tag: " + tag);
             }
             ConstantPoolEntry.Factory b = factories.get(tag);
-            b.read(tag, din);
+            b.read(din);
             return b.build();
         } catch (IOException e) {
             throw e;
