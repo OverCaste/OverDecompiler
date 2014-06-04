@@ -14,6 +14,20 @@ public abstract class ConstantPoolEntry {
         return tag;
     }
 
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (other == null) {
+            return false;
+        }
+        if (other.getClass() != this.getClass()) {
+            return false;
+        }
+        return true;
+    }
+
     public abstract static class Factory {
         public abstract void read(DataInputStream din) throws IOException;
 

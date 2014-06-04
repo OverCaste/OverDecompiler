@@ -2,6 +2,7 @@ package user.theovercaste.overdecompiler.constantpool;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.Objects;
 
 public class ConstantPoolEntryInteger extends ConstantPoolEntry {
     protected final int value;
@@ -13,6 +14,19 @@ public class ConstantPoolEntryInteger extends ConstantPoolEntry {
 
     public int getValue( ) {
         return value;
+    }
+
+    @Override
+    public int hashCode( ) {
+        return Objects.hash(tag, value);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!super.equals(other)) {
+            return false;
+        }
+        return ((ConstantPoolEntryInteger) other).value == value;
     }
 
     public static Factory factory( ) {

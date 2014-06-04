@@ -2,6 +2,8 @@ package user.theovercaste.overdecompiler.constantpool;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Objects;
 
 import com.google.common.base.Charsets;
 
@@ -19,6 +21,19 @@ public class ConstantPoolEntryUtf8 extends ConstantPoolEntry {
 
     public byte[] getData( ) {
         return data;
+    }
+
+    @Override
+    public int hashCode( ) {
+        return Objects.hash(tag, data);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!super.equals(other)) {
+            return false;
+        }
+        return Arrays.equals(data, ((ConstantPoolEntryUtf8) other).data);
     }
 
     public static Factory factory( ) {

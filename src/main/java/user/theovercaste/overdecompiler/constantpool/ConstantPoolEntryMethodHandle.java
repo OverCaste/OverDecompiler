@@ -3,6 +3,7 @@ package user.theovercaste.overdecompiler.constantpool;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Objects;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableBiMap;
@@ -51,16 +52,29 @@ public class ConstantPoolEntryMethodHandle extends ConstantPoolEntry {
         this.referenceIndex = referenceIndex;
     }
 
-    public static Factory factory( ) {
-        return new Factory();
-    }
-
     public int getReferenceKind( ) {
         return referenceKind;
     }
 
     public int getReferenceIndex( ) {
         return referenceIndex;
+    }
+
+    @Override
+    public int hashCode( ) {
+        return Objects.hash(tag, referenceKind, referenceIndex);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!super.equals(other)) {
+            return false;
+        }
+        return (((ConstantPoolEntryMethodHandle) other).referenceKind == referenceKind) && (((ConstantPoolEntryMethodHandle) other).referenceIndex == referenceIndex);
+    }
+
+    public static Factory factory( ) {
+        return new Factory();
     }
 
     public static class Factory extends ConstantPoolEntry.Factory {

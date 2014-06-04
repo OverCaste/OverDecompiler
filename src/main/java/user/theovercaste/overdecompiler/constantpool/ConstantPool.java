@@ -4,12 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import user.theovercaste.overdecompiler.constantpool.datacontainers.ClassContainer;
-import user.theovercaste.overdecompiler.constantpool.datacontainers.FieldReferenceContainer;
-import user.theovercaste.overdecompiler.constantpool.datacontainers.InterfaceMethodReferenceContainer;
-import user.theovercaste.overdecompiler.constantpool.datacontainers.MethodReferenceContainer;
-import user.theovercaste.overdecompiler.constantpool.datacontainers.NameAndTypeContainer;
-import user.theovercaste.overdecompiler.constantpool.datacontainers.StringReferenceContainer;
 import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
 import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerIndexException;
 import user.theovercaste.overdecompiler.exceptions.WrongConstantPoolPointerTypeException;
@@ -19,16 +13,16 @@ import com.google.common.base.Preconditions;
 public class ConstantPool {
     private final ArrayList<ConstantPoolEntry> entries;
 
-    private final Map<Object, Integer> entryValueMap = new HashMap<>(64);
+    private final Map<ConstantPoolEntry, Integer> entryValueMap = new HashMap<>(64);
 
     public ConstantPool(int size) {
         entries = new ArrayList<>(size);
     }
 
-    private int addValue(ConstantPoolEntry entry, Object container) {
+    private int addValue(ConstantPoolEntry entry) {
         entries.add(entry);
         int index = entries.size() - 1; // it inserted at end
-        entryValueMap.put(container, index);
+        entryValueMap.put(entry, index);
         return index;
     }
 
@@ -51,11 +45,11 @@ public class ConstantPool {
     }
 
     public int addDouble(double value) {
-        if (entryValueMap.containsKey(value)) {
-            return entryValueMap.get(value);
-        }
         ConstantPoolEntryDouble entry = new ConstantPoolEntryDouble(value);
-        return addValue(entry, value);
+        if (entryValueMap.containsKey(entry)) {
+            return entryValueMap.get(entry);
+        }
+        return addValue(entry);
     }
 
     public float getFloat(int index) throws InvalidConstantPoolPointerException {
@@ -67,11 +61,11 @@ public class ConstantPool {
     }
 
     public int addFloat(float value) {
-        if (entryValueMap.containsKey(value)) {
-            return entryValueMap.get(value);
-        }
         ConstantPoolEntryFloat entry = new ConstantPoolEntryFloat(value);
-        return addValue(entry, value);
+        if (entryValueMap.containsKey(entry)) {
+            return entryValueMap.get(entry);
+        }
+        return addValue(entry);
     }
 
     public long getLong(int index) throws InvalidConstantPoolPointerException {
@@ -83,11 +77,11 @@ public class ConstantPool {
     }
 
     public int addLong(long value) {
-        if (entryValueMap.containsKey(value)) {
-            return entryValueMap.get(value);
-        }
         ConstantPoolEntryLong entry = new ConstantPoolEntryLong(value);
-        return addValue(entry, value);
+        if (entryValueMap.containsKey(entry)) {
+            return entryValueMap.get(entry);
+        }
+        return addValue(entry);
     }
 
     public long getInteger(int index) throws InvalidConstantPoolPointerException {
@@ -99,11 +93,11 @@ public class ConstantPool {
     }
 
     public int addInteger(int value) {
-        if (entryValueMap.containsKey(value)) {
-            return entryValueMap.get(value);
-        }
         ConstantPoolEntryInteger entry = new ConstantPoolEntryInteger(value);
-        return addValue(entry, value);
+        if (entryValueMap.containsKey(entry)) {
+            return entryValueMap.get(entry);
+        }
+        return addValue(entry);
     }
 
     public String getUtf8(int index) throws InvalidConstantPoolPointerException {
@@ -116,11 +110,11 @@ public class ConstantPool {
 
     public int addUtf8(String string) {
         Preconditions.checkNotNull(string);
-        if (entryValueMap.containsKey(string)) {
-            return entryValueMap.get(string);
-        }
         ConstantPoolEntryUtf8 entry = new ConstantPoolEntryUtf8(string);
-        return addValue(entry, string);
+        if (entryValueMap.containsKey(entry)) {
+            return entryValueMap.get(entry);
+        }
+        return addValue(entry);
     }
 
     public String getStringReference(int index) throws InvalidConstantPoolPointerException {
@@ -134,12 +128,11 @@ public class ConstantPool {
     public int addStringReference(String string) {
         Preconditions.checkNotNull(string);
         int stringIndex = addUtf8(string);
-        StringReferenceContainer container = new StringReferenceContainer(stringIndex);
-        if (entryValueMap.containsKey(container)) {
-            return entryValueMap.get(string);
-        }
         ConstantPoolEntryString entry = new ConstantPoolEntryString(stringIndex);
-        return addValue(entry, string);
+        if (entryValueMap.containsKey(entry)) {
+            return entryValueMap.get(entry);
+        }
+        return addValue(entry);
     }
 
     public String getClassName(int index) throws InvalidConstantPoolPointerException {
@@ -152,12 +145,11 @@ public class ConstantPool {
 
     public int addClass(String name) {
         int nameIndex = addUtf8(name);
-        ClassContainer container = new ClassContainer(nameIndex);
-        if (entryValueMap.containsKey(container)) {
-            return entryValueMap.get(container);
-        }
         ConstantPoolEntryClass entry = new ConstantPoolEntryClass(nameIndex);
-        return addValue(entry, name);
+        if (entryValueMap.containsKey(entry)) {
+            return entryValueMap.get(entry);
+        }
+        return addValue(entry);
     }
 
     public String getNameAndTypeName(int index) throws InvalidConstantPoolPointerException {
@@ -179,12 +171,11 @@ public class ConstantPool {
     public int addNameAndType(String name, String descriptor) {
         int nameIndex = addUtf8(name);
         int descriptorIndex = addUtf8(descriptor);
-        NameAndTypeContainer container = new NameAndTypeContainer(nameIndex, descriptorIndex);
-        if (entryValueMap.containsKey(container)) {
-            return entryValueMap.get(container);
-        }
         ConstantPoolEntryNameAndType entry = new ConstantPoolEntryNameAndType(nameIndex, descriptorIndex);
-        return addValue(entry, container);
+        if (entryValueMap.containsKey(entry)) {
+            return entryValueMap.get(entry);
+        }
+        return addValue(entry);
     }
 
     public int getInvokeDynamicMethodIndex(int index) throws InvalidConstantPoolPointerException {
@@ -215,12 +206,11 @@ public class ConstantPool {
         Preconditions.checkNotNull(className);
         Preconditions.checkNotNull(descriptor);
         int nameAndTypeIndex = addNameAndType(className, descriptor);
-        ConstantPoolEntryInvokeDynamic container = new ConstantPoolEntryInvokeDynamic(methodIndex, nameAndTypeIndex);
-        if (entryValueMap.containsKey(container)) {
-            return entryValueMap.get(container);
-        }
         ConstantPoolEntryInvokeDynamic entry = new ConstantPoolEntryInvokeDynamic(methodIndex, nameAndTypeIndex);
-        return addValue(entry, container);
+        if (entryValueMap.containsKey(entry)) {
+            return entryValueMap.get(entry);
+        }
+        return addValue(entry);
     }
 
     public String getReferenceClassName(int index) throws InvalidConstantPoolPointerException {
@@ -250,37 +240,80 @@ public class ConstantPool {
     public int addFieldReference(String className, String name, String type) {
         int classIndex = addClass(className);
         int nameAndTypeIndex = addNameAndType(name, type);
-        FieldReferenceContainer container = new FieldReferenceContainer(classIndex, nameAndTypeIndex);
-        if (entryValueMap.containsKey(container)) {
-            return entryValueMap.get(container);
-        }
         ConstantPoolEntryFieldReference entry = new ConstantPoolEntryFieldReference(classIndex, nameAndTypeIndex);
-        return addValue(entry, container);
+        if (entryValueMap.containsKey(entry)) {
+            return entryValueMap.get(entry);
+        }
+        return addValue(entry);
     }
 
     public int addInterfaceMethodReference(String className, String name, String type) {
         int classIndex = addClass(className);
         int nameAndTypeIndex = addNameAndType(name, type);
-        InterfaceMethodReferenceContainer container = new InterfaceMethodReferenceContainer(classIndex, nameAndTypeIndex);
-        if (entryValueMap.containsKey(container)) {
-            return entryValueMap.get(container);
-        }
         ConstantPoolEntryInterfaceMethodReference entry = new ConstantPoolEntryInterfaceMethodReference(classIndex, nameAndTypeIndex);
-        return addValue(entry, container);
+        if (entryValueMap.containsKey(entry)) {
+            return entryValueMap.get(entry);
+        }
+        return addValue(entry);
     }
 
     public int addMethodReference(String className, String name, String type) {
         int classIndex = addClass(className);
         int nameAndTypeIndex = addNameAndType(name, type);
-        MethodReferenceContainer container = new MethodReferenceContainer(classIndex, nameAndTypeIndex);
-        if (entryValueMap.containsKey(container)) {
-            return entryValueMap.get(container);
-        }
         ConstantPoolEntryInterfaceMethodReference entry = new ConstantPoolEntryInterfaceMethodReference(classIndex, nameAndTypeIndex);
-        return addValue(entry, container);
+        if (entryValueMap.containsKey(entry)) {
+            return entryValueMap.get(entry);
+        }
+        return addValue(entry);
+    }
+
+    public long getMethodHandleKind(int index) throws InvalidConstantPoolPointerException {
+        ConstantPoolEntry entry = get(index);
+        if (entry instanceof ConstantPoolEntryMethodHandle) {
+            return ((ConstantPoolEntryMethodHandle) entry).getReferenceKind();
+        }
+        throw WrongConstantPoolPointerTypeException.constructException(index, this, ConstantPoolEntryMethodHandle.class);
+    }
+
+    public long getMethodHandleIndex(int index) throws InvalidConstantPoolPointerException {
+        ConstantPoolEntry entry = get(index);
+        if (entry instanceof ConstantPoolEntryMethodHandle) {
+            return ((ConstantPoolEntryMethodHandle) entry).getReferenceIndex();
+        }
+        throw WrongConstantPoolPointerTypeException.constructException(index, this, ConstantPoolEntryMethodHandle.class);
+    }
+
+    public int addMethodHandle(int methodKind, int methodIndex) {
+        ConstantPoolEntryMethodHandle entry = new ConstantPoolEntryMethodHandle(methodKind, methodIndex);
+        if (entryValueMap.containsKey(entry)) {
+            return entryValueMap.get(entry);
+        }
+        return addValue(entry);
+    }
+
+    public String getMethodTypeDescriptor(int index) throws InvalidConstantPoolPointerException {
+        ConstantPoolEntry entry = get(index);
+        if (entry instanceof ConstantPoolEntryMethodType) {
+            return getUtf8(((ConstantPoolEntryMethodType) entry).getDescriptorIndex());
+        }
+        throw WrongConstantPoolPointerTypeException.constructException(index, this, ConstantPoolEntryMethodType.class);
+    }
+
+    public int addMethodType(String descriptor) {
+        int descriptorIndex = addUtf8(descriptor);
+        ConstantPoolEntryMethodType entry = new ConstantPoolEntryMethodType(descriptorIndex);
+        if (entryValueMap.containsKey(entry)) {
+            return entryValueMap.get(entry);
+        }
+        return addValue(entry);
     }
 
     public ConstantPoolEntry getUnsafe(int index) {
         return entries.get(index - 1);
+    }
+
+    public void set(int index, ConstantPoolEntry entry) {
+        entries.set(index, entry);
+        entryValueMap.put(entry, index);
     }
 }
