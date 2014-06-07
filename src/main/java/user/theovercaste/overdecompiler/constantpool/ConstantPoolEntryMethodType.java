@@ -1,6 +1,7 @@
 package user.theovercaste.overdecompiler.constantpool;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -14,6 +15,11 @@ public class ConstantPoolEntryMethodType extends ConstantPoolEntry {
 
     public int getDescriptorIndex( ) {
         return descriptorIndex;
+    }
+
+    @Override
+    public void write(DataOutputStream dout) throws IOException {
+        dout.writeShort(descriptorIndex);
     }
 
     @Override
@@ -38,7 +44,7 @@ public class ConstantPoolEntryMethodType extends ConstantPoolEntry {
 
         @Override
         public void read(DataInputStream din) throws IOException {
-            descriptorIndex = din.readInt();
+            descriptorIndex = din.readUnsignedShort();
         }
 
         @Override

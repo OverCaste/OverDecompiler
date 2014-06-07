@@ -63,7 +63,7 @@ public class BinaryClassDataLoader implements ClassDataLoader {
         for (int i = 0; i < attributes.length; i++) {
             attributes[i] = AttributeData.loadAttribute(din);
         }
-        ClassData classData = new ClassData(constantPool);
+        ParsedClass classData = new ParsedClass(constantPool);
         classData.setClassId(thisClassId);
         classData.setParentId(superClassId);
         classData.setFlags(classFlags);

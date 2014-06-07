@@ -1,6 +1,7 @@
 package user.theovercaste.overdecompiler.constantpool;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -22,6 +23,12 @@ public class ConstantPoolEntryMethodReference extends ConstantPoolEntry implemen
     @Override
     public int getNameAndTypeIndex( ) {
         return nameAndTypeIndex;
+    }
+
+    @Override
+    public void write(DataOutputStream dout) throws IOException {
+        dout.writeShort(classIndex);
+        dout.writeShort(nameAndTypeIndex);
     }
 
     @Override

@@ -4,7 +4,6 @@ import java.io.DataInputStream;
 import java.io.IOException;
 
 import user.theovercaste.overdecompiler.constantpool.ConstantPool;
-import user.theovercaste.overdecompiler.constantpool.ConstantPoolValueRetriever;
 import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
 
 public class AttributeData {
@@ -17,7 +16,7 @@ public class AttributeData {
     }
 
     public String getName(ConstantPool constantPool) throws InvalidConstantPoolPointerException {
-        return ConstantPoolValueRetriever.getString(constantPool, nameIndex);
+        return constantPool.getUtf8(nameIndex);
     }
 
     public static AttributeData loadAttribute(DataInputStream din) throws IOException {

@@ -1,6 +1,7 @@
 package user.theovercaste.overdecompiler.constantpool;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 
 public abstract class ConstantPoolEntry {
@@ -27,6 +28,8 @@ public abstract class ConstantPoolEntry {
         }
         return true;
     }
+
+    public abstract void write(DataOutputStream dout) throws IOException;
 
     public abstract static class Factory {
         public abstract void read(DataInputStream din) throws IOException;

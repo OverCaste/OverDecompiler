@@ -1,6 +1,7 @@
 package user.theovercaste.overdecompiler.constantpool;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -14,6 +15,11 @@ public class ConstantPoolEntryLong extends ConstantPoolEntry {
 
     public long getValue( ) {
         return value;
+    }
+
+    @Override
+    public void write(DataOutputStream dout) throws IOException {
+        dout.writeLong(value);
     }
 
     @Override

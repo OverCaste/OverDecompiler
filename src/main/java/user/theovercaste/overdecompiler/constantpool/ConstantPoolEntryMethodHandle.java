@@ -1,6 +1,7 @@
 package user.theovercaste.overdecompiler.constantpool;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
@@ -10,7 +11,7 @@ import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.Maps;
 
 public class ConstantPoolEntryMethodHandle extends ConstantPoolEntry {
-    public enum ReferenceType {
+    public static enum ReferenceType {
         GET_FIELD(1),
         GET_STATIC(2),
         PUT_FIELD(3),
@@ -58,6 +59,12 @@ public class ConstantPoolEntryMethodHandle extends ConstantPoolEntry {
 
     public int getReferenceIndex( ) {
         return referenceIndex;
+    }
+
+    @Override
+    public void write(DataOutputStream dout) throws IOException {
+        dout.writeShort(referenceKind);
+        dout.writeShort(referenceIndex);
     }
 
     @Override
