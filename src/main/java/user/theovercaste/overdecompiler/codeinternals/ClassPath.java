@@ -7,6 +7,7 @@ import java.util.Objects;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Iterables;
@@ -28,6 +29,7 @@ public class ClassPath {
     public static final ClassPath DOUBLE = createPrimitivePath("double", 'D');
 
     public static final ClassPath OBJECT = new ClassPath("Object", "java.lang", 0, true);
+    public static final ClassPath OBJECT_ANNOTATION = new ClassPath("Annotation", "java.lang.annotation", 0, true);
     public static final ClassPath OBJECT_ENUM = new ClassPath("Enum", "java.lang", 0, true);
     public static final ClassPath OBJECT_LONG = new ClassPath("Long", "java.lang", 0, true);
     public static final ClassPath OBJECT_INTEGER = new ClassPath("Integer", "java.lang", 0, true);
@@ -65,7 +67,7 @@ public class ClassPath {
      */
     public ClassPath(String qualifiedName, int arrayDepth) {
         Preconditions.checkNotNull(qualifiedName, "Qualified name is null!");
-        if (qualifiedName.indexOf("/") > 0) { // Remove slashes
+        if (qualifiedName.indexOf("/") >= 0) { // Remove slashes
             qualifiedName = qualifiedName.replace("/", ".");
         }
         int lastPeriodIndex = qualifiedName.lastIndexOf(".");
@@ -85,9 +87,7 @@ public class ClassPath {
     }
 
     /**
-     * Returns a simple representation of what this class is. Example: java.lang.Object
-     * 
-     * @return
+     * @return A simple representation of what this class is. Example: java.lang.Object
      */
     public String getSimplePath( ) {
         StringBuilder ret = new StringBuilder();
@@ -98,8 +98,22 @@ public class ClassPath {
         return ret.toString();
     }
 
+    /**
+     * @return A representation of how you would define this ClassPath in code. Example: Object[][]
+     */
     public String getDefinition( ) {
         StringBuilder ret = new StringBuilder(className);
+        for (int i = 0; i < arrayDepth; i++) {
+            ret.append("[]");
+        }
+        return ret.toString();
+    }
+
+    /**
+     * @return A representation of how you would fully define this ClassPath in code. Example: java.lang.Object[][]
+     */
+    public String getFullDefinition( ) {
+        StringBuilder ret = new StringBuilder(getSimplePath());
         for (int i = 0; i < arrayDepth; i++) {
             ret.append("[]");
         }
@@ -189,8 +203,9 @@ public class ClassPath {
         if (input.length() == 0) {
             return new ArrayList<ClassPath>(0);
         }
-        String[] split = input.split(";");
-        ArrayList<ClassPath> ret = new ArrayList<ClassPath>(split.length);
+        Splitter splitter = Splitter.on(";").omitEmptyStrings();
+        Iterable<String> split = splitter.split(input);
+        ArrayList<ClassPath> ret = new ArrayList<ClassPath>();
         for (String s : split) {
             ret.add(demangle(s));
         }
@@ -250,6 +265,11 @@ public class ClassPath {
     }
 
     @Override
+    public String toString( ) {
+        return "ClassPath [" + getFullDefinition() + "]";
+    }
+
+    @Override
     public int hashCode( ) {
         return Objects.hash(arrayDepth, className, classPackage, isObject);
     }
@@ -284,4 +304,5 @@ public class ClassPath {
         }
         return true;
     }
+
 }

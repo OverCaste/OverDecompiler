@@ -8,7 +8,9 @@ import java.util.Stack;
 import user.theovercaste.overdecompiler.codeinternals.ClassPath;
 import user.theovercaste.overdecompiler.constantpool.ConstantPool;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntry;
+import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryInterfaceMethodReference;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryMethodReference;
+import user.theovercaste.overdecompiler.constantpool.ConstantPoolPreconditions;
 import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.EndOfStackException;
 import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
@@ -17,7 +19,12 @@ import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
 import user.theovercaste.overdecompiler.parserdata.method.MethodActionInvokeMethodStatic;
 import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
 
+import com.google.common.collect.ImmutableSet;
+
 public class InstructionInvokeStatic extends Instruction {
+    private static final ImmutableSet<Class<? extends ConstantPoolEntry>> REQUIRED_TYPES =
+            ImmutableSet.<Class<? extends ConstantPoolEntry>> builder().add(ConstantPoolEntryMethodReference.class).add(ConstantPoolEntryInterfaceMethodReference.class).build(); // .of doesn't like these for some reason...
+
     private final int methodIndex;
 
     public InstructionInvokeStatic(int opcode, int byteIndex, int instructionIndex, int lineNumber, int methodIndex) {
@@ -30,14 +37,6 @@ public class InstructionInvokeStatic extends Instruction {
         this.methodIndex = methodIndex;
     }
 
-    public ConstantPoolEntryMethodReference getMethod(ConstantPool constantPool) throws InvalidConstantPoolPointerException {
-        ConstantPoolEntry e = constantPool.get(methodIndex);
-        if (e instanceof ConstantPoolEntryMethodReference) {
-            return (ConstantPoolEntryMethodReference) e;
-        }
-        throw new InvalidConstantPoolPointerException("Invoke virtual has an invalid reference: " + methodIndex + ".");
-    }
-
     @Override
     public boolean isAction( ) {
         return true;
@@ -46,7 +45,9 @@ public class InstructionInvokeStatic extends Instruction {
     @Override
     public MethodAction getAction(ClassData originClass, Stack<MethodMember> stack) throws InstructionParsingException {
         try {
-            String descriptor = getMethod(originClass.getConstantPool()).getDescription(originClass.getConstantPool());
+            ConstantPool constantPool = originClass.getConstantPool();
+            ConstantPoolPreconditions.checkEntryType(constantPool, methodIndex, REQUIRED_TYPES);
+            String descriptor = constantPool.getReferenceType(methodIndex);
             Collection<ClassPath> arguments = ClassPath.getMethodArguments(descriptor);
             MethodAction[] actions = new MethodAction[arguments.size()];
             for (int i = 0; i < arguments.size(); i++) {
@@ -60,8 +61,7 @@ public class InstructionInvokeStatic extends Instruction {
                     throw new InstructionParsingException("Parameter " + i + "'s type isn't printable! (" + a.getClass().getName() + ")");
                 }
             }
-            ConstantPoolEntryMethodReference method = getMethod(originClass.getConstantPool());
-            return new MethodActionInvokeMethodStatic(new ClassPath(method.getClassName(originClass.getConstantPool())), method.getName(originClass.getConstantPool()), actions);
+            return new MethodActionInvokeMethodStatic(new ClassPath(constantPool.getReferenceClassName(methodIndex)), constantPool.getReferenceName(methodIndex), actions);
         } catch (InvalidConstantPoolPointerException e) {
             throw new InstructionParsingException(e);
         }

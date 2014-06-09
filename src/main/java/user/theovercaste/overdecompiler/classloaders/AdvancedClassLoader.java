@@ -9,12 +9,12 @@ import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.InvalidClassException;
 import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
 import user.theovercaste.overdecompiler.parserdata.ParsedClass;
-import user.theovercaste.overdecompiler.parsers.AbstractParser;
+import user.theovercaste.overdecompiler.parsers.ClassParser;
 import user.theovercaste.overdecompiler.parsers.JavaParser;
 
 public abstract class AdvancedClassLoader extends ClassLoader {
     private final HashMap<String, Class<?>> loadedClasses = new HashMap<>();
-    private final AbstractParser parser = JavaParser.Factory.getInstance().createParser();
+    private final ClassParser parser = JavaParser.Factory.getInstance().createParser();
 
     public AdvancedClassLoader( ) {
         super();

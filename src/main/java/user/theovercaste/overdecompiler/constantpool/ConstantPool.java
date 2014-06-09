@@ -26,6 +26,20 @@ public class ConstantPool {
         return index;
     }
 
+    /**
+     * Adds a method to the end of this Constant Pool. This method isn't smart, it won't remove duplicates.
+     * 
+     * @param entry
+     */
+    public void add(ConstantPoolEntry entry) {
+        entries.add(entry);
+    }
+
+    public void set(int index, ConstantPoolEntry entry) {
+        entries.set(index, entry);
+        entryValueMap.put(entry, index);
+    }
+
     public ConstantPoolEntry get(int index) throws InvalidConstantPoolPointerIndexException {
         if (index < 0) {
             throw new InvalidConstantPoolPointerIndexException("Constant pool index is less than zero: " + index + ".");
@@ -34,6 +48,10 @@ public class ConstantPool {
             throw new InvalidConstantPoolPointerIndexException("Constant pool index is larger than pool size: " + index + " > " + entries.size() + ".");
         }
         return entries.get(index - 1); // Start at index 0, pool starts at 1
+    }
+
+    public ConstantPoolEntry getUnsafe(int index) {
+        return entries.get(index - 1);
     }
 
     public double getDouble(int index) throws InvalidConstantPoolPointerException {
@@ -135,6 +153,15 @@ public class ConstantPool {
         return addValue(entry);
     }
 
+    /**
+     * Fetches the specified class' name from the constant pool.
+     * 
+     * @see {@link user.theovercaste.overdecompiler.codeinternals.ClassPath#getMangledPath(String)}
+     * 
+     * @param index The index from which the class is to be retrieved
+     * @return A mangled form of the class.
+     * @throws InvalidConstantPoolPointerException
+     */
     public String getClassName(int index) throws InvalidConstantPoolPointerException {
         ConstantPoolEntry entry = get(index);
         if (entry instanceof ConstantPoolEntryClass) {
@@ -213,6 +240,78 @@ public class ConstantPool {
         return addValue(entry);
     }
 
+    public String getMethodReferenceClassName(int index) throws InvalidConstantPoolPointerException {
+        ConstantPoolEntry entry = get(index);
+        if (entry instanceof ConstantPoolEntryMethodReference) {
+            return getClassName(((ConstantPoolEntryMethodReference) entry).getClassIndex());
+        }
+        throw WrongConstantPoolPointerTypeException.constructException(index, this, ConstantPoolEntryMethodReference.class);
+    }
+
+    public String getMethodReferenceName(int index) throws InvalidConstantPoolPointerException {
+        ConstantPoolEntry entry = get(index);
+        if (entry instanceof ConstantPoolEntryMethodReference) {
+            return getNameAndTypeName(((ConstantPoolEntryMethodReference) entry).getNameAndTypeIndex());
+        }
+        throw WrongConstantPoolPointerTypeException.constructException(index, this, ConstantPoolEntryMethodReference.class);
+    }
+
+    public String getMethodReferenceType(int index) throws InvalidConstantPoolPointerException {
+        ConstantPoolEntry entry = get(index);
+        if (entry instanceof ConstantPoolEntryMethodReference) {
+            return getNameAndTypeType(((ConstantPoolEntryMethodReference) entry).getNameAndTypeIndex());
+        }
+        throw WrongConstantPoolPointerTypeException.constructException(index, this, ConstantPoolEntryMethodReference.class);
+    }
+
+    public String getFieldReferenceClassName(int index) throws InvalidConstantPoolPointerException {
+        ConstantPoolEntry entry = get(index);
+        if (entry instanceof ConstantPoolEntryFieldReference) {
+            return getClassName(((ConstantPoolEntryFieldReference) entry).getClassIndex());
+        }
+        throw WrongConstantPoolPointerTypeException.constructException(index, this, ConstantPoolEntryFieldReference.class);
+    }
+
+    public String getFieldReferenceName(int index) throws InvalidConstantPoolPointerException {
+        ConstantPoolEntry entry = get(index);
+        if (entry instanceof ConstantPoolEntryFieldReference) {
+            return getNameAndTypeName(((ConstantPoolEntryFieldReference) entry).getNameAndTypeIndex());
+        }
+        throw WrongConstantPoolPointerTypeException.constructException(index, this, ConstantPoolEntryFieldReference.class);
+    }
+
+    public String getFieldReferenceType(int index) throws InvalidConstantPoolPointerException {
+        ConstantPoolEntry entry = get(index);
+        if (entry instanceof ConstantPoolEntryFieldReference) {
+            return getNameAndTypeType(((ConstantPoolEntryFieldReference) entry).getNameAndTypeIndex());
+        }
+        throw WrongConstantPoolPointerTypeException.constructException(index, this, ConstantPoolEntryFieldReference.class);
+    }
+
+    public String getInterfaceMethodReferenceClassName(int index) throws InvalidConstantPoolPointerException {
+        ConstantPoolEntry entry = get(index);
+        if (entry instanceof ConstantPoolEntryInterfaceMethodReference) {
+            return getClassName(((ConstantPoolEntryInterfaceMethodReference) entry).getClassIndex());
+        }
+        throw WrongConstantPoolPointerTypeException.constructException(index, this, ConstantPoolEntryInterfaceMethodReference.class);
+    }
+
+    public String getInterfaceMethodReferenceName(int index) throws InvalidConstantPoolPointerException {
+        ConstantPoolEntry entry = get(index);
+        if (entry instanceof ConstantPoolEntryInterfaceMethodReference) {
+            return getNameAndTypeName(((ConstantPoolEntryInterfaceMethodReference) entry).getNameAndTypeIndex());
+        }
+        throw WrongConstantPoolPointerTypeException.constructException(index, this, ConstantPoolEntryInterfaceMethodReference.class);
+    }
+
+    public String getInterfaceMethodReferenceType(int index) throws InvalidConstantPoolPointerException {
+        ConstantPoolEntry entry = get(index);
+        if (entry instanceof ConstantPoolEntryInterfaceMethodReference) {
+            return getNameAndTypeType(((ConstantPoolEntryInterfaceMethodReference) entry).getNameAndTypeIndex());
+        }
+        throw WrongConstantPoolPointerTypeException.constructException(index, this, ConstantPoolEntryInterfaceMethodReference.class);
+    }
+
     public String getReferenceClassName(int index) throws InvalidConstantPoolPointerException {
         ConstantPoolEntry entry = get(index);
         if (entry instanceof ConstantPoolEntryReference) {
@@ -226,7 +325,7 @@ public class ConstantPool {
         if (entry instanceof ConstantPoolEntryReference) {
             return getNameAndTypeName(((ConstantPoolEntryReference) entry).getNameAndTypeIndex());
         }
-        throw WrongConstantPoolPointerTypeException.constructException(index, this, ConstantPoolEntryNameAndType.class);
+        throw WrongConstantPoolPointerTypeException.constructException(index, this, ConstantPoolEntryReference.class);
     }
 
     public String getReferenceType(int index) throws InvalidConstantPoolPointerException {
@@ -234,7 +333,7 @@ public class ConstantPool {
         if (entry instanceof ConstantPoolEntryReference) {
             return getNameAndTypeType(((ConstantPoolEntryReference) entry).getNameAndTypeIndex());
         }
-        throw WrongConstantPoolPointerTypeException.constructException(index, this, ConstantPoolEntryNameAndType.class);
+        throw WrongConstantPoolPointerTypeException.constructException(index, this, ConstantPoolEntryReference.class);
     }
 
     public int addFieldReference(String className, String name, String type) {
@@ -306,14 +405,5 @@ public class ConstantPool {
             return entryValueMap.get(entry);
         }
         return addValue(entry);
-    }
-
-    public ConstantPoolEntry getUnsafe(int index) {
-        return entries.get(index - 1);
-    }
-
-    public void set(int index, ConstantPoolEntry entry) {
-        entries.set(index, entry);
-        entryValueMap.put(entry, index);
     }
 }

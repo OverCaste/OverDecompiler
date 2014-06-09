@@ -15,6 +15,7 @@ public class MethodActionGetConstant extends MethodActionGetter {
         FLOAT,
         DOUBLE,
         STRING,
+        CLASS,
         NULL;
     }
 
@@ -48,6 +49,8 @@ public class MethodActionGetConstant extends MethodActionGetter {
                 return value + "f";
             case STRING:
                 return "\"" + value + "\"";
+            case CLASS:
+                return value.replace("/", ".") + ".class";
             case NULL:
                 return "null";
         }

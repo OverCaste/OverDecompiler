@@ -9,6 +9,7 @@ import user.theovercaste.overdecompiler.codeinternals.ClassPath;
 import user.theovercaste.overdecompiler.constantpool.ConstantPool;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntry;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryMethodReference;
+import user.theovercaste.overdecompiler.constantpool.ConstantPoolPreconditions;
 import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.EndOfStackException;
 import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
@@ -18,7 +19,12 @@ import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetter;
 import user.theovercaste.overdecompiler.parserdata.method.MethodActionInvokeMethod;
 import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
 
+import com.google.common.collect.ImmutableSet;
+
 public class InstructionInvokeVirtual extends Instruction {
+    private static final ImmutableSet<Class<? extends ConstantPoolEntry>> REQUIRED_TYPES =
+            ImmutableSet.<Class<? extends ConstantPoolEntry>> builder().add(ConstantPoolEntryMethodReference.class).build(); // .of doesn't like these for some reason...
+
     private final int methodIndex;
 
     public InstructionInvokeVirtual(int opcode, int byteIndex, int instructionIndex, int lineNumber, int methodIndex) {
@@ -31,14 +37,6 @@ public class InstructionInvokeVirtual extends Instruction {
         this.methodIndex = methodIndex;
     }
 
-    public ConstantPoolEntryMethodReference getMethod(ConstantPool constantPool) throws InvalidConstantPoolPointerException {
-        ConstantPoolEntry e = constantPool.get(methodIndex);
-        if (e instanceof ConstantPoolEntryMethodReference) {
-            return (ConstantPoolEntryMethodReference) e;
-        }
-        throw new InvalidConstantPoolPointerException("Invoke virtual has an invalid reference: " + methodIndex + ".");
-    }
-
     @Override
     public boolean isAction( ) {
         return true;
@@ -47,7 +45,9 @@ public class InstructionInvokeVirtual extends Instruction {
     @Override
     public MethodAction getAction(ClassData originClass, Stack<MethodMember> stack) throws InstructionParsingException {
         try {
-            String descriptor = getMethod(originClass.getConstantPool()).getDescription(originClass.getConstantPool());
+            ConstantPool constantPool = originClass.getConstantPool();
+            ConstantPoolPreconditions.checkEntryType(constantPool, methodIndex, REQUIRED_TYPES);
+            String descriptor = constantPool.getReferenceType(methodIndex);
             Collection<ClassPath> arguments = ClassPath.getMethodArguments(descriptor);
             MethodAction[] actions = new MethodAction[arguments.size()];
             for (int i = 0; i < arguments.size(); i++) {
@@ -66,7 +66,7 @@ public class InstructionInvokeVirtual extends Instruction {
             }
             MethodMember a = stack.pop();
             if (a instanceof MethodActionGetter) {
-                return new MethodActionInvokeMethod((MethodActionGetter) a, getMethod(originClass.getConstantPool()).getName(originClass.getConstantPool()), actions);
+                return new MethodActionInvokeMethod((MethodActionGetter) a, constantPool.getReferenceName(methodIndex), actions); // todo transfer
             } else {
                 throw new InstructionParsingException("The instruction which owns this invoker isn't a proper type! (" + a.getClass().getName() + ")");
             }

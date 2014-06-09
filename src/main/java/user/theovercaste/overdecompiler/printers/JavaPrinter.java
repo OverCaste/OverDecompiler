@@ -1,20 +1,23 @@
 package user.theovercaste.overdecompiler.printers;
 
 import java.io.PrintStream;
+import java.util.List;
 
 import user.theovercaste.overdecompiler.codeinternals.ClassFlag;
 import user.theovercaste.overdecompiler.codeinternals.ClassPath;
+import user.theovercaste.overdecompiler.codeinternals.ClassType;
 import user.theovercaste.overdecompiler.codeinternals.FieldFlag;
 import user.theovercaste.overdecompiler.codeinternals.MethodFlag;
 import user.theovercaste.overdecompiler.parserdata.ParsedClass;
 import user.theovercaste.overdecompiler.parserdata.ParsedField;
 import user.theovercaste.overdecompiler.parserdata.ParsedMethod;
-import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
 import user.theovercaste.overdecompiler.parserdata.method.MethodActionReturnVoid;
+import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 public abstract class JavaPrinter extends AbstractPrinter {
     protected boolean printPackage(ParsedClass clazz, PrintStream out) {
@@ -80,9 +83,16 @@ public abstract class JavaPrinter extends AbstractPrinter {
             out.print(parent.getClassName());
             out.print(" ");
         }
-        if (clazz.getInterfaces().size() > 0) {
+        List<ClassPath> effectiveParents = Lists.newArrayListWithCapacity(clazz.getInterfaces().size());
+        for (ClassPath p : clazz.getInterfaces()) {
+            if ((clazz.getType().equals(ClassType.ANNOTATION) && p.equals(ClassPath.OBJECT_ANNOTATION))) {
+                continue; // If it's an annotation, skip the 'implements annotation'
+            }
+            effectiveParents.add(p);
+        }
+        if (effectiveParents.size() > 0) {
             out.print("implements ");
-            out.print(Joiner.on(", ").join(Iterables.transform(clazz.getInterfaces(), new Function<ClassPath, String>() { // Transforms an iterable of classpaths into a CSV string
+            out.print(Joiner.on(", ").join(Iterables.transform(effectiveParents, new Function<ClassPath, String>() { // Transforms an Iterable of classpaths into a CSV string
                 @Override
                 public String apply(ClassPath input) {
                     return input.getClassName();

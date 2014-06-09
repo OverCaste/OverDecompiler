@@ -4,13 +4,13 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Stack;
 
+import user.theovercaste.overdecompiler.codeinternals.ClassPath;
 import user.theovercaste.overdecompiler.constantpool.ConstantPool;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntry;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryClass;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryFloat;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryInteger;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryString;
-import user.theovercaste.overdecompiler.constantpool.ConstantPoolValueRetriever;
 import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
 import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
@@ -58,29 +58,21 @@ public class InstructionLoadConstant extends Instruction {
         ConstantPoolEntry e;
         try {
             e = getValue(originClass.getConstantPool());
-        } catch (InvalidConstantPoolPointerIndexException ex) {
+            if (e instanceof ConstantPoolEntryInteger) {
+                return new MethodActionGetConstant(String.valueOf(((ConstantPoolEntryInteger) e).getValue()), ConstantType.INT);
+            }
+            else if (e instanceof ConstantPoolEntryFloat) {
+                return new MethodActionGetConstant(String.valueOf(((ConstantPoolEntryFloat) e).getValue()), ConstantType.FLOAT);
+            }
+            else if (e instanceof ConstantPoolEntryString) {
+                return new MethodActionGetConstant(originClass.getConstantPool().getStringReference(constantIndex), ConstantType.STRING);
+            }
+            else if (e instanceof ConstantPoolEntryClass) {
+                ClassPath path = ClassPath.getMangledPath(originClass.getConstantPool().getClassName(constantIndex));
+                return new MethodActionGetConstant(path.getSimplePath(), ConstantType.CLASS);
+            }
+        } catch (InvalidConstantPoolPointerException ex) {
             throw new InstructionParsingException(ex);
-        }
-        if (e instanceof ConstantPoolEntryInteger) {
-            return new MethodActionGetConstant(String.valueOf(((ConstantPoolEntryInteger) e).getValue()), ConstantType.INT);
-        }
-        else if (e instanceof ConstantPoolEntryFloat) {
-            return new MethodActionGetConstant(String.valueOf(((ConstantPoolEntryFloat) e).getValue()), ConstantType.FLOAT);
-        }
-        else if (e instanceof ConstantPoolEntryString) {
-            try {
-                return new MethodActionGetConstant(ConstantPoolValueRetriever.getString(originClass.getConstantPool(), constantIndex), ConstantType.STRING);
-            } catch (InvalidConstantPoolPointerException ex) {
-                // Do nothing, fail through
-            }
-        }
-        else if (e instanceof ConstantPoolEntryClass) {
-            try {
-                throw new InstructionParsingException("Parsing class LDC hasn't been implemented yet. Forward this to the developer: "
-                        + ((ConstantPoolEntryClass) e).getName(originClass.getConstantPool()));
-            } catch (InvalidConstantPoolPointerException ex) {
-                ex.printStackTrace();
-            }
         }
         throw new InstructionParsingException("Invalid type for LDC: " + (e == null ? "null" : e.getClass().getName()));
     }

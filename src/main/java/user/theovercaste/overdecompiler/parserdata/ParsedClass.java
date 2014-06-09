@@ -9,6 +9,7 @@ import user.theovercaste.overdecompiler.codeinternals.ClassFlag;
 import user.theovercaste.overdecompiler.codeinternals.ClassPath;
 import user.theovercaste.overdecompiler.codeinternals.ClassType;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -26,6 +27,10 @@ public class ParsedClass implements AnnotatableElement {
     private final List<ClassPath> annotations = Lists.newArrayList();
 
     public ParsedClass(String name, String packageValue, ClassType type, ClassPath parent) {
+        Preconditions.checkNotNull(name);
+        Preconditions.checkNotNull(packageValue);
+        Preconditions.checkNotNull(type);
+        Preconditions.checkNotNull(parent);
         this.name = name;
         this.packageValue = packageValue;
         this.type = type;
@@ -73,7 +78,7 @@ public class ParsedClass implements AnnotatableElement {
     }
 
     @Override
-    public void addAnnotation(ClassPath annotation) {
+    public void addAnnotation(ClassPath annotation) { // TODO actual annotation class, annotation params
         annotations.add(annotation);
     }
 
