@@ -6,6 +6,8 @@ import java.util.EnumSet;
 
 import user.theovercaste.overdecompiler.attributes.AttributableElement;
 import user.theovercaste.overdecompiler.attributes.AttributeData;
+import user.theovercaste.overdecompiler.attributes.AttributeTypes;
+import user.theovercaste.overdecompiler.attributes.ExceptionsAttribute;
 import user.theovercaste.overdecompiler.attributes.RuntimeVisibleAnnotationsAttribute;
 import user.theovercaste.overdecompiler.codeinternals.ClassFlag;
 import user.theovercaste.overdecompiler.codeinternals.ClassPath;
@@ -23,6 +25,7 @@ import user.theovercaste.overdecompiler.parserdata.ParsedField;
 import user.theovercaste.overdecompiler.parserdata.ParsedMethod;
 import user.theovercaste.overdecompiler.parsers.methodparsers.JavaMethodParser;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 
 public class JavaParser extends AbstractParser {
@@ -75,7 +78,7 @@ public class JavaParser extends AbstractParser {
     @Override
     public ClassPath getParentPath( ) throws ClassParsingException {
         try {
-            return new ClassPath(classData.getConstantPool().getClassName(classData.getParentId()));
+            return ClassPath.getInternalPath(classData.getConstantPool().getClassName(classData.getParentId()));
         } catch (InvalidConstantPoolPointerException ex) {
             throw new ClassParsingException("Failed to get class parent.", ex);
         }
@@ -84,7 +87,7 @@ public class JavaParser extends AbstractParser {
     @Override
     public ClassPath getClassPath( ) throws ClassParsingException {
         try {
-            return new ClassPath(classData.getConstantPool().getClassName(classData.getClassId()));
+            return ClassPath.getInternalPath(classData.getConstantPool().getClassName(classData.getClassId()));
         } catch (InvalidConstantPoolPointerException ex) {
             throw new ClassParsingException("Failed to get classpath.", ex);
         }
@@ -95,7 +98,7 @@ public class JavaParser extends AbstractParser {
         ConstantPool constantPool = classData.getConstantPool();
         try {
             for (int i : classData.getInterfaces()) {
-                ClassPath classPath = new ClassPath(constantPool.getClassName(i));
+                ClassPath classPath = ClassPath.getInternalPath(constantPool.getClassName(i));
                 addImport(classPath);
                 parsedClass.addInterface(classPath);
             }
@@ -126,7 +129,27 @@ public class JavaParser extends AbstractParser {
     public void parseMethods( ) throws ClassParsingException {
         try {
             for (MethodData m : classData.getMethods()) {
-                parsedClass.addMethod(parseMethod(m));
+                ParsedMethod parsedMethod = parseMethod(m);
+                //for(AttributeData d : m.getAttributes()) {
+                //    System.out.println("Method data: " + d.getName(classData.getConstantPool()));
+                //}
+                try { //Parse exceptions
+                    Optional<ExceptionsAttribute> optionalExceptions = AttributeTypes.getWrappedAttribute(m.getAttributes(), classData.getConstantPool(), ExceptionsAttribute.class);
+                    if(optionalExceptions.isPresent()) {
+                         ArrayList<ClassPath> exceptions = new ArrayList<ClassPath>(optionalExceptions.get().getExceptions().length);
+                        for(int i : optionalExceptions.get().getExceptions()) {
+                            ClassPath exceptionPath = ClassPath.getInternalPath(classData.getConstantPool().getClassName(i));
+                            exceptions.add(exceptionPath);
+                        }
+                        for(ClassPath exception : exceptions) {
+                            parsedClass.addImport(exception);
+                            parsedMethod.addException(exception);
+                        }
+                    }
+                } catch (InvalidAttributeException e) {
+                    e.printStackTrace(); //TODO proper logging, slf4j?
+                }
+                parsedClass.addMethod(parsedMethod);
             }
         } catch (InvalidConstantPoolPointerException ex) {
             throw new ClassParsingException("Failed to parse fields.", ex);

@@ -7,15 +7,15 @@ import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
 import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
 import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
 
-public abstract class AbstractInstructionCompare extends Instruction {
+public abstract class AbstractInstructionComparator extends Instruction {
     protected final int branchIndex;
 
-    public AbstractInstructionCompare(int opcode, int byteIndex, int instructionIndex, int lineNumber, int branchIndex) {
+    public AbstractInstructionComparator(int opcode, int byteIndex, int instructionIndex, int lineNumber, int branchIndex) {
         super(opcode, byteIndex, instructionIndex, lineNumber);
         this.branchIndex = branchIndex;
     }
 
-    public AbstractInstructionCompare(int opcode, int byteIndex, int instructionIndex, int branchIndex) {
+    public AbstractInstructionComparator(int opcode, int byteIndex, int instructionIndex, int branchIndex) {
         super(opcode, byteIndex, instructionIndex);
         this.branchIndex = branchIndex;
     }
@@ -27,7 +27,12 @@ public abstract class AbstractInstructionCompare extends Instruction {
 
     @Override
     public MethodAction getAction(ClassData originClass, Stack<MethodMember> stack) throws InstructionParsingException {
-        return null;
+        throw new UnsupportedOperationException();
+    }
+    
+    @Override
+    public void modifyStack(Stack<MethodMember> stack) {
+        //Do nothing
     }
 
     @Override

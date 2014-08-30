@@ -15,7 +15,7 @@ public abstract class MethodMember {
     public Type getType( ) {
         return type;
     }
-
+    
     public abstract void print(ParsedClass c, ParsedMethod parent, PrintStream out);
 
     public static enum Type {

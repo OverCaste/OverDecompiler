@@ -12,6 +12,7 @@ import user.theovercaste.overdecompiler.datahandlers.FieldData;
 import user.theovercaste.overdecompiler.datahandlers.MethodData;
 import user.theovercaste.overdecompiler.exceptions.InvalidClassException;
 import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolEntryException;
+import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
 
 public class BinaryClassDataLoader implements ClassDataLoader {
     public static final int CLASS_MAGIC = 0xCAFEBABE;
@@ -63,6 +64,11 @@ public class BinaryClassDataLoader implements ClassDataLoader {
         AttributeData[] attributes = new AttributeData[din.readUnsignedShort()];
         for (int i = 0; i < attributes.length; i++) {
             attributes[i] = AttributeData.loadAttribute(din);
+            try {
+                System.out.println("Attribute: " + attributes[i].getName(constantPool));
+            } catch (InvalidConstantPoolPointerException e) {
+                e.printStackTrace();
+            }
         }
         ClassData classData = new ClassData(constantPool);
         classData.setClassId(thisClassId);

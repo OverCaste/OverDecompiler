@@ -11,7 +11,7 @@ import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetConstan
 import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetConstant.ConstantType;
 import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
 
-public class InstructionByteIntegerPush extends Instruction {
+public class InstructionByteIntegerPush extends AbstractInstructionDirectAction {
     private final int byteValue;
 
     public InstructionByteIntegerPush(int opcode, int byteIndex, int instructionIndex, int lineNumber, int byteValue) {
@@ -22,11 +22,6 @@ public class InstructionByteIntegerPush extends Instruction {
     public InstructionByteIntegerPush(int opcode, int byteIndex, int instructionIndex, int byteValue) {
         super(opcode, byteIndex, instructionIndex);
         this.byteValue = byteValue;
-    }
-
-    @Override
-    public boolean isAction( ) {
-        return true;
     }
 
     @Override

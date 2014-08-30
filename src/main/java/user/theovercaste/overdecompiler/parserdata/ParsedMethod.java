@@ -21,6 +21,7 @@ public class ParsedMethod implements AnnotatableElement {
     private final Set<MethodFlag> flags = Sets.newHashSet();
     private final List<ClassPath> arguments = Lists.newArrayList();
     private final List<ClassPath> annotations = Lists.newArrayList();
+    private final List<ClassPath> exceptions = Lists.newArrayList();
 
     public ParsedMethod(ClassPath returnType, String name) {
         Preconditions.checkNotNull(name, "Name can not be null!");
@@ -52,6 +53,10 @@ public class ParsedMethod implements AnnotatableElement {
     public void addAnnotation(ClassPath annotation) {
         annotations.add(annotation);
     }
+    
+    public void addException(ClassPath exception) {
+        exceptions.add(exception);
+    }
 
     public Collection<MethodMember> getActions( ) {
         return Collections.unmodifiableCollection(actions);
@@ -68,5 +73,9 @@ public class ParsedMethod implements AnnotatableElement {
     @Override
     public Collection<ClassPath> getAnnotations( ) {
         return Collections.unmodifiableCollection(annotations);
+    }
+    
+    public Collection<ClassPath> getExceptions( ) {
+        return Collections.unmodifiableCollection(exceptions);
     }
 }

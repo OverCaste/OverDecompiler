@@ -46,6 +46,8 @@ public abstract class Instruction {
     public abstract boolean isAction( );
 
     public abstract MethodAction getAction(ClassData originClass, Stack<MethodMember> stack) throws InstructionParsingException;
+    
+    public abstract void modifyStack(Stack<MethodMember> stack);
 
     public int getOpcode( ) {
         return opcode;

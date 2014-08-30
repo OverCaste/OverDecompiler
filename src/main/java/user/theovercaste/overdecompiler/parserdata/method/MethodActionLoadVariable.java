@@ -4,7 +4,7 @@ import user.theovercaste.overdecompiler.parserdata.ParsedClass;
 import user.theovercaste.overdecompiler.parserdata.ParsedMethod;
 
 public class MethodActionLoadVariable extends MethodActionGetter {
-    private int variableIndex;
+    private final int variableIndex;
 
     public MethodActionLoadVariable(int variableIndex) {
         this.variableIndex = variableIndex;

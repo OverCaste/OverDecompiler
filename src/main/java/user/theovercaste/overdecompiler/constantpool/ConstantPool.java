@@ -41,10 +41,10 @@ public class ConstantPool {
     }
 
     public ConstantPoolEntry get(int index) throws InvalidConstantPoolPointerIndexException {
-        if (index < 0) {
+        if (index < 1) {
             throw new InvalidConstantPoolPointerIndexException("Constant pool index is less than zero: " + index + ".");
         }
-        if (index >= entries.size()) {
+        if (index > entries.size()) {
             throw new InvalidConstantPoolPointerIndexException("Constant pool index is larger than pool size: " + index + " > " + entries.size() + ".");
         }
         return entries.get(index - 1); // Start at index 0, pool starts at 1
@@ -156,7 +156,7 @@ public class ConstantPool {
     /**
      * Fetches the specified class' name from the constant pool.
      * 
-     * @see {@link user.theovercaste.overdecompiler.codeinternals.ClassPath#getMangledPath(String)}
+     * @see {@link user.theovercaste.overdecompiler.codeinternals.ClassPath#getInternalPath(String)}
      * 
      * @param index The index from which the class is to be retrieved
      * @return A mangled form of the class.

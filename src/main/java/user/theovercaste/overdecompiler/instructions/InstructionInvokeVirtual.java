@@ -6,22 +6,15 @@ import java.util.Collection;
 import java.util.Stack;
 
 import user.theovercaste.overdecompiler.codeinternals.ClassPath;
-import user.theovercaste.overdecompiler.constantpool.ConstantPool;
-import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntry;
-import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryMethodReference;
-import user.theovercaste.overdecompiler.constantpool.ConstantPoolPreconditions;
+import user.theovercaste.overdecompiler.constantpool.*;
 import user.theovercaste.overdecompiler.datahandlers.ClassData;
-import user.theovercaste.overdecompiler.exceptions.EndOfStackException;
-import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
-import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
-import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
-import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetter;
-import user.theovercaste.overdecompiler.parserdata.method.MethodActionInvokeMethod;
-import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
+import user.theovercaste.overdecompiler.exceptions.*;
+import user.theovercaste.overdecompiler.parserdata.method.*;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
-public class InstructionInvokeVirtual extends Instruction {
+public class InstructionInvokeVirtual extends AbstractInstructionDirectAction {
     private static final ImmutableSet<Class<? extends ConstantPoolEntry>> REQUIRED_TYPES =
             ImmutableSet.<Class<? extends ConstantPoolEntry>> builder().add(ConstantPoolEntryMethodReference.class).build(); // .of doesn't like these for some reason...
 
@@ -38,17 +31,15 @@ public class InstructionInvokeVirtual extends Instruction {
     }
 
     @Override
-    public boolean isAction( ) {
-        return true;
-    }
-
-    @Override
     public MethodAction getAction(ClassData originClass, Stack<MethodMember> stack) throws InstructionParsingException {
         try {
             ConstantPool constantPool = originClass.getConstantPool();
             ConstantPoolPreconditions.checkEntryType(constantPool, methodIndex, REQUIRED_TYPES);
             String descriptor = constantPool.getReferenceType(methodIndex);
             Collection<ClassPath> arguments = ClassPath.getMethodArguments(descriptor);
+            for(MethodMember m : stack) {
+                System.out.println("Method on stack: " + m.getClass());
+            }
             MethodAction[] actions = new MethodAction[arguments.size()];
             for (int i = 0; i < arguments.size(); i++) {
                 if (stack.isEmpty()) {
@@ -66,7 +57,7 @@ public class InstructionInvokeVirtual extends Instruction {
             }
             MethodMember a = stack.pop();
             if (a instanceof MethodActionGetter) {
-                return new MethodActionInvokeMethod((MethodActionGetter) a, constantPool.getReferenceName(methodIndex), actions); // todo transfer
+                return new MethodActionInvokeMethod((MethodActionGetter) a, constantPool.getReferenceName(methodIndex), ImmutableList.copyOf(actions)); // todo transfer
             } else {
                 throw new InstructionParsingException("The instruction which owns this invoker isn't a proper type! (" + a.getClass().getName() + ")");
             }

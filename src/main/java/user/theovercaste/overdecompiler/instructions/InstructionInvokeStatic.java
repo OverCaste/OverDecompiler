@@ -19,9 +19,10 @@ import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
 import user.theovercaste.overdecompiler.parserdata.method.MethodActionInvokeMethodStatic;
 import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
-public class InstructionInvokeStatic extends Instruction {
+public class InstructionInvokeStatic extends AbstractInstructionDirectAction {
     private static final ImmutableSet<Class<? extends ConstantPoolEntry>> REQUIRED_TYPES =
             ImmutableSet.<Class<? extends ConstantPoolEntry>> builder().add(ConstantPoolEntryMethodReference.class).add(ConstantPoolEntryInterfaceMethodReference.class).build(); // .of doesn't like these for some reason...
 
@@ -38,17 +39,13 @@ public class InstructionInvokeStatic extends Instruction {
     }
 
     @Override
-    public boolean isAction( ) {
-        return true;
-    }
-
-    @Override
     public MethodAction getAction(ClassData originClass, Stack<MethodMember> stack) throws InstructionParsingException {
         try {
             ConstantPool constantPool = originClass.getConstantPool();
             ConstantPoolPreconditions.checkEntryType(constantPool, methodIndex, REQUIRED_TYPES);
             String descriptor = constantPool.getReferenceType(methodIndex);
             Collection<ClassPath> arguments = ClassPath.getMethodArguments(descriptor);
+            System.out.println("MethodAction: " + descriptor);
             MethodAction[] actions = new MethodAction[arguments.size()];
             for (int i = 0; i < arguments.size(); i++) {
                 if (stack.isEmpty()) {
@@ -61,7 +58,7 @@ public class InstructionInvokeStatic extends Instruction {
                     throw new InstructionParsingException("Parameter " + i + "'s type isn't printable! (" + a.getClass().getName() + ")");
                 }
             }
-            return new MethodActionInvokeMethodStatic(new ClassPath(constantPool.getReferenceClassName(methodIndex)), constantPool.getReferenceName(methodIndex), actions);
+            return new MethodActionInvokeMethodStatic(ClassPath.getInternalPath(constantPool.getReferenceClassName(methodIndex)), constantPool.getReferenceName(methodIndex), ImmutableList.copyOf(actions));
         } catch (InvalidConstantPoolPointerException e) {
             throw new InstructionParsingException(e);
         }

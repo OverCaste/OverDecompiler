@@ -11,18 +11,13 @@ import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetConstan
 import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetConstant.ConstantType;
 import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
 
-public class InstructionConstantNumber extends Instruction {
+public class InstructionConstantNumber extends AbstractInstructionDirectAction {
     public InstructionConstantNumber(int opcode, int byteIndex, int instructionIndex, int lineNumber) {
         super(opcode, byteIndex, instructionIndex, lineNumber);
     }
 
     public InstructionConstantNumber(int opcode, int byteIndex, int instructionIndex) {
         super(opcode, byteIndex, instructionIndex);
-    }
-
-    @Override
-    public boolean isAction( ) {
-        return true;
     }
 
     @Override

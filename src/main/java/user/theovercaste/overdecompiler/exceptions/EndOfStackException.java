@@ -6,4 +6,8 @@ public class EndOfStackException extends InstructionParsingException {
     public EndOfStackException( ) {
         super("Unexpectedly reached end of stack.");
     }
+
+    public EndOfStackException(String message) {
+        super(message);
+    }
 }

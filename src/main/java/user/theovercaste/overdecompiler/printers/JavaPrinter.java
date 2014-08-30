@@ -5,6 +5,7 @@ import java.util.List;
 
 import user.theovercaste.overdecompiler.codeinternals.ClassFlag;
 import user.theovercaste.overdecompiler.codeinternals.ClassPath;
+import user.theovercaste.overdecompiler.codeinternals.ClassPaths;
 import user.theovercaste.overdecompiler.codeinternals.ClassType;
 import user.theovercaste.overdecompiler.codeinternals.FieldFlag;
 import user.theovercaste.overdecompiler.codeinternals.MethodFlag;
@@ -200,7 +201,7 @@ public abstract class JavaPrinter extends AbstractPrinter {
         if (m.getFlags().contains(MethodFlag.NATIVE)) {
             out.print("native ");
         }
-        if (m.getName().equals("<init>")) {
+        if (m.getName().equals("<init>")) { //Constructor, no type def
             out.print(clazz.getName());
         }
         else {
@@ -223,6 +224,10 @@ public abstract class JavaPrinter extends AbstractPrinter {
             })));
         }
         out.print(")");
+        if(!m.getExceptions().isEmpty()) {
+            out.print(" throws ");
+            out.print(Joiner.on(", ").join(ClassPaths.transformDefinitions(m.getExceptions())));
+        }
         if (m.getFlags().contains(MethodFlag.NATIVE) || m.getFlags().contains(MethodFlag.ABSTRACT)) {
             out.print(";");
         } else {

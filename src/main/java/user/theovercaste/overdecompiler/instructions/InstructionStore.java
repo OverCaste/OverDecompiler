@@ -5,15 +5,10 @@ import java.io.IOException;
 import java.util.Stack;
 
 import user.theovercaste.overdecompiler.datahandlers.ClassData;
-import user.theovercaste.overdecompiler.exceptions.EndOfStackException;
-import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
-import user.theovercaste.overdecompiler.exceptions.InvalidStackTypeException;
-import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
-import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetter;
-import user.theovercaste.overdecompiler.parserdata.method.MethodActionSetVariable;
-import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
+import user.theovercaste.overdecompiler.exceptions.*;
+import user.theovercaste.overdecompiler.parserdata.method.*;
 
-public class InstructionStore extends Instruction {
+public class InstructionStore extends AbstractInstructionDirectAction {
     private final int value;
 
     public InstructionStore(int opcode, int byteIndex, int instructionIndex, int lineNumber, int value) {
@@ -28,11 +23,6 @@ public class InstructionStore extends Instruction {
 
     public int getNumber( ) {
         return value;
-    }
-
-    @Override
-    public boolean isAction( ) {
-        return true;
     }
 
     @Override

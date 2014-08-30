@@ -13,18 +13,13 @@ import user.theovercaste.overdecompiler.parserdata.method.MethodActionAdd;
 import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetter;
 import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
 
-public class InstructionAdd extends Instruction {
+public class InstructionAdd extends AbstractInstructionDirectAction {
     public InstructionAdd(int opcode, int byteIndex, int instructionIndex, int lineNumber) {
         super(opcode, byteIndex, instructionIndex, lineNumber);
     }
 
     public InstructionAdd(int opcode, int byteIndex, int instructionIndex) {
         super(opcode, byteIndex, instructionIndex);
-    }
-
-    @Override
-    public boolean isAction( ) {
-        return true;
     }
 
     @Override

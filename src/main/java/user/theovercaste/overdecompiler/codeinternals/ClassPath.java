@@ -12,7 +12,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Iterables;
 
-public class ClassPath {
+public final class ClassPath {
     private static final BiMap<Character, ClassPath> primitiveIdentifiers = HashBiMap.create();
     private static final BiMap<Character, String> primitiveNames = HashBiMap.create();
 
@@ -51,8 +51,8 @@ public class ClassPath {
     private final String classPackage;
     private final int arrayDepth;
     private final boolean isObject;
-
-    protected ClassPath(String className, String classPackage, int arrayDepth, boolean isObject) {
+    
+    private ClassPath(String className, String classPackage, int arrayDepth, boolean isObject) {
         this.className = className;
         this.classPackage = classPackage;
         this.arrayDepth = arrayDepth;
@@ -65,7 +65,7 @@ public class ClassPath {
      * @param qualifiedName
      * @see<a href=http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.3>The definition of bytecode field descriptors at the oracle site</a>.
      */
-    public ClassPath(String qualifiedName, int arrayDepth) {
+    private ClassPath(String qualifiedName, int arrayDepth) {
         Preconditions.checkNotNull(qualifiedName, "Qualified name is null!");
         if (qualifiedName.indexOf("/") >= 0) { // Remove slashes
             qualifiedName = qualifiedName.replace("/", ".");
@@ -80,10 +80,6 @@ public class ClassPath {
         }
         this.arrayDepth = arrayDepth;
         isObject = true;
-    }
-
-    public ClassPath(String qualifiedName) {
-        this(qualifiedName, 0);
     }
 
     /**
@@ -263,6 +259,24 @@ public class ClassPath {
         }
         throw new IllegalArgumentException("The path \"" + mangled + "\" isn't a valid, mangled path!");
     }
+    
+    /**
+     * Retrieves a ClassPath from it's internal, informal string representation in the binary data, for example java/lang/String would return {@link #OBJECT_STRING}
+     * 
+     * @param internalValue
+     * @return The ClassPath value of the internally represented string.
+     */
+    public static ClassPath getInternalPath(String internalValue) {
+        return new ClassPath(internalValue, 0);
+    }
+    
+    public static ClassPath getInstance(String string) {
+        if(string.contains("/")) {
+            throw new IllegalArgumentException("Unable to create a classpath with slashes in it. Use 'getInternalPath'");
+        }
+        return new ClassPath(string, 0);
+    }
+
 
     @Override
     public String toString( ) {
@@ -304,5 +318,4 @@ public class ClassPath {
         }
         return true;
     }
-
 }

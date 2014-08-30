@@ -3,7 +3,7 @@ package user.theovercaste.overdecompiler.instructions;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-public class InstructionCompareEquals extends AbstractInstructionCompare {
+public class InstructionCompareEquals extends AbstractInstructionComparator {
     public InstructionCompareEquals(int opcode, int byteIndex, int instructionIndex, int lineNumber, int branchIndex) {
         super(opcode, byteIndex, instructionIndex, lineNumber, branchIndex);
     }

@@ -5,15 +5,10 @@ import java.io.IOException;
 import java.util.Stack;
 
 import user.theovercaste.overdecompiler.datahandlers.ClassData;
-import user.theovercaste.overdecompiler.exceptions.EndOfStackException;
-import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
-import user.theovercaste.overdecompiler.exceptions.InvalidStackTypeException;
-import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
-import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetter;
-import user.theovercaste.overdecompiler.parserdata.method.MethodActionSetVariable;
-import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
+import user.theovercaste.overdecompiler.exceptions.*;
+import user.theovercaste.overdecompiler.parserdata.method.*;
 
-public class InstructionStoreNumbered extends Instruction {
+public class InstructionStoreNumbered extends AbstractInstructionDirectAction {
     public InstructionStoreNumbered(int opcode, int byteIndex, int instructionIndex, int lineNumber) {
         super(opcode, byteIndex, instructionIndex, lineNumber);
     }
@@ -24,11 +19,6 @@ public class InstructionStoreNumbered extends Instruction {
 
     public int getNumber( ) {
         return (opcode - 0x3b) & 3; // For clarity, this is (roughly) equivalent to (getOpcodes( )[0]) % 4, which takes advantage of the fact that all of the xstore_n operations are sequential.
-    }
-
-    @Override
-    public boolean isAction( ) {
-        return true;
     }
 
     @Override

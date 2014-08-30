@@ -14,7 +14,7 @@ import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
 /**
  * Equivalent to <a href="http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.aconst_null">aconst_null</a>
  */
-public class InstructionConstantNull extends Instruction {
+public class InstructionConstantNull extends AbstractInstructionDirectAction {
     public InstructionConstantNull(int opcode, int byteIndex, int instructionIndex, int lineNumber) {
         super(opcode, byteIndex, instructionIndex, lineNumber);
     }
@@ -25,11 +25,6 @@ public class InstructionConstantNull extends Instruction {
 
     public static int[] getOpcodes( ) {
         return new int[] {0x1};
-    }
-
-    @Override
-    public boolean isAction( ) {
-        return true;
     }
 
     @Override

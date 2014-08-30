@@ -10,7 +10,7 @@ import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
 import user.theovercaste.overdecompiler.parserdata.method.MethodActionLoadVariable;
 import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
 
-public class InstructionLoad extends Instruction {
+public class InstructionLoad extends AbstractInstructionDirectAction {
     private final int referenceIndex;
 
     public InstructionLoad(int opcode, int byteIndex, int instructionIndex, int lineNumber, int referenceIndex) {
@@ -29,11 +29,6 @@ public class InstructionLoad extends Instruction {
 
     public int getNumber( ) {
         return referenceIndex;
-    }
-
-    @Override
-    public boolean isAction( ) {
-        return true;
     }
 
     @Override

@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.Stack;
 
 import user.theovercaste.overdecompiler.codeinternals.ClassPath;
-import user.theovercaste.overdecompiler.constantpool.ConstantPool;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntry;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryClass;
 import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryFloat;
@@ -14,7 +13,6 @@ import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryString;
 import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
 import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
-import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerIndexException;
 import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
 import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetConstant;
 import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetConstant.ConstantType;
@@ -23,12 +21,12 @@ import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
 /**
  * Equivalent to <a href="http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.ldc">ldc</a>
  */
-public class InstructionLoadConstant extends Instruction {
-    private final int constantIndex;
+public class InstructionLoadConstant extends AbstractInstructionDirectAction {
+    protected final int constantIndex;
 
-    public InstructionLoadConstant(int opcode, int byteIndex, int instructionIndex, int lineNumber, int nameIndex) {
+    public InstructionLoadConstant(int opcode, int byteIndex, int instructionIndex, int lineNumber, int constantIndex) {
         super(opcode, byteIndex, instructionIndex, lineNumber);
-        constantIndex = nameIndex;
+        this.constantIndex = constantIndex;
     }
 
     public InstructionLoadConstant(int opcode, int byteIndex, int instructionIndex, int nameIndex) {
@@ -40,24 +38,15 @@ public class InstructionLoadConstant extends Instruction {
         return new int[] {0x12};
     }
 
-    public ConstantPoolEntry getValue(ConstantPool constantPool) throws InvalidConstantPoolPointerIndexException {
-        return constantPool.get(constantIndex);
-    }
-
     public static Factory factory( ) {
         return new Factory();
-    }
-
-    @Override
-    public boolean isAction( ) {
-        return true;
     }
 
     @Override
     public MethodAction getAction(ClassData originClass, Stack<MethodMember> stack) throws InstructionParsingException {
         ConstantPoolEntry e;
         try {
-            e = getValue(originClass.getConstantPool());
+            e = originClass.getConstantPool().get(constantIndex);
             if (e instanceof ConstantPoolEntryInteger) {
                 return new MethodActionGetConstant(String.valueOf(((ConstantPoolEntryInteger) e).getValue()), ConstantType.INT);
             }
@@ -85,8 +74,8 @@ public class InstructionLoadConstant extends Instruction {
     public static class Factory extends Instruction.Factory {
         @Override
         public InstructionLoadConstant load(int opcode, DataInputStream din) throws IOException {
-            int nameIndex = din.readUnsignedByte();
-            return new InstructionLoadConstant(opcode, byteIndex, instructionIndex, lineNumber, nameIndex);
+            int constantIndex = din.readUnsignedByte();
+            return new InstructionLoadConstant(opcode, byteIndex, instructionIndex, lineNumber, constantIndex);
         }
     }
 }

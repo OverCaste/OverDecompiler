@@ -10,7 +10,8 @@ import com.google.common.collect.ImmutableMap;
 public enum AttributeTypes {
     CODE(CodeAttribute.class, CodeAttribute.parser(), CodeAttribute.getName()),
     CONSTANT_VALUE(ConstantValueAttribute.class, ConstantValueAttribute.parser(), ConstantValueAttribute.getName()),
-    LINE_NUMBER_TABLE(LineNumberTableAttribute.class, LineNumberTableAttribute.parser(), LineNumberTableAttribute.getName());
+    LINE_NUMBER_TABLE(LineNumberTableAttribute.class, LineNumberTableAttribute.parser(), LineNumberTableAttribute.getName()),
+    EXCEPTIONS(ExceptionsAttribute.class, ExceptionsAttribute.parser(), ExceptionsAttribute.getName());
 
     private final Class<? extends ParsedAttribute> clazz;
     private final ParsedAttribute.Parser<? extends ParsedAttribute> parser;

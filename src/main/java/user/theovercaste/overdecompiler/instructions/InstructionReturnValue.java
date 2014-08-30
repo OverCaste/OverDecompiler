@@ -5,14 +5,10 @@ import java.io.IOException;
 import java.util.Stack;
 
 import user.theovercaste.overdecompiler.datahandlers.ClassData;
-import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
-import user.theovercaste.overdecompiler.exceptions.InvalidStackTypeException;
-import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
-import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetter;
-import user.theovercaste.overdecompiler.parserdata.method.MethodActionReturnValue;
-import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
+import user.theovercaste.overdecompiler.exceptions.*;
+import user.theovercaste.overdecompiler.parserdata.method.*;
 
-public class InstructionReturnValue extends Instruction {
+public class InstructionReturnValue extends AbstractInstructionDirectAction {
     public InstructionReturnValue(int opcode, int byteIndex, int instructionIndex, int lineNumber) {
         super(opcode, byteIndex, instructionIndex, lineNumber);
     }
@@ -22,12 +18,10 @@ public class InstructionReturnValue extends Instruction {
     }
 
     @Override
-    public boolean isAction( ) {
-        return true;
-    }
-
-    @Override
     public MethodAction getAction(ClassData originClass, Stack<MethodMember> stack) throws InstructionParsingException {
+        if(stack.isEmpty()) {
+            throw new EndOfStackException("There was no value to be returned!");
+        }
         MethodMember value = stack.pop();
         if (value instanceof MethodActionGetter) {
             return new MethodActionReturnValue((MethodActionGetter) value);

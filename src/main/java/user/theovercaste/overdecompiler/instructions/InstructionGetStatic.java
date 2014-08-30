@@ -13,7 +13,7 @@ import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
 import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetStaticField;
 import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
 
-public class InstructionGetStatic extends Instruction {
+public class InstructionGetStatic extends AbstractInstructionDirectAction {
     private final int fieldIndex;
 
     public InstructionGetStatic(int opcode, int byteIndex, int instructionIndex, int lineNumber, int fieldIndex) {
@@ -27,15 +27,10 @@ public class InstructionGetStatic extends Instruction {
     }
 
     @Override
-    public boolean isAction( ) {
-        return true;
-    }
-
-    @Override
     public MethodAction getAction(ClassData originClass, Stack<MethodMember> stack) throws InstructionParsingException {
         try {
             ConstantPool constantPool = originClass.getConstantPool();
-            return new MethodActionGetStaticField(constantPool.getFieldReferenceName(fieldIndex), new ClassPath(constantPool.getFieldReferenceClassName(fieldIndex).replace("/", ".")));
+            return new MethodActionGetStaticField(constantPool.getFieldReferenceName(fieldIndex), ClassPath.getInternalPath(constantPool.getFieldReferenceClassName(fieldIndex).replace("/", ".")));
         } catch (InvalidConstantPoolPointerException e) {
             throw new InstructionParsingException(e);
         }
