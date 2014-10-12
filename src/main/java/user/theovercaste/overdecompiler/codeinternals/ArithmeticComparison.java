@@ -24,9 +24,9 @@ public enum ArithmeticComparison {
         Preconditions.checkNotNull(o);
         return oppositeMap.get(o);
     }
-    
+
     private final String symbol;
-    
+
     ArithmeticComparison(String symbol) {
         this.symbol = symbol;
     }

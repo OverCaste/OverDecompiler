@@ -1,6 +1,5 @@
 package user.theovercaste.overdecompiler.codeinternals;
 
-
 public enum ClassFlag {
     PUBLIC(0x0001),
     FINAL(0x0010),

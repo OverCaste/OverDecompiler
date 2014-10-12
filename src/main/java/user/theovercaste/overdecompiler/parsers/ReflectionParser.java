@@ -107,7 +107,7 @@ public class ReflectionParser extends AbstractParser {
         for (Class<?> c : m.getParameterTypes()) {
             parsedMethod.addArgument(convertClassPath(c));
         }
-        for (Class<?> exception: m.getExceptionTypes()) {
+        for (Class<?> exception : m.getExceptionTypes()) {
             parsedMethod.addException(convertClassPath(exception));
         }
         // TODO parameter annotations

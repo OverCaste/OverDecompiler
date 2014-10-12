@@ -19,7 +19,7 @@ public class InstructionArrayLength extends AbstractInstructionDirectAction {
 
     @Override
     public MethodAction getAction(ClassData originClass, Stack<MethodMember> stack) throws InstructionParsingException {
-        if(stack.isEmpty()) {
+        if (stack.isEmpty()) {
             throw new EndOfStackException("There was no array to get the length of!");
         }
         MethodMember value = stack.pop();

@@ -7,11 +7,11 @@ import user.theovercaste.overdecompiler.instructions.comparisons.InstructionIfNo
 
 import com.google.common.collect.ImmutableMap;
 
-public final class  Instructions {
+public final class Instructions {
     private Instructions( ) {
-        //No instantiation
+        // No instantiation
     }
-    
+
     private static final ImmutableMap<Integer, Instruction.Factory> factoryMap = getFactoryMap();
 
     private static ImmutableMap<Integer, Instruction.Factory> getFactoryMap( ) {
@@ -21,14 +21,14 @@ public final class  Instructions {
         registerInstruction(builder, InstructionByteIntegerPush.getOpcodes(), InstructionByteIntegerPush.factory());
         registerInstruction(builder, InstructionNew.getOpcodes(), InstructionNew.factory());
         registerInstruction(builder, InstructionArrayLength.getOpcodes(), InstructionArrayLength.factory());
-        
-        //Dummy instructions with no data and no MethodAction, used by other instructions
+
+        // Dummy instructions with no data and no MethodAction, used by other instructions
         registerInstruction(builder, InstructionDup.getOpcodes(), InstructionDup.factory());
         registerInstruction(builder, InstructionPop.getOpcodes(), InstructionPop.factory());
-        
-        //Comparison instructions, used in goto -> block conversion
+
+        // Comparison instructions, used in goto -> block conversion
         registerInstruction(builder, InstructionIfNotEqual.getOpcodes(), InstructionIfNotEqual.factory());
-        
+
         registerInstruction(builder, InstructionGetStatic.getOpcodes(), InstructionGetStatic.factory()); // This may be easier with reflection, but it would make the code brittle.
         registerInstruction(builder, InstructionInvokeVirtual.getOpcodes(), InstructionInvokeVirtual.factory());
         registerInstruction(builder, InstructionInvokeSpecial.getOpcodes(), InstructionInvokeSpecial.factory());
@@ -56,7 +56,7 @@ public final class  Instructions {
         }
         throw new InvalidInstructionException("Instruction " + id + " (" + Integer.toHexString(id) + ") isn't defined.");
     }
-    
+
     public static Iterable<Instruction.Factory> getFactories( ) {
         return factoryMap.values();
     }

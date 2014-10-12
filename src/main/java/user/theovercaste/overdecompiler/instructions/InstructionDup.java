@@ -14,7 +14,7 @@ public class InstructionDup extends AbstractInstructionStackModifier {
     public InstructionDup(int opcode, int byteIndex, int instructionIndex) {
         super(opcode, byteIndex, instructionIndex);
     }
-    
+
     public static int[] getOpcodes( ) {
         return new int[] {0x59};
     }

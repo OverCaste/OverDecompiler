@@ -19,7 +19,7 @@ public class InstructionReturnValue extends AbstractInstructionDirectAction {
 
     @Override
     public MethodAction getAction(ClassData originClass, Stack<MethodMember> stack) throws InstructionParsingException {
-        if(stack.isEmpty()) {
+        if (stack.isEmpty()) {
             throw new EndOfStackException("There was no value to be returned!");
         }
         MethodMember value = stack.pop();

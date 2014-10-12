@@ -53,7 +53,7 @@ public class ParsedMethod implements AnnotatableElement {
     public void addAnnotation(ClassPath annotation) {
         annotations.add(annotation);
     }
-    
+
     public void addException(ClassPath exception) {
         exceptions.add(exception);
     }
@@ -74,7 +74,7 @@ public class ParsedMethod implements AnnotatableElement {
     public Collection<ClassPath> getAnnotations( ) {
         return Collections.unmodifiableCollection(annotations);
     }
-    
+
     public Collection<ClassPath> getExceptions( ) {
         return Collections.unmodifiableCollection(exceptions);
     }

@@ -15,7 +15,7 @@ public class InstructionNew extends AbstractInstructionDummy {
         super(opcode, byteIndex, instructionIndex);
         this.newIndex = byteValue;
     }
-    
+
     public int getNewIndex( ) {
         return newIndex;
     }

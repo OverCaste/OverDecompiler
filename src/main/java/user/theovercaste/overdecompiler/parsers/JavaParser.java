@@ -116,24 +116,24 @@ public class JavaParser extends AbstractParser {
         try {
             for (MethodData m : classData.getMethods()) {
                 ParsedMethod parsedMethod = parseMethod(m);
-                //for(AttributeData d : m.getAttributes()) {
-                //    System.out.println("Method data: " + d.getName(classData.getConstantPool()));
-                //}
-                try { //Parse exceptions
+                // for(AttributeData d : m.getAttributes()) {
+                // System.out.println("Method data: " + d.getName(classData.getConstantPool()));
+                // }
+                try { // Parse exceptions
                     Optional<ExceptionsAttribute> optionalExceptions = AttributeTypes.getWrappedAttribute(m.getAttributes(), classData.getConstantPool(), ExceptionsAttribute.class);
-                    if(optionalExceptions.isPresent()) {
-                         ArrayList<ClassPath> exceptions = new ArrayList<ClassPath>(optionalExceptions.get().getExceptions().length);
-                        for(int i : optionalExceptions.get().getExceptions()) {
+                    if (optionalExceptions.isPresent()) {
+                        ArrayList<ClassPath> exceptions = new ArrayList<ClassPath>(optionalExceptions.get().getExceptions().length);
+                        for (int i : optionalExceptions.get().getExceptions()) {
                             ClassPath exceptionPath = ClassPath.getInternalPath(classData.getConstantPool().getClassName(i));
                             exceptions.add(exceptionPath);
                         }
-                        for(ClassPath exception : exceptions) {
+                        for (ClassPath exception : exceptions) {
                             parsedClass.addImport(exception);
                             parsedMethod.addException(exception);
                         }
                     }
                 } catch (InvalidAttributeException e) {
-                    e.printStackTrace(); //TODO proper logging, slf4j?
+                    e.printStackTrace(); // TODO proper logging, slf4j?
                 }
                 parsedClass.addMethod(parsedMethod);
             }
@@ -146,14 +146,14 @@ public class JavaParser extends AbstractParser {
     protected void parseAnnotations( ) throws ClassParsingException {
         // TODO
     }
-    
+
     @Override
     protected void parseFlags( ) throws ClassParsingException {
         EnumSet<ClassFlag> classFlags = getClassFlags(classData.getFlagMask());
-        if(classFlags.contains(ClassFlag.PUBLIC)) {
+        if (classFlags.contains(ClassFlag.PUBLIC)) {
             parsedClass.addFlag(ClassFlag.PUBLIC);
         }
-        if(classFlags.contains(ClassFlag.FINAL)) {
+        if (classFlags.contains(ClassFlag.FINAL)) {
             parsedClass.addFlag(ClassFlag.FINAL);
         }
     }

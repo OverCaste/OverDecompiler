@@ -1,6 +1,5 @@
 package user.theovercaste.overdecompiler.parserdata.method;
 
-
 public abstract class MethodMember {
     protected final Type type;
 
@@ -11,7 +10,7 @@ public abstract class MethodMember {
     public Type getType( ) {
         return type;
     }
-    
+
     public static enum Type {
         /**
          * Members such as if statements, loops, and other blocks that contain code.

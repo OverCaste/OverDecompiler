@@ -110,7 +110,7 @@ public class JavaMethodParser extends AbstractMethodParser {
         ScanState currentState = ScanState.NO_MATCH;
         MethodBlockParser currentParser = null;
         System.out.println("Initial size: " + members.size());
-        List<MethodBlockContainer.Member> currentBlockMembers = new ArrayList<>(); 
+        List<MethodBlockContainer.Member> currentBlockMembers = new ArrayList<>();
         ListIterator<MethodBlockContainer.Member> listIterator = members.listIterator();
         while (listIterator.hasNext()) {
             int i = listIterator.nextIndex();
@@ -122,7 +122,7 @@ public class JavaMethodParser extends AbstractMethodParser {
                     switch (parserState) {
                         case SCAN_ENDED: // The current block was parsed, and a new block of the same type didn't start.
                             currentState = ScanState.SCAN_ENDED;
-                            for(MethodBlockContainer.Member m : currentBlockMembers) {
+                            for (MethodBlockContainer.Member m : currentBlockMembers) {
                                 System.out.println("Member in if block: " + m.getInstruction().getClass().getName());
                             }
                             listIterator.previous();
@@ -145,7 +145,7 @@ public class JavaMethodParser extends AbstractMethodParser {
                         if (ScanState.SCAN_STARTED.equals(parserState)) {
                             currentParser = parser;
                             currentState = ScanState.SCAN_STARTED;
-                            
+
                             break;
                         } else if (ScanState.SCAN_ENDED.equals(parserState)) {
                             throw new IllegalStateException("The parser state was set to SCAN_ENDED when only SCAN_STARTED was expected.");

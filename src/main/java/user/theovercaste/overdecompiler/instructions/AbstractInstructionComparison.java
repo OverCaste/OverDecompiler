@@ -30,17 +30,17 @@ public abstract class AbstractInstructionComparison extends Instruction {
     public MethodAction getAction(ClassData originClass, Stack<MethodMember> stack) throws InstructionParsingException {
         throw new UnsupportedOperationException();
     }
-    
+
     @Override
     public void modifyStack(Stack<MethodMember> stack) {
-        //Do nothing
+        // Do nothing
     }
 
     @Override
     public int getByteSize( ) {
         return 2;
     }
-    
+
     public abstract ArithmeticComparison getComparisonOperator( );
 
     public int getBranchIndex( ) {

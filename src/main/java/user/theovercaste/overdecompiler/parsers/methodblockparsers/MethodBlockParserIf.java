@@ -14,11 +14,11 @@ public class MethodBlockParserIf implements MethodBlockParser {
     /** The byte at which the currently scanned jump instruction ends at. */
     private int scanEnd = -1;
     private ArithmeticComparison operator;
-    
+
     @Override
-    public ScanState parse(AbstractMethodParser subParser,  ListIterator<MethodBlockContainer.Member> listIterator) {
+    public ScanState parse(AbstractMethodParser subParser, ListIterator<MethodBlockContainer.Member> listIterator) {
         int index = listIterator.nextIndex();
-        if(!listIterator.hasNext()) {
+        if (!listIterator.hasNext()) {
             return ScanState.NO_MATCH;
         }
         MethodBlockContainer.Member member = listIterator.next();
@@ -32,7 +32,7 @@ public class MethodBlockParserIf implements MethodBlockParser {
         }
         if (instruction instanceof AbstractInstructionComparison) {
             int branchIndex = ((AbstractInstructionComparison) instruction).getBranchIndex();
-            operator = ((AbstractInstructionComparison)instruction).getComparisonOperator();
+            operator = ((AbstractInstructionComparison) instruction).getComparisonOperator();
             if (branchIndex > instruction.getByteIndex()) { // If statements go forwards, otherwise it's a do while
                 startIndex = index;
                 scanEnd = branchIndex;
@@ -49,7 +49,7 @@ public class MethodBlockParserIf implements MethodBlockParser {
 
     @Override
     public MethodBlockContainer createContainer(List<Member> instructions) {
-        if(operator == null) {
+        if (operator == null) {
             throw new IllegalStateException("Tried to create a container when the operator wasn't defined.");
         }
         return new IfContainer(instructions, operator);
@@ -61,10 +61,10 @@ public class MethodBlockParserIf implements MethodBlockParser {
         scanEnd = -1;
         operator = null;
     }
-    
+
     private static class IfContainer extends MethodBlockContainer {
         private final ArithmeticComparison operator;
-        
+
         public IfContainer(List<Member> members, ArithmeticComparison operator) {
             super(members);
             this.operator = operator;
@@ -72,10 +72,10 @@ public class MethodBlockParserIf implements MethodBlockParser {
 
         @Override
         public MethodBlock toMethodBlock(List<MethodMember> members, Stack<MethodMember> parentMemberStack) {
-            MethodActionGetter right = (MethodActionGetter)parentMemberStack.pop();
-            MethodActionGetter left = (MethodActionGetter)parentMemberStack.pop();
+            MethodActionGetter right = (MethodActionGetter) parentMemberStack.pop();
+            MethodActionGetter left = (MethodActionGetter) parentMemberStack.pop();
             MethodBlock ret = new MethodBlockIf(new MethodActionComparison(left, operator, right));
-            for(MethodMember m : members) {
+            for (MethodMember m : members) {
                 ret.addMember(m);
             }
             return ret;

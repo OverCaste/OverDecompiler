@@ -1,6 +1,5 @@
 package user.theovercaste.overdecompiler.codeinternals;
 
-
 public enum FieldFlag {
     PUBLIC(0x0001),
     PRIVATE(0x0002),

@@ -10,7 +10,7 @@ public class MethodActionComparison extends MethodActionGetter {
     private final MethodActionGetter left;
     private final ArithmeticComparison operand;
     private final MethodActionGetter right;
-    
+
     public MethodActionComparison(MethodActionGetter valueOne, ArithmeticComparison operand, MethodActionGetter valueTwo) {
         Preconditions.checkNotNull(valueOne, "valueOne");
         Preconditions.checkNotNull(valueTwo, "valueTwo");
@@ -19,7 +19,7 @@ public class MethodActionComparison extends MethodActionGetter {
         this.operand = operand;
         this.right = valueTwo;
     }
-    
+
     @Override
     public String getStringValue(ParsedClass c, ParsedMethod parent) {
         return left.getStringValue(c, parent) + " " + operand.getSymbol() + " " + right.getStringValue(c, parent);

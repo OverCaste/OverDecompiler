@@ -11,7 +11,7 @@ import com.google.common.collect.ImmutableList;
 public abstract class MethodBlock extends MethodMember {
     protected final List<MethodMember> members = new ArrayList<>();
 
-    public MethodBlock() {
+    public MethodBlock( ) {
         super(MethodMember.Type.BLOCK);
     }
 

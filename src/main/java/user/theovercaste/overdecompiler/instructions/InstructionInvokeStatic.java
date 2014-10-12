@@ -49,7 +49,8 @@ public class InstructionInvokeStatic extends AbstractInstructionDirectAction {
                     throw new InstructionParsingException("Parameter " + i + "'s type isn't printable! (" + a.getClass().getName() + ")");
                 }
             }
-            return new MethodActionInvokeMethodStatic(ClassPath.getInternalPath(constantPool.getReferenceClassName(methodIndex)), constantPool.getReferenceName(methodIndex), ImmutableList.copyOf(actions));
+            return new MethodActionInvokeMethodStatic(ClassPath.getInternalPath(constantPool.getReferenceClassName(methodIndex)), constantPool.getReferenceName(methodIndex),
+                    ImmutableList.copyOf(actions));
         } catch (InvalidConstantPoolPointerException e) {
             throw new InstructionParsingException(e);
         }

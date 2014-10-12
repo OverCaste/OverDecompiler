@@ -8,9 +8,9 @@ import com.google.common.collect.Iterables;
  */
 public final class ClassPaths {
     private ClassPaths( ) {
-        //Non-instantiable.
+        // Non-instantiable.
     }
-    
+
     /**
      * Transforms an iterable of ClassPath into an Iterable of Strings of their definitions.
      * 
@@ -20,7 +20,7 @@ public final class ClassPaths {
      * @return A string iterable backed by the source.
      */
     public static Iterable<String> transformDefinitions(Iterable<ClassPath> source) {
-        return Iterables.transform(source, new Function<ClassPath, String>() { //Would be a lambda...
+        return Iterables.transform(source, new Function<ClassPath, String>() { // Would be a lambda...
             @Override
             public String apply(ClassPath input) {
                 return input.getDefinition();

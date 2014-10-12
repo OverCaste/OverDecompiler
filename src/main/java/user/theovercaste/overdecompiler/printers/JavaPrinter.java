@@ -154,11 +154,11 @@ public abstract class JavaPrinter extends AbstractPrinter {
             for (MethodMember m : soleConstructor.getActions()) {
                 if (index == 0 && (m instanceof MethodActionSuperConstructor)) {
                     if (((MethodActionSuperConstructor) m).getArguments().size() != 0) {
-                        System.out.println("Arguments: " + ((MethodActionSuperConstructor)m).getArguments());
+                        System.out.println("Arguments: " + ((MethodActionSuperConstructor) m).getArguments());
                         return false;
                     }
                 } else if (index == 1 && (m instanceof MethodActionReturnVoid)) {
-                    //Second argument always return void.
+                    // Second argument always return void.
                 } else {
                     return false;
                 }
@@ -216,27 +216,27 @@ public abstract class JavaPrinter extends AbstractPrinter {
             count++;
         }
     }
-    
+
     protected void printMethodAction(ParsedClass clazz, ParsedMethod m, MethodAction action, PrintStream out) {
         out.print(action.getStringValue(clazz, m));
         out.println(";");
     }
-    
+
     protected void printMethodBlock(ParsedClass clazz, ParsedMethod m, MethodBlock block, PrintStream out) {
         out.print(block.getBlockHeader(clazz, m));
         out.println(" {");
-        for(MethodMember subMember : block.getMembers()) {
+        for (MethodMember subMember : block.getMembers()) {
             printMethodMember(clazz, m, subMember, out);
         }
         out.println("}");
     }
-    
+
     protected void printMethodMember(ParsedClass clazz, ParsedMethod m, MethodMember member, PrintStream out) {
-        if(member.getType() == MethodMember.Type.ACTION) {
-            printMethodAction(clazz, m, (MethodAction)member, out);
+        if (member.getType() == MethodMember.Type.ACTION) {
+            printMethodAction(clazz, m, (MethodAction) member, out);
         }
-        else if(member.getType() == MethodMember.Type.BLOCK) {
-            printMethodBlock(clazz, m, (MethodBlock)member, out);
+        else if (member.getType() == MethodMember.Type.BLOCK) {
+            printMethodBlock(clazz, m, (MethodBlock) member, out);
         }
     }
 

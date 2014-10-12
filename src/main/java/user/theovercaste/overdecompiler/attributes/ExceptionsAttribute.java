@@ -32,7 +32,7 @@ public class ExceptionsAttribute extends ParsedAttribute {
             try (DataInputStream din = new DataInputStream(new ByteArrayInputStream(a.data))) {
                 int exceptionsCount = din.readUnsignedShort();
                 int[] exceptions = new int[exceptionsCount];
-                for(int i = 0; i < exceptionsCount; i++) {
+                for (int i = 0; i < exceptionsCount; i++) {
                     exceptions[i] = din.readUnsignedShort();
                 }
                 return new ExceptionsAttribute(exceptions);

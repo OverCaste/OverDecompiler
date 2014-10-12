@@ -51,7 +51,7 @@ public final class ClassPath {
     private final String classPackage;
     private final int arrayDepth;
     private final boolean isObject;
-    
+
     private ClassPath(String className, String classPackage, int arrayDepth, boolean isObject) {
         this.className = className;
         this.classPackage = classPackage;
@@ -259,7 +259,7 @@ public final class ClassPath {
         }
         throw new IllegalArgumentException("The path \"" + mangled + "\" isn't a valid, mangled path!");
     }
-    
+
     /**
      * Retrieves a ClassPath from it's internal, informal string representation in the binary data, for example java/lang/String would return {@link #OBJECT_STRING}
      * 
@@ -269,14 +269,13 @@ public final class ClassPath {
     public static ClassPath getInternalPath(String internalValue) {
         return new ClassPath(internalValue, 0);
     }
-    
+
     public static ClassPath getInstance(String string) {
-        if(string.contains("/")) {
+        if (string.contains("/")) {
             throw new IllegalArgumentException("Unable to create a classpath with slashes in it. Use 'getInternalPath'");
         }
         return new ClassPath(string, 0);
     }
-
 
     @Override
     public String toString( ) {

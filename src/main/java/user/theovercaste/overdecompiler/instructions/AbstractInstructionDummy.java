@@ -28,6 +28,6 @@ public abstract class AbstractInstructionDummy extends Instruction {
 
     @Override
     public void modifyStack(Stack<MethodMember> stack) {
-        //Do nothing
+        // Do nothing
     }
 }

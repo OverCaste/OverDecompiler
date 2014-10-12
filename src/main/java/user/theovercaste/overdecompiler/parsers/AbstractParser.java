@@ -22,7 +22,7 @@ public abstract class AbstractParser implements ClassParser {
     protected abstract void parseMethods( ) throws ClassParsingException;
 
     protected abstract void parseAnnotations( ) throws ClassParsingException;
-    
+
     protected abstract void parseFlags( ) throws ClassParsingException;
 
     protected void addImport(ClassPath i) {

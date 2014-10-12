@@ -15,13 +15,13 @@ public class InstructionIfNotEqual extends AbstractInstructionComparison {
     public InstructionIfNotEqual(int opcode, int byteIndex, int instructionIndex, int branchIndex) {
         super(opcode, byteIndex, instructionIndex, branchIndex);
     }
-    
+
     public static Factory factory( ) {
         return new Factory();
     }
-    
+
     public static int[] getOpcodes( ) {
-        return new int[] {0xA0, 0xA6}; //integer comparison, reference comparison
+        return new int[] {0xA0, 0xA6}; // integer comparison, reference comparison
     }
 
     public static class Factory extends Instruction.Factory {
@@ -34,6 +34,6 @@ public class InstructionIfNotEqual extends AbstractInstructionComparison {
 
     @Override
     public ArithmeticComparison getComparisonOperator( ) {
-        return ArithmeticComparison.EQUAL_TO; //Since we skip if not, then we continue if it IS, making this the opposite.
+        return ArithmeticComparison.EQUAL_TO; // Since we skip if not, then we continue if it IS, making this the opposite.
     }
 }

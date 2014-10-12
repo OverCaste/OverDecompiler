@@ -32,7 +32,7 @@ public class PrettyPrinter extends EnumCompatiblePrinter {
         if (printFields(c, printer)) {
             printer.println();
         }
-        if(printConstructors(c, printer)) {
+        if (printConstructors(c, printer)) {
             printer.println();
         }
         printMethods(c, printer);
@@ -68,21 +68,21 @@ public class PrettyPrinter extends EnumCompatiblePrinter {
         out.print(getIndent(currentIndent));
         super.printMethodAction(clazz, m, action, out);
     }
-    
+
     @Override
     protected void printMethodBlock(ParsedClass clazz, ParsedMethod m, MethodBlock block, PrintStream out) {
         out.print(getIndent(currentIndent));
         out.print(block.getBlockHeader(clazz, m));
         out.println(" {");
         currentIndent++;
-        for(MethodMember subMember : block.getMembers()) {
+        for (MethodMember subMember : block.getMembers()) {
             printMethodMember(clazz, m, subMember, out);
         }
         currentIndent--;
         out.print(getIndent(currentIndent));
         out.println("}");
     }
-    
+
     @Override
     protected boolean printMethodHeader(ParsedClass clazz, ParsedMethod m, PrintStream out) {
         // if (!m.getFlags().contains(MethodFlag.SYNTHETIC)) { //This can be abused by nefarious people setting the synthetic flag to hide elements.

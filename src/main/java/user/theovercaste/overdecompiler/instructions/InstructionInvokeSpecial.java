@@ -55,8 +55,8 @@ public class InstructionInvokeSpecial extends AbstractInstructionDirectAction {
             MethodMember a = stack.pop();
             if (a instanceof MethodActionGetter) {
                 System.out.println("Invoking special on " + a);
-                if(a instanceof MethodActionLoadVariable) {
-                    if(((MethodActionLoadVariable)a).getVariableIndex() == 0) {
+                if (a instanceof MethodActionLoadVariable) {
+                    if (((MethodActionLoadVariable) a).getVariableIndex() == 0) {
                         return new MethodActionSuperConstructor(ImmutableList.copyOf(actions));
                     }
                 }

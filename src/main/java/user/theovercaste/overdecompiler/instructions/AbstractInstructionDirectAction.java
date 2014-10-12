@@ -18,10 +18,10 @@ public abstract class AbstractInstructionDirectAction extends Instruction {
     public AbstractInstructionDirectAction(int opcode, int byteIndex, int instructionIndex) {
         super(opcode, byteIndex, instructionIndex);
     }
-    
+
     @Override
     public void modifyStack(Stack<MethodMember> stack) {
-        //Do nothing
+        // Do nothing
     }
 
     @Override

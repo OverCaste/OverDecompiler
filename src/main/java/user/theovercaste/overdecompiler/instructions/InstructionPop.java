@@ -19,7 +19,7 @@ public class InstructionPop extends AbstractInstructionStackModifier {
     public void modifyStack(Stack<MethodMember> stack) {
         stack.pop();
     }
-    
+
     public static int[] getOpcodes( ) {
         return new int[] {0x57};
     }

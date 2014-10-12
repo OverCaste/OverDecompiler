@@ -11,11 +11,11 @@ import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
  */
 public abstract class MethodBlockContainer {
     private final List<Member> members;
-    
+
     public MethodBlockContainer(List<Member> members) {
         this.members = new ArrayList<>(members);
     }
-    
+
     /**
      * @return A mutable list of this container's members.
      */
@@ -26,22 +26,22 @@ public abstract class MethodBlockContainer {
     public void addMember(Member member) {
         members.add(member);
     }
-    
+
     public abstract MethodBlock toMethodBlock(List<MethodMember> members, Stack<MethodMember> parentMemberStack);
-    
+
     public static class Member {
         private final Instruction instruction;
         private final MethodBlockContainer container;
-        
+
         public Member(Instruction instruction, MethodBlockContainer container) {
             this.instruction = instruction;
             this.container = container;
         }
-        
+
         public boolean isInstruction( ) {
             return instruction != null;
         }
-        
+
         public boolean isContainer( ) {
             return container != null;
         }
