@@ -2,22 +2,23 @@ package user.theovercaste.overdecompiler.instructions;
 
 import java.util.Stack;
 
+import user.theovercaste.overdecompiler.codeinternals.ArithmeticComparison;
 import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
 import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
 import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
 
-public abstract class AbstractInstructionComparator extends Instruction {
-    protected final int branchIndex;
+public abstract class AbstractInstructionComparison extends Instruction {
+    protected final int branchOffset;
 
-    public AbstractInstructionComparator(int opcode, int byteIndex, int instructionIndex, int lineNumber, int branchIndex) {
+    public AbstractInstructionComparison(int opcode, int byteIndex, int instructionIndex, int lineNumber, int branchOffset) {
         super(opcode, byteIndex, instructionIndex, lineNumber);
-        this.branchIndex = branchIndex;
+        this.branchOffset = branchOffset;
     }
 
-    public AbstractInstructionComparator(int opcode, int byteIndex, int instructionIndex, int branchIndex) {
+    public AbstractInstructionComparison(int opcode, int byteIndex, int instructionIndex, int branchOffset) {
         super(opcode, byteIndex, instructionIndex);
-        this.branchIndex = branchIndex;
+        this.branchOffset = branchOffset;
     }
 
     @Override
@@ -38,5 +39,11 @@ public abstract class AbstractInstructionComparator extends Instruction {
     @Override
     public int getByteSize( ) {
         return 2;
+    }
+    
+    public abstract ArithmeticComparison getComparisonOperator( );
+
+    public int getBranchIndex( ) {
+        return branchOffset + byteIndex;
     }
 }

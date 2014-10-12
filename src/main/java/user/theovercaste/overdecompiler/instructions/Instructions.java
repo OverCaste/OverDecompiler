@@ -3,6 +3,7 @@ package user.theovercaste.overdecompiler.instructions;
 import java.io.IOException;
 
 import user.theovercaste.overdecompiler.exceptions.InvalidInstructionException;
+import user.theovercaste.overdecompiler.instructions.comparisons.InstructionIfNotEqual;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -19,10 +20,14 @@ public final class  Instructions {
         registerInstruction(builder, InstructionConstantNumber.getOpcodes(), InstructionConstantNumber.factory());
         registerInstruction(builder, InstructionByteIntegerPush.getOpcodes(), InstructionByteIntegerPush.factory());
         registerInstruction(builder, InstructionNew.getOpcodes(), InstructionNew.factory());
+        registerInstruction(builder, InstructionArrayLength.getOpcodes(), InstructionArrayLength.factory());
         
         //Dummy instructions with no data and no MethodAction, used by other instructions
         registerInstruction(builder, InstructionDup.getOpcodes(), InstructionDup.factory());
         registerInstruction(builder, InstructionPop.getOpcodes(), InstructionPop.factory());
+        
+        //Comparison instructions, used in goto -> block conversion
+        registerInstruction(builder, InstructionIfNotEqual.getOpcodes(), InstructionIfNotEqual.factory());
         
         registerInstruction(builder, InstructionGetStatic.getOpcodes(), InstructionGetStatic.factory()); // This may be easier with reflection, but it would make the code brittle.
         registerInstruction(builder, InstructionInvokeVirtual.getOpcodes(), InstructionInvokeVirtual.factory());

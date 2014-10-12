@@ -1,9 +1,5 @@
 package user.theovercaste.overdecompiler.parserdata.method;
 
-import java.io.PrintStream;
-
-import user.theovercaste.overdecompiler.parserdata.ParsedClass;
-import user.theovercaste.overdecompiler.parserdata.ParsedMethod;
 
 public abstract class MethodMember {
     protected final Type type;
@@ -16,8 +12,6 @@ public abstract class MethodMember {
         return type;
     }
     
-    public abstract void print(ParsedClass c, ParsedMethod parent, PrintStream out);
-
     public static enum Type {
         /**
          * Members such as if statements, loops, and other blocks that contain code.

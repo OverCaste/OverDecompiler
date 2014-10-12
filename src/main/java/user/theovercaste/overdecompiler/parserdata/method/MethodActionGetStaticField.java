@@ -5,8 +5,8 @@ import user.theovercaste.overdecompiler.parserdata.ParsedClass;
 import user.theovercaste.overdecompiler.parserdata.ParsedMethod;
 
 public class MethodActionGetStaticField extends MethodActionGetter {
-    private String field;
-    private ClassPath staticClass;
+    private final String field;
+    private final ClassPath staticClass;
 
     public MethodActionGetStaticField(String field, ClassPath staticClass) {
         this.field = field;
@@ -24,13 +24,5 @@ public class MethodActionGetStaticField extends MethodActionGetter {
 
     public ClassPath getStaticClass( ) {
         return staticClass;
-    }
-
-    public void setField(String field) {
-        this.field = field;
-    }
-
-    public void setStaticClass(ClassPath staticClass) {
-        this.staticClass = staticClass;
     }
 }

@@ -1,13 +1,9 @@
 package user.theovercaste.overdecompiler.printers;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.*;
 
-import user.theovercaste.overdecompiler.parserdata.ParsedClass;
-import user.theovercaste.overdecompiler.parserdata.ParsedField;
-import user.theovercaste.overdecompiler.parserdata.ParsedMethod;
-import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
+import user.theovercaste.overdecompiler.parserdata.*;
+import user.theovercaste.overdecompiler.parserdata.method.*;
 
 import com.google.common.base.Strings;
 
@@ -34,6 +30,9 @@ public class PrettyPrinter extends EnumCompatiblePrinter {
         printClassHeader(c, printer);
 
         if (printFields(c, printer)) {
+            printer.println();
+        }
+        if(printConstructors(c, printer)) {
             printer.println();
         }
         printMethods(c, printer);
@@ -65,31 +64,25 @@ public class PrettyPrinter extends EnumCompatiblePrinter {
     }
 
     @Override
-    protected boolean printMethods(ParsedClass clazz, PrintStream out) {
-        int count = 0;
-        boolean first = true;
-        for (ParsedMethod m : clazz.getMethods()) {
-            // if (!m.getFlags().contains(MethodFlag.SYNTHETIC)) { //This can be abused by nefarious people setting the synthetic flag to hide elements.
-            if (!first) {
-                out.println();
-            }
-            if (printMethodHeader(clazz, m, out)) {
-                printMethodCode(clazz, m, out);
-                printFooter(clazz, out);
-                first = false;
-                count++;
-            }
-            // }
-        }
-        return count > 0;
-    }
-
-    @Override
-    protected void printMethodAction(ParsedClass clazz, ParsedMethod m, MethodMember action, PrintStream out) {
+    protected void printMethodAction(ParsedClass clazz, ParsedMethod m, MethodAction action, PrintStream out) {
         out.print(getIndent(currentIndent));
         super.printMethodAction(clazz, m, action, out);
     }
-
+    
+    @Override
+    protected void printMethodBlock(ParsedClass clazz, ParsedMethod m, MethodBlock block, PrintStream out) {
+        out.print(getIndent(currentIndent));
+        out.print(block.getBlockHeader(clazz, m));
+        out.println(" {");
+        currentIndent++;
+        for(MethodMember subMember : block.getMembers()) {
+            printMethodMember(clazz, m, subMember, out);
+        }
+        currentIndent--;
+        out.print(getIndent(currentIndent));
+        out.println("}");
+    }
+    
     @Override
     protected boolean printMethodHeader(ParsedClass clazz, ParsedMethod m, PrintStream out) {
         // if (!m.getFlags().contains(MethodFlag.SYNTHETIC)) { //This can be abused by nefarious people setting the synthetic flag to hide elements.

@@ -1,26 +1,12 @@
 package user.theovercaste.overdecompiler.parsers;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EnumSet;
+import java.util.*;
 
-import user.theovercaste.overdecompiler.attributes.AttributableElement;
-import user.theovercaste.overdecompiler.attributes.AttributeData;
-import user.theovercaste.overdecompiler.attributes.AttributeTypes;
-import user.theovercaste.overdecompiler.attributes.ExceptionsAttribute;
-import user.theovercaste.overdecompiler.attributes.RuntimeVisibleAnnotationsAttribute;
-import user.theovercaste.overdecompiler.codeinternals.ClassFlag;
-import user.theovercaste.overdecompiler.codeinternals.ClassPath;
-import user.theovercaste.overdecompiler.codeinternals.ClassType;
-import user.theovercaste.overdecompiler.codeinternals.FieldFlag;
-import user.theovercaste.overdecompiler.codeinternals.MethodFlag;
+import user.theovercaste.overdecompiler.attributes.*;
+import user.theovercaste.overdecompiler.codeinternals.*;
 import user.theovercaste.overdecompiler.constantpool.ConstantPool;
-import user.theovercaste.overdecompiler.datahandlers.ClassData;
-import user.theovercaste.overdecompiler.datahandlers.FieldData;
-import user.theovercaste.overdecompiler.datahandlers.MethodData;
-import user.theovercaste.overdecompiler.exceptions.ClassParsingException;
-import user.theovercaste.overdecompiler.exceptions.InvalidAttributeException;
-import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
+import user.theovercaste.overdecompiler.datahandlers.*;
+import user.theovercaste.overdecompiler.exceptions.*;
 import user.theovercaste.overdecompiler.parserdata.ParsedField;
 import user.theovercaste.overdecompiler.parserdata.ParsedMethod;
 import user.theovercaste.overdecompiler.parsers.methodparsers.JavaMethodParser;
@@ -159,6 +145,17 @@ public class JavaParser extends AbstractParser {
     @Override
     protected void parseAnnotations( ) throws ClassParsingException {
         // TODO
+    }
+    
+    @Override
+    protected void parseFlags( ) throws ClassParsingException {
+        EnumSet<ClassFlag> classFlags = getClassFlags(classData.getFlagMask());
+        if(classFlags.contains(ClassFlag.PUBLIC)) {
+            parsedClass.addFlag(ClassFlag.PUBLIC);
+        }
+        if(classFlags.contains(ClassFlag.FINAL)) {
+            parsedClass.addFlag(ClassFlag.FINAL);
+        }
     }
 
     public ParsedMethod parseMethod(MethodData m) throws InvalidConstantPoolPointerException {

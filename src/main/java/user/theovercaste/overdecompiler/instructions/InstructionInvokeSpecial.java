@@ -14,18 +14,18 @@ import user.theovercaste.overdecompiler.parserdata.method.*;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
-public class InstructionInvokeStatic extends AbstractInstructionDirectAction {
+public class InstructionInvokeSpecial extends AbstractInstructionDirectAction {
     private static final ImmutableSet<Class<? extends ConstantPoolEntry>> REQUIRED_TYPES =
-            ImmutableSet.<Class<? extends ConstantPoolEntry>> builder().add(ConstantPoolEntryMethodReference.class).add(ConstantPoolEntryInterfaceMethodReference.class).build(); // .of doesn't like these for some reason...
+            ImmutableSet.<Class<? extends ConstantPoolEntry>> builder().add(ConstantPoolEntryMethodReference.class).build(); // .of doesn't like these for some reason...
 
     private final int methodIndex;
 
-    public InstructionInvokeStatic(int opcode, int byteIndex, int instructionIndex, int lineNumber, int methodIndex) {
+    public InstructionInvokeSpecial(int opcode, int byteIndex, int instructionIndex, int lineNumber, int methodIndex) {
         super(opcode, byteIndex, instructionIndex, lineNumber);
         this.methodIndex = methodIndex;
     }
 
-    public InstructionInvokeStatic(int opcode, int byteIndex, int instructionIndex, int methodIndex) {
+    public InstructionInvokeSpecial(int opcode, int byteIndex, int instructionIndex, int methodIndex) {
         super(opcode, byteIndex, instructionIndex);
         this.methodIndex = methodIndex;
     }
@@ -49,7 +49,21 @@ public class InstructionInvokeStatic extends AbstractInstructionDirectAction {
                     throw new InstructionParsingException("Parameter " + i + "'s type isn't printable! (" + a.getClass().getName() + ")");
                 }
             }
-            return new MethodActionInvokeMethodStatic(ClassPath.getInternalPath(constantPool.getReferenceClassName(methodIndex)), constantPool.getReferenceName(methodIndex), ImmutableList.copyOf(actions));
+            if (stack.isEmpty()) {
+                throw new EndOfStackException();
+            }
+            MethodMember a = stack.pop();
+            if (a instanceof MethodActionGetter) {
+                System.out.println("Invoking special on " + a);
+                if(a instanceof MethodActionLoadVariable) {
+                    if(((MethodActionLoadVariable)a).getVariableIndex() == 0) {
+                        return new MethodActionSuperConstructor(ImmutableList.copyOf(actions));
+                    }
+                }
+                return new MethodActionInvokeMethod((MethodActionGetter) a, constantPool.getReferenceName(methodIndex), ImmutableList.copyOf(actions)); // todo transfer
+            } else {
+                throw new InstructionParsingException("The instruction which owns this invoker isn't a proper type! (" + a.getClass().getName() + ")");
+            }
         } catch (InvalidConstantPoolPointerException e) {
             throw new InstructionParsingException(e);
         }
@@ -61,7 +75,7 @@ public class InstructionInvokeStatic extends AbstractInstructionDirectAction {
     }
 
     public static int[] getOpcodes( ) {
-        return new int[] {0xb8};
+        return new int[] {0xb7};
     }
 
     public static Factory factory( ) {
@@ -70,9 +84,9 @@ public class InstructionInvokeStatic extends AbstractInstructionDirectAction {
 
     public static class Factory extends Instruction.Factory {
         @Override
-        public InstructionInvokeStatic load(int opcode, DataInputStream din) throws IOException {
+        public InstructionInvokeSpecial load(int opcode, DataInputStream din) throws IOException {
             int methodIndex = din.readUnsignedShort();
-            return new InstructionInvokeStatic(opcode, byteIndex, instructionIndex, lineNumber, methodIndex);
+            return new InstructionInvokeSpecial(opcode, byteIndex, instructionIndex, lineNumber, methodIndex);
         }
     }
 }

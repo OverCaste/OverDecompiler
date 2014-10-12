@@ -14,4 +14,8 @@ public class MethodActionLoadVariable extends MethodActionGetter {
     public String getStringValue(final ParsedClass c, final ParsedMethod parent) {
         return "v" + variableIndex; // TODO actual variable naming
     }
+
+    public int getVariableIndex( ) {
+        return variableIndex;
+    }
 }

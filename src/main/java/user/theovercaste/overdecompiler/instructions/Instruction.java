@@ -52,6 +52,12 @@ public abstract class Instruction {
     public int getOpcode( ) {
         return opcode;
     }
+    
+    public int getByteIndex( ) {
+        return byteIndex;
+    }
+    
+    public abstract int getByteSize( );
 
     public static abstract class Factory {
         protected int byteIndex;
@@ -78,6 +84,4 @@ public abstract class Instruction {
 
         public abstract Instruction load(int opcode, DataInputStream din) throws IOException;
     }
-
-    public abstract int getByteSize( );
 }

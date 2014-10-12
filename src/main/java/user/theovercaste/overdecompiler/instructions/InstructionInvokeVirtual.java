@@ -37,9 +37,6 @@ public class InstructionInvokeVirtual extends AbstractInstructionDirectAction {
             ConstantPoolPreconditions.checkEntryType(constantPool, methodIndex, REQUIRED_TYPES);
             String descriptor = constantPool.getReferenceType(methodIndex);
             Collection<ClassPath> arguments = ClassPath.getMethodArguments(descriptor);
-            for(MethodMember m : stack) {
-                System.out.println("Method on stack: " + m.getClass());
-            }
             MethodAction[] actions = new MethodAction[arguments.size()];
             for (int i = 0; i < arguments.size(); i++) {
                 if (stack.isEmpty()) {

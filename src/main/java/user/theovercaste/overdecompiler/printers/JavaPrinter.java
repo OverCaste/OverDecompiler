@@ -1,19 +1,12 @@
 package user.theovercaste.overdecompiler.printers;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.List;
 
-import user.theovercaste.overdecompiler.codeinternals.ClassFlag;
-import user.theovercaste.overdecompiler.codeinternals.ClassPath;
-import user.theovercaste.overdecompiler.codeinternals.ClassPaths;
-import user.theovercaste.overdecompiler.codeinternals.ClassType;
-import user.theovercaste.overdecompiler.codeinternals.FieldFlag;
-import user.theovercaste.overdecompiler.codeinternals.MethodFlag;
-import user.theovercaste.overdecompiler.parserdata.ParsedClass;
-import user.theovercaste.overdecompiler.parserdata.ParsedField;
-import user.theovercaste.overdecompiler.parserdata.ParsedMethod;
-import user.theovercaste.overdecompiler.parserdata.method.MethodActionReturnVoid;
-import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
+import user.theovercaste.overdecompiler.codeinternals.*;
+import user.theovercaste.overdecompiler.parserdata.*;
+import user.theovercaste.overdecompiler.parserdata.method.*;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -32,16 +25,6 @@ public abstract class JavaPrinter extends AbstractPrinter {
         return false;
     }
 
-    protected boolean printImports(ParsedClass clazz, PrintStream out) {
-        int count = 0;
-        for (ClassPath i : clazz.getImports()) { // import is a keyword, c is already used, i it is!
-            if (printImport(clazz, i, out)) {
-                count++;
-            }
-        }
-        return count > 0;
-    }
-
     protected boolean printImport(ParsedClass clazz, ClassPath i, PrintStream out) {
         if (i.isObject()) {
             String path = i.getSimplePath();
@@ -51,6 +34,16 @@ public abstract class JavaPrinter extends AbstractPrinter {
             }
         }
         return false;
+    }
+
+    protected boolean printImports(ParsedClass clazz, PrintStream out) {
+        int count = 0;
+        for (ClassPath i : clazz.getImports()) { // import is a keyword, c is already used, i it is!
+            if (printImport(clazz, i, out)) {
+                count++;
+            }
+        }
+        return count > 0;
     }
 
     protected void printClassHeader(ParsedClass clazz, PrintStream out) {
@@ -105,16 +98,6 @@ public abstract class JavaPrinter extends AbstractPrinter {
         out.println();
     }
 
-    protected boolean printFields(ParsedClass clazz, PrintStream out) {
-        int count = 0;
-        for (ParsedField f : clazz.getFields()) {
-            if (printField(clazz, f, out)) {
-                count++;
-            }
-        }
-        return count > 0;
-    }
-
     protected boolean printField(ParsedClass clazz, ParsedField f, PrintStream out) {
         // if (f.getFlags().contains(FieldFlag.SYNTHETIC)) { This can be abused by nefarious people setting the synthetic flag to hide elements.
         // return false;// don't print
@@ -146,9 +129,72 @@ public abstract class JavaPrinter extends AbstractPrinter {
         return true;
     }
 
+    protected boolean printFields(ParsedClass clazz, PrintStream out) {
+        int count = 0;
+        for (ParsedField f : clazz.getFields()) {
+            if (printField(clazz, f, out)) {
+                count++;
+            }
+        }
+        return count > 0;
+    }
+
+    protected boolean printConstructor(ParsedClass clazz, ParsedMethod constructor, PrintStream out) {
+        if (printMethodHeader(clazz, constructor, out)) {
+            printMethodCode(clazz, constructor, out);
+            printFooter(clazz, out);
+            return true;
+        }
+        return false;
+    }
+
+    protected boolean checkDefaultConstructor(ParsedMethod soleConstructor) {
+        if (soleConstructor.getArguments().size() == 0 && soleConstructor.getActions().size() == 2) {
+            int index = 0;
+            for (MethodMember m : soleConstructor.getActions()) {
+                if (index == 0 && (m instanceof MethodActionSuperConstructor)) {
+                    if (((MethodActionSuperConstructor) m).getArguments().size() != 0) {
+                        System.out.println("Arguments: " + ((MethodActionSuperConstructor)m).getArguments());
+                        return false;
+                    }
+                } else if (index == 1 && (m instanceof MethodActionReturnVoid)) {
+                    //Second argument always return void.
+                } else {
+                    return false;
+                }
+                index++;
+            }
+        }
+        return true;
+    }
+
+    protected boolean printConstructors(ParsedClass clazz, PrintStream out) {
+        List<ParsedMethod> constructors = new ArrayList<>();
+        for (ParsedMethod m : clazz.getMethods()) {
+            if (m.getName().equals("<init>")) {
+                constructors.add(m);
+            }
+        }
+        if (constructors.size() == 1) {
+            if (checkDefaultConstructor(constructors.get(0))) { // Don't print the implicit single, default constructor
+                return false;
+            }
+        }
+        int count = 0;
+        for (ParsedMethod c : constructors) {
+            if (printConstructor(clazz, c, out)) {
+                count++;
+            }
+        }
+        return count > 0;
+    }
+
     protected boolean printMethods(ParsedClass clazz, PrintStream out) {
         int count = 0;
         for (ParsedMethod m : clazz.getMethods()) {
+            if (m.getName().equals("<init>") || m.getName().equals("<clinit>")) {
+                continue; // Special cases.
+            }
             if (printMethodHeader(clazz, m, out)) {
                 printMethodCode(clazz, m, out);
                 printFooter(clazz, out);
@@ -165,14 +211,33 @@ public abstract class JavaPrinter extends AbstractPrinter {
             if ((count == (size - 1)) && (action instanceof MethodActionReturnVoid)) {
                 // A exception to printing. If the action is a return void and it's the last action it's implicit. Don't print.
             } else {
-                printMethodAction(clazz, m, action, out);
+                printMethodMember(clazz, m, action, out);
             }
             count++;
         }
     }
-
-    protected void printMethodAction(ParsedClass clazz, ParsedMethod m, MethodMember action, PrintStream out) {
-        action.print(clazz, m, out);
+    
+    protected void printMethodAction(ParsedClass clazz, ParsedMethod m, MethodAction action, PrintStream out) {
+        out.print(action.getStringValue(clazz, m));
+        out.println(";");
+    }
+    
+    protected void printMethodBlock(ParsedClass clazz, ParsedMethod m, MethodBlock block, PrintStream out) {
+        out.print(block.getBlockHeader(clazz, m));
+        out.println(" {");
+        for(MethodMember subMember : block.getMembers()) {
+            printMethodMember(clazz, m, subMember, out);
+        }
+        out.println("}");
+    }
+    
+    protected void printMethodMember(ParsedClass clazz, ParsedMethod m, MethodMember member, PrintStream out) {
+        if(member.getType() == MethodMember.Type.ACTION) {
+            printMethodAction(clazz, m, (MethodAction)member, out);
+        }
+        else if(member.getType() == MethodMember.Type.BLOCK) {
+            printMethodBlock(clazz, m, (MethodBlock)member, out);
+        }
     }
 
     protected boolean printMethodHeader(final ParsedClass clazz, final ParsedMethod m, PrintStream out) {
@@ -201,7 +266,7 @@ public abstract class JavaPrinter extends AbstractPrinter {
         if (m.getFlags().contains(MethodFlag.NATIVE)) {
             out.print("native ");
         }
-        if (m.getName().equals("<init>")) { //Constructor, no type def
+        if (m.getName().equals("<init>")) { // Constructor, no type def
             out.print(clazz.getName());
         }
         else {
@@ -224,7 +289,7 @@ public abstract class JavaPrinter extends AbstractPrinter {
             })));
         }
         out.print(")");
-        if(!m.getExceptions().isEmpty()) {
+        if (!m.getExceptions().isEmpty()) {
             out.print(" throws ");
             out.print(Joiner.on(", ").join(ClassPaths.transformDefinitions(m.getExceptions())));
         }

@@ -7,7 +7,6 @@ import user.theovercaste.overdecompiler.parserdata.ParsedClass;
 import user.theovercaste.overdecompiler.parserdata.ParsedField;
 
 public abstract class EnumCompatiblePrinter extends JavaPrinter {
-
     protected boolean printEnumField(ParsedClass clazz, ParsedField f, boolean last, PrintStream out) {
         out.print(f.getName());
         out.println(last ? ";" : ",");

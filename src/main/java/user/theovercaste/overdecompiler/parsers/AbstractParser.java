@@ -2,11 +2,7 @@ package user.theovercaste.overdecompiler.parsers;
 
 import java.util.EnumSet;
 
-import user.theovercaste.overdecompiler.codeinternals.ClassFlag;
-import user.theovercaste.overdecompiler.codeinternals.ClassPath;
-import user.theovercaste.overdecompiler.codeinternals.ClassType;
-import user.theovercaste.overdecompiler.codeinternals.FieldFlag;
-import user.theovercaste.overdecompiler.codeinternals.MethodFlag;
+import user.theovercaste.overdecompiler.codeinternals.*;
 import user.theovercaste.overdecompiler.exceptions.ClassParsingException;
 import user.theovercaste.overdecompiler.parserdata.ParsedClass;
 
@@ -26,6 +22,8 @@ public abstract class AbstractParser implements ClassParser {
     protected abstract void parseMethods( ) throws ClassParsingException;
 
     protected abstract void parseAnnotations( ) throws ClassParsingException;
+    
+    protected abstract void parseFlags( ) throws ClassParsingException;
 
     protected void addImport(ClassPath i) {
         if (i.isObject() && !"java.lang".equals(i.getClassPackage())) {
@@ -71,6 +69,7 @@ public abstract class AbstractParser implements ClassParser {
         parseFields();
         parseMethods();
         parseAnnotations();
+        parseFlags();
         return parsedClass;
     }
 }
