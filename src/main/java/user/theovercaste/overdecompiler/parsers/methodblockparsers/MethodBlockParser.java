@@ -17,8 +17,7 @@ public interface MethodBlockParser {
     }
 
     /**
-     * Check to see if our block matches the following instruction(s)<br>
-     * Please note that reading from the iterator will affect decompilation. Make sure to return proper data in {@link #getTraversedInstructions()}
+     * Parse the following instruction(s) to see if our block matches.
      * 
      * @param listIterator an iterator to be traversed checking for the start of this method block.
      */
@@ -27,17 +26,12 @@ public interface MethodBlockParser {
     /**
      * Get the state of this method block parser after the previous parser step.
      * 
-     * @return NO_MATCH if this parser wasn't already scanning, and there the block header was found.<br>
-     * SCAN_STATED if this parser wasn't already scanning, and the block header was found.<br>
-     * SCAN_ENDED if the instruction passed the end of this specific block.
+     * @return {@link ScanState#NO_MATCH} if this parser wasn't already scanning, and there the block header was found.<br>
+     * {@link ScanState#SCAN_STARTED} if this parser wasn't already scanning, and the block header was found.<br>
+     * {@link ScanState#SCAN_ENDED} if the instruction passed the end of this specific block.
      */
     public ScanState getState( );
     
-    /**
-     * @return how many indices the {@link #parse(ListIterator)} method traversed of the given iterator.
-     */
-    public int getTraversedInstructions( );
-
     /**
      * @param instructions The parsed members to be put in this container after the MethodBlock is created.
      * @return A new MethodBlockC

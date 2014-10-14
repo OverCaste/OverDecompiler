@@ -14,6 +14,7 @@ public class MethodBlockParserIf implements MethodBlockParser {
     private int scanEnd = -1;
     private ArithmeticComparison operator;
     private ScanState state;
+    private boolean scanning = false;
 
     @Override
     public void parse(ListIterator<MethodBlockContainer.Member> listIterator) {
@@ -23,7 +24,7 @@ public class MethodBlockParserIf implements MethodBlockParser {
         }
         MethodBlockContainer.Member member = listIterator.next();
         Instruction instruction = member.getInstruction();
-        if (state == ScanState.SCAN_STARTED && instruction.getByteIndex() >= scanEnd) {
+        if (scanning && instruction.getByteIndex() >= scanEnd) {
             state = ScanState.SCAN_ENDED;
         }
         if (instruction instanceof AbstractInstructionComparison) {
@@ -32,6 +33,7 @@ public class MethodBlockParserIf implements MethodBlockParser {
             if (branchIndex > instruction.getByteIndex()) { // If statements go forwards, otherwise it's a do while
                 scanEnd = branchIndex;
                 state = ScanState.SCAN_STARTED;
+                scanning = true;
             }
         }
     }
@@ -45,15 +47,11 @@ public class MethodBlockParserIf implements MethodBlockParser {
     }
 
     @Override
-    public int getTraversedInstructions( ) {
-        return 1;
-    }
-    
-    @Override
     public void reset( ) {
         scanEnd = -1;
         operator = null;
         state = null;
+        scanning = false;
     }
 
     private static class IfContainer extends MethodBlockContainer {
