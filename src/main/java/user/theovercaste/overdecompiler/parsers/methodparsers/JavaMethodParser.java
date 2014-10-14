@@ -109,7 +109,6 @@ public class JavaMethodParser extends AbstractMethodParser {
         List<MethodBlockContainer.Member> members = block.getMembers();
         ScanState currentState = ScanState.NO_MATCH;
         MethodBlockParser currentParser = null;
-        System.out.println("Initial size: " + members.size());
         List<MethodBlockContainer.Member> currentBlockMembers = new ArrayList<>();
         ListIterator<MethodBlockContainer.Member> listIterator = members.listIterator();
         while (listIterator.hasNext()) {
@@ -118,7 +117,8 @@ public class JavaMethodParser extends AbstractMethodParser {
             ListIterator<MethodBlockContainer.Member> parserListIterator = members.listIterator(i);
             if (member.isInstruction()) {
                 if (ScanState.SCAN_STARTED.equals(currentState)) {
-                    ScanState parserState = currentParser.parse(this, parserListIterator);
+                    currentParser.parse(parserListIterator);
+                    ScanState parserState = currentParser.getState();
                     switch (parserState) {
                         case SCAN_ENDED: // The current block was parsed, and a new block of the same type didn't start.
                             currentState = ScanState.SCAN_ENDED;
@@ -134,14 +134,16 @@ public class JavaMethodParser extends AbstractMethodParser {
                         case SCAN_STARTED: // The current block was parsed, and a new block of the same start immediately started again
                             throw new IllegalStateException("The parser state was set to SCAN_STARTED when only SCAN_ENDED was expected.");
                         case NO_MATCH:
-                        default:
                             currentBlockMembers.add(member);
                             listIterator.remove();
                             break;
+                        default:
+                            throw new RuntimeException("The parser had a state that was unknown! (" + parserState + ")");
                     }
                 } else {
                     for (MethodBlockParser parser : getMethodBlockParsers()) {
-                        ScanState parserState = parser.parse(this, parserListIterator);
+                        parser.parse(parserListIterator);
+                        ScanState parserState = parser.getState();
                         if (ScanState.SCAN_STARTED.equals(parserState)) {
                             currentParser = parser;
                             currentState = ScanState.SCAN_STARTED;

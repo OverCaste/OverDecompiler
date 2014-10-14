@@ -116,9 +116,6 @@ public class JavaParser extends AbstractParser {
         try {
             for (MethodData m : classData.getMethods()) {
                 ParsedMethod parsedMethod = parseMethod(m);
-                // for(AttributeData d : m.getAttributes()) {
-                // System.out.println("Method data: " + d.getName(classData.getConstantPool()));
-                // }
                 try { // Parse exceptions
                     Optional<ExceptionsAttribute> optionalExceptions = AttributeTypes.getWrappedAttribute(m.getAttributes(), classData.getConstantPool(), ExceptionsAttribute.class);
                     if (optionalExceptions.isPresent()) {

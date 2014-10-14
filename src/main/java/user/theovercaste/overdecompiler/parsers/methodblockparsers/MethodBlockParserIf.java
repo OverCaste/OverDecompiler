@@ -6,47 +6,36 @@ import user.theovercaste.overdecompiler.codeinternals.ArithmeticComparison;
 import user.theovercaste.overdecompiler.instructions.AbstractInstructionComparison;
 import user.theovercaste.overdecompiler.instructions.Instruction;
 import user.theovercaste.overdecompiler.parserdata.method.*;
-import user.theovercaste.overdecompiler.parsers.methodparsers.*;
+import user.theovercaste.overdecompiler.parsers.methodparsers.MethodBlockContainer;
 import user.theovercaste.overdecompiler.parsers.methodparsers.MethodBlockContainer.Member;
 
 public class MethodBlockParserIf implements MethodBlockParser {
-    private int startIndex = -1;
     /** The byte at which the currently scanned jump instruction ends at. */
     private int scanEnd = -1;
     private ArithmeticComparison operator;
+    private ScanState state;
 
     @Override
-    public ScanState parse(AbstractMethodParser subParser, ListIterator<MethodBlockContainer.Member> listIterator) {
-        int index = listIterator.nextIndex();
+    public void parse(ListIterator<MethodBlockContainer.Member> listIterator) {
+        state = ScanState.NO_MATCH;
         if (!listIterator.hasNext()) {
-            return ScanState.NO_MATCH;
+            return;
         }
         MethodBlockContainer.Member member = listIterator.next();
-        ScanState state = ScanState.NO_MATCH;
         Instruction instruction = member.getInstruction();
-        if (startIndex >= 0) {
-            if (instruction.getByteIndex() >= scanEnd) {
-                System.out.println("Found an if statement between " + startIndex + " and " + index);
-                state = ScanState.SCAN_ENDED;
-            }
+        if (state == ScanState.SCAN_STARTED && instruction.getByteIndex() >= scanEnd) {
+            state = ScanState.SCAN_ENDED;
         }
         if (instruction instanceof AbstractInstructionComparison) {
             int branchIndex = ((AbstractInstructionComparison) instruction).getBranchIndex();
             operator = ((AbstractInstructionComparison) instruction).getComparisonOperator();
             if (branchIndex > instruction.getByteIndex()) { // If statements go forwards, otherwise it's a do while
-                startIndex = index;
                 scanEnd = branchIndex;
                 state = ScanState.SCAN_STARTED;
             }
         }
-        return state;
     }
-
-    @Override
-    public int getBlockHeaderCount( ) {
-        return 2;
-    }
-
+    
     @Override
     public MethodBlockContainer createContainer(List<Member> instructions) {
         if (operator == null) {
@@ -56,10 +45,15 @@ public class MethodBlockParserIf implements MethodBlockParser {
     }
 
     @Override
+    public int getTraversedInstructions( ) {
+        return 1;
+    }
+    
+    @Override
     public void reset( ) {
-        startIndex = -1;
         scanEnd = -1;
         operator = null;
+        state = null;
     }
 
     private static class IfContainer extends MethodBlockContainer {
@@ -80,5 +74,13 @@ public class MethodBlockParserIf implements MethodBlockParser {
             }
             return ret;
         }
+    }
+
+    @Override
+    public ScanState getState( ) {
+        if(state == null) {
+            throw new IllegalStateException("Attempted to get the state of a MethodBlockParser before its parse method was called!");
+        }
+        return state;
     }
 }

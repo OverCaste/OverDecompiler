@@ -3,7 +3,7 @@ package user.theovercaste.overdecompiler.parsers.methodblockparsers;
 import java.util.List;
 import java.util.ListIterator;
 
-import user.theovercaste.overdecompiler.parsers.methodparsers.*;
+import user.theovercaste.overdecompiler.parsers.methodparsers.MethodBlockContainer;
 import user.theovercaste.overdecompiler.parsers.methodparsers.MethodBlockContainer.Member;
 
 public interface MethodBlockParser {
@@ -16,10 +16,32 @@ public interface MethodBlockParser {
         SCAN_ENDED;
     }
 
-    public ScanState parse(AbstractMethodParser subParser, ListIterator<MethodBlockContainer.Member> listIterator);
+    /**
+     * Check to see if our block matches the following instruction(s)<br>
+     * Please note that reading from the iterator will affect decompilation. Make sure to return proper data in {@link #getTraversedInstructions()}
+     * 
+     * @param listIterator an iterator to be traversed checking for the start of this method block.
+     */
+    public void parse(ListIterator<MethodBlockContainer.Member> listIterator);
+    
+    /**
+     * Get the state of this method block parser after the previous parser step.
+     * 
+     * @return NO_MATCH if this parser wasn't already scanning, and there the block header was found.<br>
+     * SCAN_STATED if this parser wasn't already scanning, and the block header was found.<br>
+     * SCAN_ENDED if the instruction passed the end of this specific block.
+     */
+    public ScanState getState( );
+    
+    /**
+     * @return how many indices the {@link #parse(ListIterator)} method traversed of the given iterator.
+     */
+    public int getTraversedInstructions( );
 
-    public int getBlockHeaderCount( );
-
+    /**
+     * @param instructions The parsed members to be put in this container after the MethodBlock is created.
+     * @return A new MethodBlockC
+     */
     public MethodBlockContainer createContainer(List<Member> instructions);
 
     public void reset( );
