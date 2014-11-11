@@ -1,5 +1,7 @@
 package user.theovercaste.overdecompiler.parserdata.method;
 
+import user.theovercaste.overdecompiler.parsers.methodparsers.MethodPrintingContext;
+
 public abstract class MethodMember {
     protected final Type type;
 
@@ -10,6 +12,13 @@ public abstract class MethodMember {
     public Type getType( ) {
         return type;
     }
+    
+    /**
+     * Count the references for all of the MethodActionPointers used by this member. This is so that variables only referenced once can be inlined.
+     * 
+     * @param decompileContext
+     */
+    public abstract void countReferences(MethodPrintingContext printingContext);
 
     public static enum Type {
         /**

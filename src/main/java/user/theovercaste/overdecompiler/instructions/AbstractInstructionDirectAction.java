@@ -5,7 +5,7 @@ import java.util.Stack;
 import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
 import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
-import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
+import user.theovercaste.overdecompiler.parsers.methodparsers.MethodDecompileContext;
 
 /**
  * An Instruction that directly translates to a MethodAction via {@link #getAction(ClassData, Stack)}
@@ -20,7 +20,7 @@ public abstract class AbstractInstructionDirectAction extends Instruction {
     }
 
     @Override
-    public void modifyStack(Stack<MethodMember> stack) {
+    public void modifyStack(MethodDecompileContext ctx) {
         // Do nothing
     }
 
@@ -30,5 +30,5 @@ public abstract class AbstractInstructionDirectAction extends Instruction {
     }
 
     @Override
-    public abstract MethodAction getAction(ClassData originClass, Stack<MethodMember> stack) throws InstructionParsingException;
+    public abstract MethodAction getAction(ClassData originClass, MethodDecompileContext ctx) throws InstructionParsingException;
 }

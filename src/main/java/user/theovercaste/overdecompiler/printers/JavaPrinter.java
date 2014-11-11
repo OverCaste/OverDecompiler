@@ -3,17 +3,25 @@ package user.theovercaste.overdecompiler.printers;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import user.theovercaste.overdecompiler.codeinternals.*;
 import user.theovercaste.overdecompiler.parserdata.*;
 import user.theovercaste.overdecompiler.parserdata.method.*;
+import user.theovercaste.overdecompiler.parsers.methodparsers.MethodPrintingContext;
+import user.theovercaste.overdecompiler.printerdata.variablenamers.VariableNamer;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
+import com.google.common.base.*;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 public abstract class JavaPrinter extends AbstractPrinter {
+    private final VariableNamer varNamer;
+    
+    public JavaPrinter(VariableNamer varNamer) {
+        this.varNamer = varNamer;
+    }
+    
     protected boolean printPackage(ParsedClass clazz, PrintStream out) {
         String p = clazz.getPackage();
         if (p.length() > 0) {
@@ -70,11 +78,11 @@ public abstract class JavaPrinter extends AbstractPrinter {
                 break;
         }
         out.print(clazz.getName());
-        ClassPath parent = clazz.getParent();
+        Optional<ClassPath> parent = clazz.getParent();
         out.print(" ");
-        if (!(parent.equals(ClassPath.OBJECT) || (isEnum(clazz) && parent.equals(ClassPath.OBJECT_ENUM)))) { // Doesn't extend object, or java.lang.Enum if it's an enum.
+        if (parent.isPresent()) {
             out.print("extends ");
-            out.print(parent.getClassName());
+            out.print(parent.get().getClassName());
             out.print(" ");
         }
         List<ClassPath> effectiveParents = Lists.newArrayListWithCapacity(clazz.getInterfaces().size());
@@ -148,40 +156,9 @@ public abstract class JavaPrinter extends AbstractPrinter {
         return false;
     }
 
-    protected boolean checkDefaultConstructor(ParsedMethod soleConstructor) {
-        if (soleConstructor.getArguments().size() == 0 && soleConstructor.getActions().size() == 2) {
-            int index = 0;
-            for (MethodMember m : soleConstructor.getActions()) {
-                if (index == 0 && (m instanceof MethodActionSuperConstructor)) {
-                    if (((MethodActionSuperConstructor) m).getArguments().size() != 0) {
-                        System.out.println("Arguments: " + ((MethodActionSuperConstructor) m).getArguments());
-                        return false;
-                    }
-                } else if (index == 1 && (m instanceof MethodActionReturnVoid)) {
-                    // Second argument always return void.
-                } else {
-                    return false;
-                }
-                index++;
-            }
-        }
-        return true;
-    }
-
     protected boolean printConstructors(ParsedClass clazz, PrintStream out) {
-        List<ParsedMethod> constructors = new ArrayList<>();
-        for (ParsedMethod m : clazz.getMethods()) {
-            if (m.getName().equals("<init>")) {
-                constructors.add(m);
-            }
-        }
-        if (constructors.size() == 1) {
-            if (checkDefaultConstructor(constructors.get(0))) { // Don't print the implicit single, default constructor
-                return false;
-            }
-        }
         int count = 0;
-        for (ParsedMethod c : constructors) {
+        for (ParsedMethod c : clazz.getConstructors()) {
             if (printConstructor(clazz, c, out)) {
                 count++;
             }
@@ -192,9 +169,6 @@ public abstract class JavaPrinter extends AbstractPrinter {
     protected boolean printMethods(ParsedClass clazz, PrintStream out) {
         int count = 0;
         for (ParsedMethod m : clazz.getMethods()) {
-            if (m.getName().equals("<init>") || m.getName().equals("<clinit>")) {
-                continue; // Special cases.
-            }
             if (printMethodHeader(clazz, m, out)) {
                 printMethodCode(clazz, m, out);
                 printFooter(clazz, out);
@@ -205,38 +179,46 @@ public abstract class JavaPrinter extends AbstractPrinter {
     }
 
     protected void printMethodCode(ParsedClass clazz, ParsedMethod m, PrintStream out) {
-        int size = m.getActions().size();
-        int count = 0;
-        for (MethodMember action : m.getActions()) {
-            if ((count == (size - 1)) && (action instanceof MethodActionReturnVoid)) {
-                // A exception to printing. If the action is a return void and it's the last action it's implicit. Don't print.
-            } else {
-                printMethodMember(clazz, m, action, out);
+        MethodPrintingContext ctx = new MethodPrintingContext(new ArrayList<>(m.getMembers()), varNamer);
+        for(MethodMember member : m.getMembers()) {
+            member.countReferences(ctx);
+        }
+        for(MethodMember member : m.getMembers()) {
+            if(member instanceof MethodActionSetVariable) {
+                int index = ((MethodActionSetVariable) member).getVariableIndex();
+                if(ctx.getReferences(index) == 1) {
+                    ctx.setReferenceInlined(index);
+                }
             }
-            count++;
+        }
+        for (MethodMember member : m.getMembers()) {
+            printMethodMember(clazz, m, member, out, ctx);
         }
     }
 
-    protected void printMethodAction(ParsedClass clazz, ParsedMethod m, MethodAction action, PrintStream out) {
-        out.print(action.getStringValue(clazz, m));
+    protected void printMethodAction(ParsedClass clazz, ParsedMethod m, MethodAction action, PrintStream out, MethodPrintingContext ctx) {
+        if(action.isForceInlined() || ctx.isActionInlined(action)) {
+            return;
+        }
+        out.print(action.getStringValue(clazz, m, ctx));
         out.println(";");
     }
 
-    protected void printMethodBlock(ParsedClass clazz, ParsedMethod m, MethodBlock block, PrintStream out) {
-        out.print(block.getBlockHeader(clazz, m));
+    protected void printMethodBlock(ParsedClass clazz, ParsedMethod m, MethodBlock block, PrintStream out, MethodPrintingContext ctx) {
+        out.print(block.getBlockHeader(clazz, m, ctx));
         out.println(" {");
         for (MethodMember subMember : block.getMembers()) {
-            printMethodMember(clazz, m, subMember, out);
+            printMethodMember(clazz, m, subMember, out, ctx);
         }
         out.println("}");
     }
 
-    protected void printMethodMember(ParsedClass clazz, ParsedMethod m, MethodMember member, PrintStream out) {
+    protected void printMethodMember(ParsedClass clazz, ParsedMethod m, MethodMember member, PrintStream out, MethodPrintingContext ctx) {
         if (member.getType() == MethodMember.Type.ACTION) {
-            printMethodAction(clazz, m, (MethodAction) member, out);
+            printMethodAction(clazz, m, (MethodAction) member, out, ctx);
         }
         else if (member.getType() == MethodMember.Type.BLOCK) {
-            printMethodBlock(clazz, m, (MethodBlock) member, out);
+            printMethodBlock(clazz, m, (MethodBlock) member, out, ctx);
         }
     }
 
@@ -270,21 +252,23 @@ public abstract class JavaPrinter extends AbstractPrinter {
             out.print(clazz.getName());
         }
         else {
-            if (m.getReturnType().isPresent()) {
-                ClassPath returnType = m.getReturnType().get();
+            if (m.getReturnType().equals(ClassPath.VOID)) {
+                out.print("void ");
+            } else {
+                ClassPath returnType = m.getReturnType();
+                clazz.addImport(returnType);
                 out.print(returnType.getDefinition());
                 out.print(" ");
-            } else {
-                out.print("void ");
             }
             out.print(m.getName());
         }
         out.print("(");
+        final AtomicInteger counter = new AtomicInteger();
         if (!m.getArguments().isEmpty()) {
             out.print(Joiner.on(", ").join(Iterables.transform(m.getArguments(), new Function<ClassPath, String>() {
                 @Override
                 public String apply(ClassPath input) {
-                    return input.getDefinition() + " " + getArgumentName(clazz, m, input);
+                    return input.getDefinition() + " " + varNamer.getVariableName(counter.getAndIncrement(), true, input);
                 }
             })));
         }

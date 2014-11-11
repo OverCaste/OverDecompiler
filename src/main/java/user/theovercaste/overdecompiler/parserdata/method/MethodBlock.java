@@ -5,6 +5,7 @@ import java.util.List;
 
 import user.theovercaste.overdecompiler.parserdata.ParsedClass;
 import user.theovercaste.overdecompiler.parserdata.ParsedMethod;
+import user.theovercaste.overdecompiler.parsers.methodparsers.MethodPrintingContext;
 
 import com.google.common.collect.ImmutableList;
 
@@ -15,7 +16,7 @@ public abstract class MethodBlock extends MethodMember {
         super(MethodMember.Type.BLOCK);
     }
 
-    public abstract String getBlockHeader(ParsedClass c, ParsedMethod parent);
+    public abstract String getBlockHeader(ParsedClass c, ParsedMethod parent, MethodPrintingContext ctx);
 
     public ImmutableList<MethodMember> getMembers( ) {
         return ImmutableList.copyOf(members); // defensive copy

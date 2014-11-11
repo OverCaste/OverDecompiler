@@ -2,13 +2,10 @@ package user.theovercaste.overdecompiler.instructions;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.Stack;
 
-import user.theovercaste.overdecompiler.datahandlers.ClassData;
-import user.theovercaste.overdecompiler.exceptions.*;
-import user.theovercaste.overdecompiler.parserdata.method.*;
+import user.theovercaste.overdecompiler.parsers.methodparsers.MethodDecompileContext;
 
-public class InstructionStoreNumbered extends AbstractInstructionDirectAction {
+public class InstructionStoreNumbered extends AbstractInstructionStackModifier {
     public InstructionStoreNumbered(int opcode, int byteIndex, int instructionIndex, int lineNumber) {
         super(opcode, byteIndex, instructionIndex, lineNumber);
     }
@@ -20,18 +17,10 @@ public class InstructionStoreNumbered extends AbstractInstructionDirectAction {
     public int getNumber( ) {
         return (opcode - 0x3b) & 3; // For clarity, this is (roughly) equivalent to (getOpcodes( )[0]) % 4, which takes advantage of the fact that all of the xstore_n operations are sequential.
     }
-
+    
     @Override
-    public MethodAction getAction(ClassData originClass, Stack<MethodMember> stack) throws InstructionParsingException {
-        if (stack.isEmpty()) {
-            throw new EndOfStackException();
-        }
-        MethodMember a = stack.pop();
-        if (a instanceof MethodActionGetter) {
-            return new MethodActionSetVariable(getNumber(), (MethodActionGetter) a);
-        } else {
-            throw new InvalidStackTypeException(a);
-        }
+    public void modifyStack(MethodDecompileContext ctx) {
+        ctx.setVariable(getNumber( ), ctx.popActionPointer());
     }
 
     @Override

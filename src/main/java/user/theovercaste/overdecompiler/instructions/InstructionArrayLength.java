@@ -2,11 +2,14 @@ package user.theovercaste.overdecompiler.instructions;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.Stack;
 
 import user.theovercaste.overdecompiler.datahandlers.ClassData;
-import user.theovercaste.overdecompiler.exceptions.*;
-import user.theovercaste.overdecompiler.parserdata.method.*;
+import user.theovercaste.overdecompiler.exceptions.EndOfStackException;
+import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
+import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
+import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetArrayLength;
+import user.theovercaste.overdecompiler.parsers.methodparsers.MethodActionPointer;
+import user.theovercaste.overdecompiler.parsers.methodparsers.MethodDecompileContext;
 
 public class InstructionArrayLength extends AbstractInstructionDirectAction {
     public InstructionArrayLength(int opcode, int byteIndex, int instructionIndex, int lineNumber) {
@@ -18,16 +21,13 @@ public class InstructionArrayLength extends AbstractInstructionDirectAction {
     }
 
     @Override
-    public MethodAction getAction(ClassData originClass, Stack<MethodMember> stack) throws InstructionParsingException {
-        if (stack.isEmpty()) {
+    public MethodAction getAction(ClassData originClass, MethodDecompileContext ctx) throws InstructionParsingException {
+        if (ctx.getActionPointers().isEmpty()) {
             throw new EndOfStackException("There was no array to get the length of!");
         }
-        MethodMember value = stack.pop();
-        if (value instanceof MethodActionGetter) {
-            return new MethodActionGetArrayLength((MethodActionGetter) value);
-        } else {
-            throw new InvalidStackTypeException(value);
-        }
+        System.out.println("Action pointers: " + ctx.getActionPointers());
+        MethodActionPointer value = ctx.popActionPointer();
+        return new MethodActionGetArrayLength(value);
     }
 
     @Override
@@ -49,4 +49,5 @@ public class InstructionArrayLength extends AbstractInstructionDirectAction {
             return new InstructionArrayLength(opcode, byteIndex, instructionIndex, lineNumber);
         }
     }
+
 }

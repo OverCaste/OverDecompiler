@@ -64,7 +64,8 @@ public abstract class AbstractParser implements ClassParser {
     @Override
     public ParsedClass parseClass( ) throws ClassParsingException {
         ClassPath parsedClassPath = getClassPath();
-        parsedClass = new ParsedClass(parsedClassPath.getClassName(), parsedClassPath.getClassPackage(), getClassType(), getParentPath());
+        parsedClass = new ParsedClass(parsedClassPath.getClassName(), parsedClassPath.getClassPackage(), getClassType());
+        parsedClass.setParent(getParentPath());
         parseInterfaces();
         parseFields();
         parseMethods();

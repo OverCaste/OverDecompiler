@@ -2,14 +2,12 @@ package user.theovercaste.overdecompiler.instructions;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.Stack;
 
 import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
-import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
-import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetConstant;
+import user.theovercaste.overdecompiler.parserdata.method.*;
 import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetConstant.ConstantType;
-import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
+import user.theovercaste.overdecompiler.parsers.methodparsers.MethodDecompileContext;
 
 public class InstructionByteIntegerPush extends AbstractInstructionDirectAction {
     private final int byteValue;
@@ -25,7 +23,7 @@ public class InstructionByteIntegerPush extends AbstractInstructionDirectAction 
     }
 
     @Override
-    public MethodAction getAction(ClassData originClass, Stack<MethodMember> stack) throws InstructionParsingException {
+    public MethodAction getAction(ClassData originClass, MethodDecompileContext ctx) throws InstructionParsingException {
         return new MethodActionGetConstant(String.valueOf(byteValue), ConstantType.INT);
     }
 

@@ -27,7 +27,7 @@ public abstract class MethodBlockContainer {
         members.add(member);
     }
 
-    public abstract MethodBlock toMethodBlock(List<MethodMember> members, Stack<MethodMember> parentMemberStack);
+    public abstract MethodBlock toMethodBlock(List<MethodMember> members, Stack<MethodActionPointer> pointerStack);
 
     public static class Member {
         private final Instruction instruction;

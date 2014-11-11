@@ -6,7 +6,7 @@ import user.theovercaste.overdecompiler.codeinternals.ArithmeticComparison;
 import user.theovercaste.overdecompiler.instructions.AbstractInstructionComparison;
 import user.theovercaste.overdecompiler.instructions.Instruction;
 import user.theovercaste.overdecompiler.parserdata.method.*;
-import user.theovercaste.overdecompiler.parsers.methodparsers.MethodBlockContainer;
+import user.theovercaste.overdecompiler.parsers.methodparsers.*;
 import user.theovercaste.overdecompiler.parsers.methodparsers.MethodBlockContainer.Member;
 
 public class MethodBlockParserIf implements MethodBlockParser {
@@ -37,7 +37,7 @@ public class MethodBlockParserIf implements MethodBlockParser {
             }
         }
     }
-    
+
     @Override
     public MethodBlockContainer createContainer(List<Member> instructions) {
         if (operator == null) {
@@ -63,9 +63,9 @@ public class MethodBlockParserIf implements MethodBlockParser {
         }
 
         @Override
-        public MethodBlock toMethodBlock(List<MethodMember> members, Stack<MethodMember> parentMemberStack) {
-            MethodActionGetter right = (MethodActionGetter) parentMemberStack.pop();
-            MethodActionGetter left = (MethodActionGetter) parentMemberStack.pop();
+        public MethodBlock toMethodBlock(List<MethodMember> members, Stack<MethodActionPointer> pointerStack) {
+            MethodActionPointer right = pointerStack.pop();
+            MethodActionPointer left = pointerStack.pop();
             MethodBlock ret = new MethodBlockIf(new MethodActionComparison(left, operator, right));
             for (MethodMember m : members) {
                 ret.addMember(m);
@@ -76,7 +76,7 @@ public class MethodBlockParserIf implements MethodBlockParser {
 
     @Override
     public ScanState getState( ) {
-        if(state == null) {
+        if (state == null) {
             throw new IllegalStateException("Attempted to get the state of a MethodBlockParser before its parse method was called!");
         }
         return state;

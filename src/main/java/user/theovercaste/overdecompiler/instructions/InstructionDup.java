@@ -2,9 +2,8 @@ package user.theovercaste.overdecompiler.instructions;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.Stack;
 
-import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
+import user.theovercaste.overdecompiler.parsers.methodparsers.MethodDecompileContext;
 
 public class InstructionDup extends AbstractInstructionStackModifier {
     public InstructionDup(int opcode, int byteIndex, int instructionIndex, int lineNumber) {
@@ -31,7 +30,7 @@ public class InstructionDup extends AbstractInstructionStackModifier {
     }
 
     @Override
-    public void modifyStack(Stack<MethodMember> stack) {
-        stack.push(stack.peek());
+    public void modifyStack(MethodDecompileContext ctx) {
+        ctx.pushActionPointer(ctx.getActionPointers().peek());
     }
 }

@@ -2,21 +2,15 @@ package user.theovercaste.overdecompiler.instructions;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.Stack;
 
 import user.theovercaste.overdecompiler.codeinternals.ClassPath;
-import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntry;
-import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryClass;
-import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryFloat;
-import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryInteger;
-import user.theovercaste.overdecompiler.constantpool.ConstantPoolEntryString;
+import user.theovercaste.overdecompiler.constantpool.*;
 import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
 import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
-import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
-import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetConstant;
+import user.theovercaste.overdecompiler.parserdata.method.*;
 import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetConstant.ConstantType;
-import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
+import user.theovercaste.overdecompiler.parsers.methodparsers.MethodDecompileContext;
 
 /**
  * Equivalent to <a href="http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.ldc">ldc</a>
@@ -43,7 +37,7 @@ public class InstructionLoadConstant extends AbstractInstructionDirectAction {
     }
 
     @Override
-    public MethodAction getAction(ClassData originClass, Stack<MethodMember> stack) throws InstructionParsingException {
+    public MethodAction getAction(ClassData originClass, MethodDecompileContext ctx) throws InstructionParsingException {
         ConstantPoolEntry e;
         try {
             e = originClass.getConstantPool().get(constantIndex);

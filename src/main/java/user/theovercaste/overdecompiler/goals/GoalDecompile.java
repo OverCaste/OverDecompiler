@@ -2,30 +2,24 @@ package user.theovercaste.overdecompiler.goals;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.*;
+import java.util.concurrent.*;
 
 import user.theovercaste.overdecompiler.ArgumentHandler;
 import user.theovercaste.overdecompiler.classdataloaders.FileClassDataLoader;
 import user.theovercaste.overdecompiler.datahandlers.ClassData;
-import user.theovercaste.overdecompiler.exceptions.ArgumentParsingException;
-import user.theovercaste.overdecompiler.exceptions.ClassParsingException;
-import user.theovercaste.overdecompiler.exceptions.InvalidClassException;
+import user.theovercaste.overdecompiler.exceptions.*;
+import user.theovercaste.overdecompiler.filters.*;
 import user.theovercaste.overdecompiler.parserdata.ParsedClass;
 import user.theovercaste.overdecompiler.parsers.JavaParser;
-import user.theovercaste.overdecompiler.printers.AbstractPrinter;
-import user.theovercaste.overdecompiler.printers.AbstractPrinterFactory;
-import user.theovercaste.overdecompiler.printers.PrettyPrinter;
+import user.theovercaste.overdecompiler.printerdata.variablenamers.SimpleVariableNamer;
+import user.theovercaste.overdecompiler.printers.*;
 
 import com.google.common.collect.ObjectArrays;
 
 public class GoalDecompile extends AbstractGoalByteEditor {
+    protected List<Filter> filters = new ArrayList<>();
+
     protected AbstractPrinterFactory printerFactory;
     protected boolean recursive;
     protected boolean threaded;
@@ -37,10 +31,15 @@ public class GoalDecompile extends AbstractGoalByteEditor {
             sendUsageMessage(System.out);
             return;
         }
-        printerFactory = h.getClassArgument("printer", "user.theovercaste.overdecompiler.printers", PrettyPrinter.Factory.getInstance(), AbstractPrinterFactory.class);
+        printerFactory = new PrettyPrinter.Factory(new SimpleVariableNamer()); //TODO
+       // printerFactory = new DebugPrinter.Factory();
+        //printerFactory = h.getClassArgument("printer", "user.theovercaste.overdecompiler.printers", printerFactory, AbstractPrinterFactory.class);
         recursive = h.checkFlagExists('r') || h.checkFlagExists("recursive");
         threaded = h.checkFlagExists('t') || h.checkFlagExists("threaded");
         matchLineNumbers = h.checkFlagExists('m') || h.checkFlagExists("match-line-numbers"); // TODO
+        filters.add(new FilterRemoveImplicitConstructor());
+        filters.add(new FilterRemoveImplicitExtends());
+        filters.add(new FilterRemoveImplicitReturn());
         processData(h.getArgument(h.getArgumentsSize() - 1), recursive);
     }
 
@@ -113,6 +112,10 @@ public class GoalDecompile extends AbstractGoalByteEditor {
                     ClassData c = loader.getClassData();
                     System.out.println(" - Parsing...");
                     ParsedClass parsed = (new JavaParser(c).parseClass());
+                    System.out.println(" - Filtering...");
+                    for (Filter filter : filters) {
+                        filter.apply(parsed);
+                    }
                     System.out.println(" - Writing...");
                     printer.print(parsed, System.out);
                 } catch (InvalidClassException | ClassParsingException e) {

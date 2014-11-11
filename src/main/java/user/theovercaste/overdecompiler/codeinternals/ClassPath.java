@@ -1,16 +1,10 @@
 package user.theovercaste.overdecompiler.codeinternals;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 import java.util.Objects;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.Iterables;
+import com.google.common.base.*;
+import com.google.common.collect.*;
 
 public final class ClassPath {
     private static final BiMap<Character, ClassPath> primitiveIdentifiers = HashBiMap.create();
@@ -39,6 +33,7 @@ public final class ClassPath {
     public static final ClassPath OBJECT_FLOAT = new ClassPath("Float", "java.lang", 0, true);
     public static final ClassPath OBJECT_DOUBLE = new ClassPath("Double", "java.lang", 0, true);
     public static final ClassPath OBJECT_STRING = new ClassPath("String", "java.lang", 0, true);
+    public static final ClassPath OBJECT_CLASS = new ClassPath("Class", "java.lang", 0, true);
 
     private static ClassPath createPrimitivePath(String name, char identifier) {
         ClassPath ret = new ClassPath(name, "", 0, false);
@@ -299,7 +294,7 @@ public final class ClassPath {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (!(obj instanceof ClassPath)) {
             return false;
         }
         ClassPath other = (ClassPath) obj;

@@ -4,6 +4,8 @@ import java.io.*;
 
 import user.theovercaste.overdecompiler.parserdata.*;
 import user.theovercaste.overdecompiler.parserdata.method.*;
+import user.theovercaste.overdecompiler.parsers.methodparsers.MethodPrintingContext;
+import user.theovercaste.overdecompiler.printerdata.variablenamers.VariableNamer;
 
 import com.google.common.base.Strings;
 
@@ -13,6 +15,10 @@ public class PrettyPrinter extends EnumCompatiblePrinter {
 
     private int currentIndent = 0;
 
+    public PrettyPrinter(VariableNamer varNamer) {
+        super(varNamer);
+    }
+    
     @Override
     public void print(ParsedClass c, OutputStream out) throws IOException {
         print(c, out, 0);
@@ -64,19 +70,19 @@ public class PrettyPrinter extends EnumCompatiblePrinter {
     }
 
     @Override
-    protected void printMethodAction(ParsedClass clazz, ParsedMethod m, MethodAction action, PrintStream out) {
+    protected void printMethodAction(ParsedClass clazz, ParsedMethod m, MethodAction action, PrintStream out, MethodPrintingContext table) {
         out.print(getIndent(currentIndent));
-        super.printMethodAction(clazz, m, action, out);
+        super.printMethodAction(clazz, m, action, out, table);
     }
 
     @Override
-    protected void printMethodBlock(ParsedClass clazz, ParsedMethod m, MethodBlock block, PrintStream out) {
+    protected void printMethodBlock(ParsedClass clazz, ParsedMethod m, MethodBlock block, PrintStream out, MethodPrintingContext table) {
         out.print(getIndent(currentIndent));
-        out.print(block.getBlockHeader(clazz, m));
+        out.print(block.getBlockHeader(clazz, m, table));
         out.println(" {");
         currentIndent++;
         for (MethodMember subMember : block.getMembers()) {
-            printMethodMember(clazz, m, subMember, out);
+            printMethodMember(clazz, m, subMember, out, table);
         }
         currentIndent--;
         out.print(getIndent(currentIndent));
@@ -112,19 +118,15 @@ public class PrettyPrinter extends EnumCompatiblePrinter {
     }
 
     public static class Factory implements AbstractPrinterFactory {
-        private static final Factory instance = new Factory();
-
-        private Factory( ) {
-            // do nothing
+        private VariableNamer varNamer;
+        
+        public Factory(VariableNamer varNamer) {
+            this.varNamer = varNamer;
         }
 
         @Override
         public AbstractPrinter createPrinter( ) {
-            return new PrettyPrinter();
-        }
-
-        public static Factory getInstance( ) {
-            return instance;
+            return new PrettyPrinter(varNamer);
         }
     }
 }

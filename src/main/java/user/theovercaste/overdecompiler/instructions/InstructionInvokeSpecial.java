@@ -3,13 +3,16 @@ package user.theovercaste.overdecompiler.instructions;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Stack;
 
 import user.theovercaste.overdecompiler.codeinternals.ClassPath;
 import user.theovercaste.overdecompiler.constantpool.*;
 import user.theovercaste.overdecompiler.datahandlers.ClassData;
-import user.theovercaste.overdecompiler.exceptions.*;
-import user.theovercaste.overdecompiler.parserdata.method.*;
+import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
+import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
+import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
+import user.theovercaste.overdecompiler.parserdata.method.MethodActionSuperConstructor;
+import user.theovercaste.overdecompiler.parsers.methodparsers.MethodActionPointer;
+import user.theovercaste.overdecompiler.parsers.methodparsers.MethodDecompileContext;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -31,39 +34,25 @@ public class InstructionInvokeSpecial extends AbstractInstructionDirectAction {
     }
 
     @Override
-    public MethodAction getAction(ClassData originClass, Stack<MethodMember> stack) throws InstructionParsingException {
+    public MethodAction getAction(ClassData originClass, MethodDecompileContext ctx) throws InstructionParsingException {
         try {
             ConstantPool constantPool = originClass.getConstantPool();
             ConstantPoolPreconditions.checkEntryType(constantPool, methodIndex, REQUIRED_TYPES);
             String descriptor = constantPool.getReferenceType(methodIndex);
-            Collection<ClassPath> arguments = ClassPath.getMethodArguments(descriptor);
-            MethodAction[] actions = new MethodAction[arguments.size()];
-            for (int i = 0; i < arguments.size(); i++) {
-                if (stack.isEmpty()) {
-                    throw new EndOfStackException();
-                }
-                MethodMember a = stack.pop();
-                if (a instanceof MethodAction) {
-                    actions[i] = (MethodAction) a;
-                } else {
-                    throw new InstructionParsingException("Parameter " + i + "'s type isn't printable! (" + a.getClass().getName() + ")");
-                }
+            Collection<ClassPath> argumentDescriptions = ClassPath.getMethodArguments(descriptor);
+            MethodActionPointer[] arguments = new MethodActionPointer[argumentDescriptions.size()];
+            for (int i = 0; i < arguments.length; i++) {
+                MethodActionPointer a = ctx.popActionPointer();
+                arguments[i] = a;
             }
-            if (stack.isEmpty()) {
-                throw new EndOfStackException();
-            }
-            MethodMember a = stack.pop();
-            if (a instanceof MethodActionGetter) {
-                System.out.println("Invoking special on " + a);
-                if (a instanceof MethodActionLoadVariable) {
-                    if (((MethodActionLoadVariable) a).getVariableIndex() == 0) {
-                        return new MethodActionSuperConstructor(ImmutableList.copyOf(actions));
-                    }
-                }
-                return new MethodActionInvokeMethod((MethodActionGetter) a, constantPool.getReferenceName(methodIndex), ImmutableList.copyOf(actions)); // todo transfer
-            } else {
-                throw new InstructionParsingException("The instruction which owns this invoker isn't a proper type! (" + a.getClass().getName() + ")");
-            }
+            // MethodActionPointer a = ctx.popActionPointer();
+            // if (a.get() instanceof MethodActionLoadVariable) {
+            // if (((MethodActionLoadVariable) a.get()).getVariableIndex() == 0) {
+            return new MethodActionSuperConstructor(ImmutableList.copyOf(arguments));
+            // }
+            // }
+            // ClassPath returnType = ClassPath.getMethodReturnType(descriptor);
+            // return new MethodActionInvokeMethod(a, constantPool.getReferenceName(methodIndex), ImmutableList.copyOf(arguments), returnType); // todo transfer
         } catch (InvalidConstantPoolPointerException e) {
             throw new InstructionParsingException(e);
         }

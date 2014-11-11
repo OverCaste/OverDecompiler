@@ -3,27 +3,24 @@ package user.theovercaste.overdecompiler.parserdata.method;
 import user.theovercaste.overdecompiler.codeinternals.ClassPath;
 import user.theovercaste.overdecompiler.parserdata.ParsedClass;
 import user.theovercaste.overdecompiler.parserdata.ParsedMethod;
-import user.theovercaste.overdecompiler.parsers.methodparsers.MethodActionPointer;
 import user.theovercaste.overdecompiler.parsers.methodparsers.MethodPrintingContext;
 
-public class MethodActionGetArrayLength extends MethodActionGetter {
-    private final MethodActionPointer array;
-
-    public MethodActionGetArrayLength(MethodActionPointer array) {
-        this.array = array;
+public class MethodActionGetThis extends MethodActionGetter {
+    public MethodActionGetThis() {
     }
 
     @Override
     public String getStringValue(ParsedClass c, ParsedMethod parent, MethodPrintingContext ctx) {
-        return array.get(ctx).getStringValue(c, parent, ctx) + ".length";
-    }
-
-    public MethodActionPointer getArray( ) {
-        return array;
+        return "this";
     }
 
     @Override
     public ClassPath getClassType( ) {
-        return ClassPath.INTEGER;
+        throw new UnsupportedOperationException("Can't get the class type of a 'this' keyword.");
+    }
+    
+    @Override
+    public boolean isForceInlined( ) {
+        return true; //Always call 'this.something' instead of setting a variable to 'this' and then using that.
     }
 }

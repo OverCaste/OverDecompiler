@@ -5,8 +5,13 @@ import java.io.PrintStream;
 import user.theovercaste.overdecompiler.codeinternals.FieldFlag;
 import user.theovercaste.overdecompiler.parserdata.ParsedClass;
 import user.theovercaste.overdecompiler.parserdata.ParsedField;
+import user.theovercaste.overdecompiler.printerdata.variablenamers.VariableNamer;
 
 public abstract class EnumCompatiblePrinter extends JavaPrinter {
+    public EnumCompatiblePrinter(VariableNamer varNamer) {
+        super(varNamer);
+    }
+
     protected boolean printEnumField(ParsedClass clazz, ParsedField f, boolean last, PrintStream out) {
         out.print(f.getName());
         out.println(last ? ";" : ",");
@@ -15,7 +20,7 @@ public abstract class EnumCompatiblePrinter extends JavaPrinter {
 
     @Override
     protected boolean printFields(ParsedClass clazz, PrintStream out) {
-        if (!isEnum(clazz)) {
+        if (true) { // TODO
             return super.printFields(clazz, out);
         }
 

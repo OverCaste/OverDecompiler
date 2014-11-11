@@ -1,22 +1,30 @@
 package user.theovercaste.overdecompiler.parserdata.method;
 
+import user.theovercaste.overdecompiler.codeinternals.ClassPath;
 import user.theovercaste.overdecompiler.parserdata.ParsedClass;
 import user.theovercaste.overdecompiler.parserdata.ParsedMethod;
+import user.theovercaste.overdecompiler.parsers.methodparsers.MethodPrintingContext;
 
 import com.google.common.base.Preconditions;
 
 public class MethodActionGetConstant extends MethodActionGetter {
     public enum ConstantType {
-        CHAR,
-        BYTE,
-        SHORT,
-        INT,
-        LONG,
-        FLOAT,
-        DOUBLE,
-        STRING,
-        CLASS,
-        NULL;
+        CHAR(ClassPath.CHAR),
+        BYTE(ClassPath.BYTE),
+        SHORT(ClassPath.SHORT),
+        INT(ClassPath.INTEGER),
+        LONG(ClassPath.LONG),
+        FLOAT(ClassPath.FLOAT),
+        DOUBLE(ClassPath.DOUBLE),
+        STRING(ClassPath.OBJECT_STRING),
+        CLASS(ClassPath.OBJECT_CLASS),
+        NULL(ClassPath.OBJECT);
+
+        private final ClassPath classType;
+
+        ConstantType(ClassPath classType) {
+            this.classType = classType;
+        }
     }
 
     private String value;
@@ -32,7 +40,7 @@ public class MethodActionGetConstant extends MethodActionGetter {
     }
 
     @Override
-    public String getStringValue(ParsedClass c, ParsedMethod parent) {
+    public String getStringValue(ParsedClass c, ParsedMethod parent, MethodPrintingContext ctx) {
         switch (type) {
             case CHAR:
                 return "'" + value + "'";
@@ -54,7 +62,7 @@ public class MethodActionGetConstant extends MethodActionGetter {
             case NULL:
                 return "null";
         }
-        return "<ERROR INVALID TYPE: " + type.name() + ">"; // Try to decompile even if we fail.
+        return "<ERROR INVALID TYPE: " + type.name() + "-" + value + ">"; // Try to decompile even if we fail.
     }
 
     public String getValue( ) {
@@ -63,5 +71,25 @@ public class MethodActionGetConstant extends MethodActionGetter {
 
     public ConstantType getConstantType( ) {
         return type;
+    }
+
+    @Override
+    public ClassPath getClassType( ) {
+        return type.classType;
+    }
+    
+    @Override
+    public void countReferences(MethodPrintingContext printingContext) {
+        //Do nothing
+    }
+    
+    @Override
+    public boolean isForceInlined( ) {
+        return true;
+    }
+    
+    @Override
+    public String toString( ) {
+        return "load constant " + getStringValue(null, null, null);
     }
 }

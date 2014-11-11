@@ -2,15 +2,11 @@ package user.theovercaste.overdecompiler.instructions;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.Stack;
 
-import user.theovercaste.overdecompiler.datahandlers.ClassData;
-import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
-import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
-import user.theovercaste.overdecompiler.parserdata.method.MethodActionLoadVariable;
-import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
+import user.theovercaste.overdecompiler.parsers.methodparsers.MethodActionPointer;
+import user.theovercaste.overdecompiler.parsers.methodparsers.MethodDecompileContext;
 
-public class InstructionLoad extends AbstractInstructionDirectAction {
+public class InstructionLoad extends AbstractInstructionStackModifier {
     private final int referenceIndex;
 
     public InstructionLoad(int opcode, int byteIndex, int instructionIndex, int lineNumber, int referenceIndex) {
@@ -32,8 +28,10 @@ public class InstructionLoad extends AbstractInstructionDirectAction {
     }
 
     @Override
-    public MethodAction getAction(ClassData originClass, Stack<MethodMember> stack) throws InstructionParsingException {
-        return new MethodActionLoadVariable(referenceIndex);
+    public void modifyStack(MethodDecompileContext ctx) {
+        MethodActionPointer var = ctx.getVariable(getNumber());
+        System.out.println("variable: " + var);
+        ctx.getActionPointers().push(var);
     }
 
     @Override

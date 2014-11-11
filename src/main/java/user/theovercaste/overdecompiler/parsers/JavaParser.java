@@ -54,8 +54,8 @@ public class JavaParser extends AbstractParser {
                 }
             } catch (InvalidConstantPoolPointerException ex) { // Just because we have one invalid annotation doesn't mean they're all invalid.
                 ex.printStackTrace();
-            } catch (InvalidAttributeException e1) { // ^
-                e1.printStackTrace();
+            } catch (InvalidAttributeException ex) {
+                ex.printStackTrace();
             }
         }
         return ret;
@@ -132,7 +132,11 @@ public class JavaParser extends AbstractParser {
                 } catch (InvalidAttributeException e) {
                     e.printStackTrace(); // TODO proper logging, slf4j?
                 }
-                parsedClass.addMethod(parsedMethod);
+                if (parsedMethod.getName().equals("<init>")) {
+                    parsedClass.addConstructor(parsedMethod);
+                } else {
+                    parsedClass.addMethod(parsedMethod);
+                }
             }
         } catch (InvalidConstantPoolPointerException ex) {
             throw new ClassParsingException("Failed to parse fields.", ex);
@@ -170,6 +174,12 @@ public class JavaParser extends AbstractParser {
         try {
             methodParser.parseMethodActions(classData, parsedClass, m, parsed);
         } catch (InvalidAttributeException e) {
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        } catch (IndexOutOfBoundsException e) {
             e.printStackTrace();
         }
         return parsed;

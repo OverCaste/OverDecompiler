@@ -22,16 +22,16 @@ public interface MethodBlockParser {
      * @param listIterator an iterator to be traversed checking for the start of this method block.
      */
     public void parse(ListIterator<MethodBlockContainer.Member> listIterator);
-    
+
     /**
      * Get the state of this method block parser after the previous parser step.
      * 
      * @return {@link ScanState#NO_MATCH} if this parser wasn't already scanning, and there the block header was found.<br>
-     * {@link ScanState#SCAN_STARTED} if this parser wasn't already scanning, and the block header was found.<br>
-     * {@link ScanState#SCAN_ENDED} if the instruction passed the end of this specific block.
+     *         {@link ScanState#SCAN_STARTED} if this parser wasn't already scanning, and the block header was found.<br>
+     *         {@link ScanState#SCAN_ENDED} if the instruction passed the end of this specific block.
      */
     public ScanState getState( );
-    
+
     /**
      * @param instructions The parsed members to be put in this container after the MethodBlock is created.
      * @return A new MethodBlockC

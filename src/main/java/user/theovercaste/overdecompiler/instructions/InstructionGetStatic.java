@@ -2,7 +2,6 @@ package user.theovercaste.overdecompiler.instructions;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.Stack;
 
 import user.theovercaste.overdecompiler.codeinternals.ClassPath;
 import user.theovercaste.overdecompiler.constantpool.ConstantPool;
@@ -11,7 +10,7 @@ import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
 import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
 import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
 import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetStaticField;
-import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
+import user.theovercaste.overdecompiler.parsers.methodparsers.MethodDecompileContext;
 
 public class InstructionGetStatic extends AbstractInstructionDirectAction {
     private final int fieldIndex;
@@ -27,10 +26,10 @@ public class InstructionGetStatic extends AbstractInstructionDirectAction {
     }
 
     @Override
-    public MethodAction getAction(ClassData originClass, Stack<MethodMember> stack) throws InstructionParsingException {
+    public MethodAction getAction(ClassData originClass, MethodDecompileContext ctx) throws InstructionParsingException {
         try {
             ConstantPool constantPool = originClass.getConstantPool();
-            return new MethodActionGetStaticField(constantPool.getFieldReferenceName(fieldIndex), ClassPath.getInternalPath(constantPool.getFieldReferenceClassName(fieldIndex).replace("/", ".")));
+            return new MethodActionGetStaticField(constantPool.getFieldReferenceName(fieldIndex), ClassPath.getInternalPath(constantPool.getFieldReferenceClassName(fieldIndex).replace("/", ".")), ClassPath.getMangledPath(constantPool.getFieldReferenceType(fieldIndex)));
         } catch (InvalidConstantPoolPointerException e) {
             throw new InstructionParsingException(e);
         }

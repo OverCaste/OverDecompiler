@@ -1,21 +1,35 @@
 package user.theovercaste.overdecompiler.parserdata.method;
 
+import user.theovercaste.overdecompiler.codeinternals.ClassPath;
 import user.theovercaste.overdecompiler.parserdata.ParsedClass;
 import user.theovercaste.overdecompiler.parserdata.ParsedMethod;
+import user.theovercaste.overdecompiler.parsers.methodparsers.MethodPrintingContext;
 
 public class MethodActionLoadVariable extends MethodActionGetter {
-    private final int variableIndex;
+    protected final int index;
+    protected final ClassPath type;
 
-    public MethodActionLoadVariable(int variableIndex) {
-        this.variableIndex = variableIndex;
+    public MethodActionLoadVariable(int index, ClassPath type) {
+        this.index = index;
+        this.type = type;
     }
-
+    
     @Override
-    public String getStringValue(final ParsedClass c, final ParsedMethod parent) {
-        return "v" + variableIndex; // TODO actual variable naming
+    public String getStringValue(final ParsedClass c, final ParsedMethod parent, MethodPrintingContext ctx) {
+        return ctx.getVariableName(index, false, getClassType());
     }
 
     public int getVariableIndex( ) {
-        return variableIndex;
+        return index;
+    }
+
+    @Override
+    public ClassPath getClassType( ) {
+        return type;
+    }
+
+    @Override
+    public void countReferences(MethodPrintingContext printingContext) {
+        //Do nothing
     }
 }

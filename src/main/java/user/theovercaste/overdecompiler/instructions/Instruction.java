@@ -2,12 +2,11 @@ package user.theovercaste.overdecompiler.instructions;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.Stack;
 
 import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
 import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
-import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
+import user.theovercaste.overdecompiler.parsers.methodparsers.MethodDecompileContext;
 
 public abstract class Instruction {
     /**
@@ -45,9 +44,9 @@ public abstract class Instruction {
 
     public abstract boolean isAction( );
 
-    public abstract MethodAction getAction(ClassData originClass, Stack<MethodMember> stack) throws InstructionParsingException;
+    public abstract MethodAction getAction(ClassData originClass, MethodDecompileContext ctx) throws InstructionParsingException;
 
-    public abstract void modifyStack(Stack<MethodMember> stack);
+    public abstract void modifyStack(MethodDecompileContext ctx);
 
     public int getOpcode( ) {
         return opcode;
