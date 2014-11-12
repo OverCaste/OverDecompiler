@@ -1,25 +1,30 @@
 package user.theovercaste.overdecompiler.printers;
 
-import java.io.PrintStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import user.theovercaste.overdecompiler.codeinternals.*;
 import user.theovercaste.overdecompiler.parserdata.*;
-import user.theovercaste.overdecompiler.parserdata.method.*;
-import user.theovercaste.overdecompiler.parsers.methodparsers.MethodPrintingContext;
+import user.theovercaste.overdecompiler.parserdata.methodmembers.*;
+import user.theovercaste.overdecompiler.parsers.javaparser.methodparsers.MethodPrintingContext;
+import user.theovercaste.overdecompiler.printerdata.IndentationStrategy;
 import user.theovercaste.overdecompiler.printerdata.variablenamers.VariableNamer;
 
 import com.google.common.base.*;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
-public abstract class JavaPrinter extends AbstractPrinter {
+public class JavaPrinter extends AbstractPrinter {
     private final VariableNamer varNamer;
+    private final IndentationStrategy indentationStrategy;
     
-    public JavaPrinter(VariableNamer varNamer) {
+    private int currentIndent = 0;
+    
+    public JavaPrinter(VariableNamer varNamer, IndentationStrategy indentationStrategy) {
         this.varNamer = varNamer;
+        this.indentationStrategy = indentationStrategy;
     }
     
     protected boolean printPackage(ParsedClass clazz, PrintStream out) {
@@ -55,6 +60,7 @@ public abstract class JavaPrinter extends AbstractPrinter {
     }
 
     protected void printClassHeader(ParsedClass clazz, PrintStream out) {
+        out.print(indentationStrategy.getIndentation(currentIndent++));
         if (clazz.getFlags().contains(ClassFlag.PUBLIC)) {
             out.print("public ");
         }
@@ -110,6 +116,7 @@ public abstract class JavaPrinter extends AbstractPrinter {
         // if (f.getFlags().contains(FieldFlag.SYNTHETIC)) { This can be abused by nefarious people setting the synthetic flag to hide elements.
         // return false;// don't print
         // }
+        out.print(indentationStrategy.getIndentation(currentIndent));
         if (f.getFlags().contains(FieldFlag.PUBLIC)) {
             out.print("public ");
         } else if (f.getFlags().contains(FieldFlag.PRIVATE)) {
@@ -200,16 +207,19 @@ public abstract class JavaPrinter extends AbstractPrinter {
         if(action.isForceInlined() || ctx.isActionInlined(action)) {
             return;
         }
+        out.print(indentationStrategy.getIndentation(currentIndent));
         out.print(action.getStringValue(clazz, m, ctx));
         out.println(";");
     }
 
     protected void printMethodBlock(ParsedClass clazz, ParsedMethod m, MethodBlock block, PrintStream out, MethodPrintingContext ctx) {
+        out.print(indentationStrategy.getIndentation(currentIndent++));
         out.print(block.getBlockHeader(clazz, m, ctx));
         out.println(" {");
         for (MethodMember subMember : block.getMembers()) {
             printMethodMember(clazz, m, subMember, out, ctx);
         }
+        out.print(indentationStrategy.getIndentation(--currentIndent));
         out.println("}");
     }
 
@@ -226,6 +236,7 @@ public abstract class JavaPrinter extends AbstractPrinter {
         // if (m.getFlags().contains(MethodFlag.SYNTHETIC)) { This can be abused by nefarious people setting the synthetic flag to hide elements.
         // return false;// don't print
         // }
+        out.print(indentationStrategy.getIndentation(currentIndent++));
         if (m.getFlags().contains(MethodFlag.PUBLIC)) {
             out.print("public ");
         } else if (m.getFlags().contains(MethodFlag.PRIVATE)) {
@@ -287,6 +298,43 @@ public abstract class JavaPrinter extends AbstractPrinter {
     }
 
     protected void printFooter(ParsedClass clazz, PrintStream out) {
+        out.print(indentationStrategy.getIndentation(--currentIndent));
         out.println("}");
+    }
+
+    @Override
+    public void print(ParsedClass c, OutputStream out) throws IOException {
+        PrintStream printer = (out instanceof PrintStream ? (PrintStream) out : new PrintStream(out));
+        if (printPackage(c, printer)) {
+            printer.println();
+        }
+        if (printImports(c, printer)) {
+            printer.println();
+        }
+        printClassHeader(c, printer);
+
+        if (printFields(c, printer)) {
+            printer.println();
+        }
+        if (printConstructors(c, printer)) {
+            printer.println();
+        }
+        printMethods(c, printer);
+        printFooter(c, printer); // Close the class
+    }
+    
+    public static class Factory implements AbstractPrinterFactory {
+        private VariableNamer varNamer;
+        private IndentationStrategy indentationStrategy;
+        
+        public Factory(VariableNamer varNamer, IndentationStrategy indentationStrategy) {
+            this.varNamer = varNamer;
+            this.indentationStrategy = indentationStrategy;
+        }
+
+        @Override
+        public AbstractPrinter createPrinter( ) {
+            return new JavaPrinter(varNamer, indentationStrategy);
+        }
     }
 }

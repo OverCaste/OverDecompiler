@@ -9,7 +9,7 @@ import user.theovercaste.overdecompiler.codeinternals.ClassPath;
 import user.theovercaste.overdecompiler.constantpool.*;
 import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.*;
-import user.theovercaste.overdecompiler.parserdata.method.*;
+import user.theovercaste.overdecompiler.parserdata.methodmembers.*;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;

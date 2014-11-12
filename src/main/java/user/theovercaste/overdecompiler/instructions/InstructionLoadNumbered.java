@@ -3,8 +3,8 @@ package user.theovercaste.overdecompiler.instructions;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import user.theovercaste.overdecompiler.parsers.methodparsers.MethodActionPointer;
-import user.theovercaste.overdecompiler.parsers.methodparsers.MethodDecompileContext;
+import user.theovercaste.overdecompiler.parsers.javaparser.methodparsers.MethodActionPointer;
+import user.theovercaste.overdecompiler.parsers.javaparser.methodparsers.MethodDecompileContext;
 
 public class InstructionLoadNumbered extends AbstractInstructionStackModifier {
     public InstructionLoadNumbered(int opcode, int byteIndex, int instructionIndex, int lineNumber) {

@@ -2,7 +2,7 @@ package user.theovercaste.overdecompiler.filters;
 
 import user.theovercaste.overdecompiler.parserdata.ParsedClass;
 import user.theovercaste.overdecompiler.parserdata.ParsedMethod;
-import user.theovercaste.overdecompiler.parserdata.method.*;
+import user.theovercaste.overdecompiler.parserdata.methodmembers.*;
 
 import com.google.common.collect.Iterables;
 

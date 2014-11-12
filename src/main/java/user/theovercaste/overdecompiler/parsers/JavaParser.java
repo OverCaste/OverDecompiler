@@ -9,7 +9,7 @@ import user.theovercaste.overdecompiler.datahandlers.*;
 import user.theovercaste.overdecompiler.exceptions.*;
 import user.theovercaste.overdecompiler.parserdata.ParsedField;
 import user.theovercaste.overdecompiler.parserdata.ParsedMethod;
-import user.theovercaste.overdecompiler.parsers.methodparsers.JavaMethodParser;
+import user.theovercaste.overdecompiler.parsers.javaparser.methodparsers.JavaMethodParser;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;

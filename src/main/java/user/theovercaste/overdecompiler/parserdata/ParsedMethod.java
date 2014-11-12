@@ -4,7 +4,7 @@ import java.util.*;
 
 import user.theovercaste.overdecompiler.codeinternals.ClassPath;
 import user.theovercaste.overdecompiler.codeinternals.MethodFlag;
-import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
+import user.theovercaste.overdecompiler.parserdata.methodmembers.MethodMember;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;

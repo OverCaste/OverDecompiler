@@ -5,9 +5,9 @@ import java.io.IOException;
 
 import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
-import user.theovercaste.overdecompiler.parserdata.method.*;
-import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetConstant.ConstantType;
-import user.theovercaste.overdecompiler.parsers.methodparsers.MethodDecompileContext;
+import user.theovercaste.overdecompiler.parserdata.methodmembers.*;
+import user.theovercaste.overdecompiler.parserdata.methodmembers.MethodActionGetConstant.ConstantType;
+import user.theovercaste.overdecompiler.parsers.javaparser.methodparsers.MethodDecompileContext;
 
 public class InstructionConstantNumber extends AbstractInstructionDirectAction {
     public InstructionConstantNumber(int opcode, int byteIndex, int instructionIndex, int lineNumber) {

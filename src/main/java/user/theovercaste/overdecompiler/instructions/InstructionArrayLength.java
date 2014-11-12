@@ -6,10 +6,10 @@ import java.io.IOException;
 import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.EndOfStackException;
 import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
-import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
-import user.theovercaste.overdecompiler.parserdata.method.MethodActionGetArrayLength;
-import user.theovercaste.overdecompiler.parsers.methodparsers.MethodActionPointer;
-import user.theovercaste.overdecompiler.parsers.methodparsers.MethodDecompileContext;
+import user.theovercaste.overdecompiler.parserdata.methodmembers.MethodAction;
+import user.theovercaste.overdecompiler.parserdata.methodmembers.MethodActionGetArrayLength;
+import user.theovercaste.overdecompiler.parsers.javaparser.methodparsers.MethodActionPointer;
+import user.theovercaste.overdecompiler.parsers.javaparser.methodparsers.MethodDecompileContext;
 
 public class InstructionArrayLength extends AbstractInstructionDirectAction {
     public InstructionArrayLength(int opcode, int byteIndex, int instructionIndex, int lineNumber) {

@@ -12,6 +12,7 @@ import user.theovercaste.overdecompiler.exceptions.*;
 import user.theovercaste.overdecompiler.filters.*;
 import user.theovercaste.overdecompiler.parserdata.ParsedClass;
 import user.theovercaste.overdecompiler.parsers.JavaParser;
+import user.theovercaste.overdecompiler.printerdata.IndentationStrategySpaces;
 import user.theovercaste.overdecompiler.printerdata.variablenamers.SimpleVariableNamer;
 import user.theovercaste.overdecompiler.printers.*;
 
@@ -31,7 +32,7 @@ public class GoalDecompile extends AbstractGoalByteEditor {
             sendUsageMessage(System.out);
             return;
         }
-        printerFactory = new PrettyPrinter.Factory(new SimpleVariableNamer()); //TODO
+        printerFactory = new JavaPrinter.Factory(new SimpleVariableNamer(), new IndentationStrategySpaces(2)); //TODO
        // printerFactory = new DebugPrinter.Factory();
         //printerFactory = h.getClassArgument("printer", "user.theovercaste.overdecompiler.printers", printerFactory, AbstractPrinterFactory.class);
         recursive = h.checkFlagExists('r') || h.checkFlagExists("recursive");

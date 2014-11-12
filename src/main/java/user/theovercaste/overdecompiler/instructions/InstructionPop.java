@@ -4,7 +4,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Stack;
 
-import user.theovercaste.overdecompiler.parsers.methodparsers.MethodActionPointer;
+import user.theovercaste.overdecompiler.parsers.javaparser.methodparsers.MethodActionPointer;
 
 public class InstructionPop extends AbstractInstructionStackModifier {
     public InstructionPop(int opcode, int byteIndex, int instructionIndex, int lineNumber) {

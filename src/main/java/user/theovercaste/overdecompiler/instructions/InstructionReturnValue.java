@@ -6,7 +6,7 @@ import java.util.Stack;
 
 import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.*;
-import user.theovercaste.overdecompiler.parserdata.method.*;
+import user.theovercaste.overdecompiler.parserdata.methodmembers.*;
 
 public class InstructionReturnValue extends AbstractInstructionDirectAction {
     public InstructionReturnValue(int opcode, int byteIndex, int instructionIndex, int lineNumber) {

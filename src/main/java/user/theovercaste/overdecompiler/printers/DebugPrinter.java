@@ -4,8 +4,8 @@ import java.io.*;
 
 import user.theovercaste.overdecompiler.parserdata.ParsedClass;
 import user.theovercaste.overdecompiler.parserdata.ParsedMethod;
-import user.theovercaste.overdecompiler.parserdata.method.MethodBlock;
-import user.theovercaste.overdecompiler.parserdata.method.MethodMember;
+import user.theovercaste.overdecompiler.parserdata.methodmembers.MethodBlock;
+import user.theovercaste.overdecompiler.parserdata.methodmembers.MethodMember;
 
 public class DebugPrinter extends AbstractPrinter {
     @Override

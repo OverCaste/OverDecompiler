@@ -2,8 +2,8 @@ package user.theovercaste.overdecompiler.instructions;
 
 import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
-import user.theovercaste.overdecompiler.parserdata.method.MethodAction;
-import user.theovercaste.overdecompiler.parsers.methodparsers.MethodDecompileContext;
+import user.theovercaste.overdecompiler.parserdata.methodmembers.MethodAction;
+import user.theovercaste.overdecompiler.parsers.javaparser.methodparsers.MethodDecompileContext;
 
 public abstract class AbstractInstructionDummy extends Instruction {
     public AbstractInstructionDummy(int opcode, int byteIndex, int instructionIndex, int lineNumber) {
