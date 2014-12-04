@@ -215,7 +215,7 @@ public final class ClassPath {
     public static ClassPath getMethodReturnType(String descriptor) {
         int closingBraceIndex = descriptor.indexOf(")");
         String returnDescriptor = (closingBraceIndex < 0 ? descriptor : descriptor.substring(closingBraceIndex + 1, descriptor.length()));
-        return demangle(returnDescriptor);
+        return getMangledPath(returnDescriptor);
     }
 
     /**

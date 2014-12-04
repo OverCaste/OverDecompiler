@@ -3,11 +3,13 @@ package user.theovercaste.overdecompiler.instructions;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Stack;
 
 import user.theovercaste.overdecompiler.constantpool.*;
-import user.theovercaste.overdecompiler.exceptions.*;
-import user.theovercaste.overdecompiler.parseddata.methodmembers.*;
+import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
+import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
+import user.theovercaste.overdecompiler.parseddata.methodmembers.MethodAction;
+import user.theovercaste.overdecompiler.parseddata.methodmembers.MethodActionInvokeMethodStatic;
+import user.theovercaste.overdecompiler.parsers.javaparser.subparsers.methodparsers.MethodActionPointer;
 import user.theovercaste.overdecompiler.parsers.javaparser.subparsers.methodparsers.MethodDecompileContext;
 import user.theovercaste.overdecompiler.rawclassdata.ClassData;
 import user.theovercaste.overdecompiler.util.ClassPath;
@@ -32,40 +34,22 @@ public class InstructionInvokeStatic extends AbstractInstructionDirectAction {
     }
 
     @Override
-    public MethodAction getAction(ClassData originClass, Stack<MethodMember> stack) throws InstructionParsingException {
-        try {
-            ConstantPool constantPool = originClass.getConstantPool();
-            ConstantPoolPreconditions.checkEntryType(constantPool, methodIndex, REQUIRED_TYPES);
-            String descriptor = constantPool.getReferenceType(methodIndex);
-            Collection<ClassPath> arguments = ClassPath.getMethodArguments(descriptor);
-            MethodAction[] actions = new MethodAction[arguments.size()];
-            for (int i = 0; i < arguments.size(); i++) {
-                if (stack.isEmpty()) {
-                    throw new EndOfStackException();
-                }
-                MethodMember a = stack.pop();
-                if (a instanceof MethodAction) {
-                    actions[i] = (MethodAction) a;
-                } else {
-                    throw new InstructionParsingException("Parameter " + i + "'s type isn't printable! (" + a.getClass().getName() + ")");
-                }
-            }
-            return new MethodActionInvokeMethodStatic(ClassPath.getInternalPath(constantPool.getReferenceClassName(methodIndex)), constantPool.getReferenceName(methodIndex),
-                    ImmutableList.copyOf(actions));
-        } catch (InvalidConstantPoolPointerException e) {
-            throw new InstructionParsingException(e);
-        }
-    }
-
-    @Override
     public MethodAction getAction(ClassData originClass, MethodDecompileContext ctx) throws InstructionParsingException {
         try {
             ConstantPool pool = originClass.getConstantPool();
             ConstantPoolPreconditions.checkEntryType(pool, methodIndex, REQUIRED_TYPES);
+            String descriptor = pool.getReferenceType(methodIndex);
+            Collection<ClassPath> arguments = ClassPath.getMethodArguments(descriptor);
+            MethodActionPointer[] actions = new MethodActionPointer[arguments.size()];
+            for (int i = 0; i < arguments.size(); i++) {
+                actions[i] = ctx.popActionPointer();
+            }
+            System.out.println("Reference type: " + ClassPath.getMethodReturnType(pool.getReferenceType(methodIndex)) + ", " + pool.getReferenceType(methodIndex));
+            return new MethodActionInvokeMethodStatic(ClassPath.getInternalPath(pool.getReferenceClassName(methodIndex)), ClassPath.getMethodReturnType(pool.getReferenceType(methodIndex)), pool.getReferenceName(methodIndex),
+                    ImmutableList.copyOf(actions));
         } catch (InvalidConstantPoolPointerException e) {
             throw new InstructionParsingException("Couldn't parse instruction due to an InvalidConstantPoolPointerException.", e);
         }
-        return null;
     }
 
     @Override

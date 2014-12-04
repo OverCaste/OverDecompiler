@@ -26,7 +26,7 @@ public class MethodActionSetVariable extends MethodActionGetter {
     public String getStringValue(ParsedClass c, ParsedMethod parent, MethodPrintingContext ctx) {
         StringBuilder builder = new StringBuilder();
         if (firstReference) {
-            builder.append(variableType.getSimplePath()).append(" ");
+            builder.append(variableType.getClassName()).append(" ");
         }
         builder.append(ctx.getVariableName(variableIndex, false, getClassType())).append(" = ").append(expression.getStringValue(c, parent, ctx));
         return builder.toString();
