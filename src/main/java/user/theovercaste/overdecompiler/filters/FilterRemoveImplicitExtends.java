@@ -1,8 +1,8 @@
 package user.theovercaste.overdecompiler.filters;
 
-import user.theovercaste.overdecompiler.codeinternals.ClassFlag;
-import user.theovercaste.overdecompiler.codeinternals.ClassPath;
-import user.theovercaste.overdecompiler.parserdata.ParsedClass;
+import user.theovercaste.overdecompiler.parseddata.ParsedClass;
+import user.theovercaste.overdecompiler.util.ClassFlag;
+import user.theovercaste.overdecompiler.util.ClassPath;
 
 public class FilterRemoveImplicitExtends implements Filter {
     @Override

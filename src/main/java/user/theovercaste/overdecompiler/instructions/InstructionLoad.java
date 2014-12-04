@@ -3,8 +3,8 @@ package user.theovercaste.overdecompiler.instructions;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import user.theovercaste.overdecompiler.parsers.javaparser.methodparsers.MethodActionPointer;
-import user.theovercaste.overdecompiler.parsers.javaparser.methodparsers.MethodDecompileContext;
+import user.theovercaste.overdecompiler.parsers.javaparser.subparsers.methodparsers.MethodActionPointer;
+import user.theovercaste.overdecompiler.parsers.javaparser.subparsers.methodparsers.MethodDecompileContext;
 
 public class InstructionLoad extends AbstractInstructionStackModifier {
     private final int referenceIndex;
@@ -30,7 +30,6 @@ public class InstructionLoad extends AbstractInstructionStackModifier {
     @Override
     public void modifyStack(MethodDecompileContext ctx) {
         MethodActionPointer var = ctx.getVariable(getNumber());
-        System.out.println("variable: " + var);
         ctx.getActionPointers().push(var);
     }
 

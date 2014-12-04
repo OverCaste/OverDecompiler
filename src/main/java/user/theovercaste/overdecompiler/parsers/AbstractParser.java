@@ -2,9 +2,9 @@ package user.theovercaste.overdecompiler.parsers;
 
 import java.util.EnumSet;
 
-import user.theovercaste.overdecompiler.codeinternals.*;
 import user.theovercaste.overdecompiler.exceptions.ClassParsingException;
-import user.theovercaste.overdecompiler.parserdata.ParsedClass;
+import user.theovercaste.overdecompiler.parseddata.ParsedClass;
+import user.theovercaste.overdecompiler.util.*;
 
 public abstract class AbstractParser implements ClassParser {
     protected ParsedClass parsedClass;
@@ -12,6 +12,8 @@ public abstract class AbstractParser implements ClassParser {
     protected abstract ClassPath getClassPath( ) throws ClassParsingException;
 
     protected abstract ClassType getClassType( ) throws ClassParsingException;
+
+    protected abstract JavaVersion getJavaVersion( ) throws ClassParsingException;
 
     protected abstract ClassPath getParentPath( ) throws ClassParsingException;
 
@@ -25,11 +27,7 @@ public abstract class AbstractParser implements ClassParser {
 
     protected abstract void parseFlags( ) throws ClassParsingException;
 
-    protected void addImport(ClassPath i) {
-        if (i.isObject() && !"java.lang".equals(i.getClassPackage())) {
-            parsedClass.addImport(i);
-        }
-    }
+    protected abstract void parseImports( ) throws ClassParsingException;
 
     public EnumSet<ClassFlag> getClassFlags(int bitmask) {
         EnumSet<ClassFlag> ret = EnumSet.noneOf(ClassFlag.class);
@@ -64,13 +62,14 @@ public abstract class AbstractParser implements ClassParser {
     @Override
     public ParsedClass parseClass( ) throws ClassParsingException {
         ClassPath parsedClassPath = getClassPath();
-        parsedClass = new ParsedClass(parsedClassPath.getClassName(), parsedClassPath.getClassPackage(), getClassType());
+        parsedClass = new ParsedClass(getJavaVersion(), parsedClassPath.getClassName(), parsedClassPath.getClassPackage(), getClassType());
         parsedClass.setParent(getParentPath());
         parseInterfaces();
         parseFields();
         parseMethods();
         parseAnnotations();
         parseFlags();
+        parseImports();
         return parsedClass;
     }
 }

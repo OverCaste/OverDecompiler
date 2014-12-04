@@ -1,24 +1,29 @@
 package user.theovercaste.overdecompiler.goals;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import user.theovercaste.overdecompiler.ArgumentHandler;
 import user.theovercaste.overdecompiler.classdataloaders.FileClassDataLoader;
-import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.*;
+import user.theovercaste.overdecompiler.exceptions.InvalidClassException;
 import user.theovercaste.overdecompiler.filters.*;
-import user.theovercaste.overdecompiler.parserdata.ParsedClass;
+import user.theovercaste.overdecompiler.parseddata.ParsedClass;
 import user.theovercaste.overdecompiler.parsers.JavaParser;
 import user.theovercaste.overdecompiler.printerdata.IndentationStrategySpaces;
 import user.theovercaste.overdecompiler.printerdata.variablenamers.SimpleVariableNamer;
 import user.theovercaste.overdecompiler.printers.*;
+import user.theovercaste.overdecompiler.rawclassdata.ClassData;
 
 import com.google.common.collect.ObjectArrays;
 
 public class GoalDecompile extends AbstractGoalByteEditor {
+    private final Logger logger = LoggerFactory.getLogger(GoalDecompile.class);
+
     protected List<Filter> filters = new ArrayList<>();
 
     protected AbstractPrinterFactory printerFactory;
@@ -32,9 +37,9 @@ public class GoalDecompile extends AbstractGoalByteEditor {
             sendUsageMessage(System.out);
             return;
         }
-        printerFactory = new JavaPrinter.Factory(new SimpleVariableNamer(), new IndentationStrategySpaces(2)); //TODO
-       // printerFactory = new DebugPrinter.Factory();
-        //printerFactory = h.getClassArgument("printer", "user.theovercaste.overdecompiler.printers", printerFactory, AbstractPrinterFactory.class);
+        printerFactory = new JavaPrinter.Factory(new SimpleVariableNamer(), new IndentationStrategySpaces(2)); // TODO
+        // printerFactory = new DebugPrinter.Factory();
+        // printerFactory = h.getClassArgument("printer", "user.theovercaste.overdecompiler.printers", printerFactory, AbstractPrinterFactory.class);
         recursive = h.checkFlagExists('r') || h.checkFlagExists("recursive");
         threaded = h.checkFlagExists('t') || h.checkFlagExists("threaded");
         matchLineNumbers = h.checkFlagExists('m') || h.checkFlagExists("match-line-numbers"); // TODO
@@ -76,9 +81,9 @@ public class GoalDecompile extends AbstractGoalByteEditor {
                 try {
                     future.get(); // Block until done
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    logger.warn("A concurrent decompilation task was interrupted.", e);
                 } catch (ExecutionException e) {
-                    e.printStackTrace();
+                    logger.warn("A concurrent decompilation task threw an exception.", e);
                 }
             }
         } else {
@@ -103,26 +108,30 @@ public class GoalDecompile extends AbstractGoalByteEditor {
 
     private class DecompilerTask implements Runnable {
         private final ArrayList<File> files = new ArrayList<File>();
-        private final AbstractPrinter printer = printerFactory.createPrinter();
+        private final Printer printer = printerFactory.createPrinter();
 
         @Override
         public void run( ) {
             for (File f : files) {
-                System.out.println(" - Reading binary data...");
+                logger.info(" - Reading binary data...");
                 try (FileClassDataLoader loader = new FileClassDataLoader(f)) {
                     ClassData c = loader.getClassData();
-                    System.out.println(" - Parsing...");
+                    logger.info(" - Parsing...");
                     ParsedClass parsed = (new JavaParser(c).parseClass());
-                    System.out.println(" - Filtering...");
+                    logger.info(" - Filtering...");
                     for (Filter filter : filters) {
                         filter.apply(parsed);
                     }
-                    System.out.println(" - Writing...");
+                    logger.info(" - Writing...");
                     printer.print(parsed, System.out);
-                } catch (InvalidClassException | ClassParsingException e) {
-                    System.err.println("Invalid class detected. (" + e.getMessage() + ")");
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (InvalidClassException ex) {
+                    logger.error("Couldn't load the class data from file {}. Is it a valid java class file?", f.getPath(), ex);
+                } catch (ClassParsingException ex) {
+                    logger.error("Couldn't parse class data from file {}. Is it in a class version supported?", f.getPath(), ex);
+                } catch (FileNotFoundException ex) {
+                    logger.error("Failed to open a file for decompilation: {}.", ex);
+                } catch (IOException ex) {
+                    logger.error("Couldn't print the class to the output stream specified.", ex);
                 }
             }
         }

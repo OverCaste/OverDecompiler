@@ -5,11 +5,12 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Stack;
 
-import user.theovercaste.overdecompiler.codeinternals.ClassPath;
 import user.theovercaste.overdecompiler.constantpool.*;
-import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.*;
-import user.theovercaste.overdecompiler.parserdata.methodmembers.*;
+import user.theovercaste.overdecompiler.parseddata.methodmembers.*;
+import user.theovercaste.overdecompiler.parsers.javaparser.subparsers.methodparsers.MethodDecompileContext;
+import user.theovercaste.overdecompiler.rawclassdata.ClassData;
+import user.theovercaste.overdecompiler.util.ClassPath;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -54,6 +55,17 @@ public class InstructionInvokeStatic extends AbstractInstructionDirectAction {
         } catch (InvalidConstantPoolPointerException e) {
             throw new InstructionParsingException(e);
         }
+    }
+
+    @Override
+    public MethodAction getAction(ClassData originClass, MethodDecompileContext ctx) throws InstructionParsingException {
+        try {
+            ConstantPool pool = originClass.getConstantPool();
+            ConstantPoolPreconditions.checkEntryType(pool, methodIndex, REQUIRED_TYPES);
+        } catch (InvalidConstantPoolPointerException e) {
+            throw new InstructionParsingException("Couldn't parse instruction due to an InvalidConstantPoolPointerException.", e);
+        }
+        return null;
     }
 
     @Override

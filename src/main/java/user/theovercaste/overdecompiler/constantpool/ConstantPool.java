@@ -1,12 +1,8 @@
 package user.theovercaste.overdecompiler.constantpool;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
-import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
-import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerIndexException;
-import user.theovercaste.overdecompiler.exceptions.WrongConstantPoolPointerTypeException;
+import user.theovercaste.overdecompiler.exceptions.*;
 
 import com.google.common.base.Preconditions;
 
@@ -47,7 +43,11 @@ public class ConstantPool {
         if (index > entries.size()) {
             throw new InvalidConstantPoolPointerIndexException("Constant pool index is larger than pool size: " + index + " > " + entries.size() + ".");
         }
-        return entries.get(index - 1); // Start at index 0, pool starts at 1
+        ConstantPoolEntry e = entries.get(index - 1); // Start at index 0, pool starts at 1
+        if (e == null) {
+            throw new InvalidConstantPoolPointerIndexException("The constant pool value at that index is null!");
+        }
+        return e;
     }
 
     public ConstantPoolEntry getUnsafe(int index) {
@@ -102,7 +102,7 @@ public class ConstantPool {
         return addValue(entry);
     }
 
-    public long getInteger(int index) throws InvalidConstantPoolPointerException {
+    public int getInteger(int index) throws InvalidConstantPoolPointerException {
         ConstantPoolEntry entry = get(index);
         if (entry instanceof ConstantPoolEntryInteger) {
             return ((ConstantPoolEntryInteger) entry).getValue(); // Get the string this 'pointer' is pointing to.
@@ -156,7 +156,7 @@ public class ConstantPool {
     /**
      * Fetches the specified class' name from the constant pool.
      * 
-     * @see {@link user.theovercaste.overdecompiler.codeinternals.ClassPath#getInternalPath(String)}
+     * @see {@link user.theovercaste.overdecompiler.util.ClassPath#getInternalPath(String)}
      * 
      * @param index The index from which the class is to be retrieved
      * @return A mangled form of the class.

@@ -2,10 +2,10 @@ package user.theovercaste.overdecompiler.instructions;
 
 import java.util.Stack;
 
-import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
-import user.theovercaste.overdecompiler.parserdata.methodmembers.MethodAction;
-import user.theovercaste.overdecompiler.parsers.javaparser.methodparsers.MethodDecompileContext;
+import user.theovercaste.overdecompiler.parseddata.methodmembers.MethodAction;
+import user.theovercaste.overdecompiler.parsers.javaparser.subparsers.methodparsers.MethodDecompileContext;
+import user.theovercaste.overdecompiler.rawclassdata.ClassData;
 
 /**
  * An Instruction that directly translates to a MethodAction via {@link #getAction(ClassData, Stack)}

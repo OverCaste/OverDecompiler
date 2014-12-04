@@ -1,45 +1,44 @@
 package user.theovercaste.overdecompiler.goals;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
+import java.io.*;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import user.theovercaste.overdecompiler.FileUtilities;
 
 public abstract class AbstractGoalByteEditor extends AbstractGoal {
+    private final Logger logger = LoggerFactory.getLogger(AbstractGoalByteEditor.class);
+
     public void processData(String filePath, boolean recursive) {
         File f = new File(filePath);
         if (!f.exists()) {
-            System.err.println("The file to decompile is missing or invalid.");
+            logger.error("The file at path {} does not exist.", f.getAbsolutePath());
             return;
         }
         if (f.isDirectory()) {
-            System.out.println("Directory detected.");
+            logger.debug("Directory detected.");
             processFiles(seekClasses(f, recursive));
         } else {
             String extension = FileUtilities.getFileExtention(f);
             switch (extension) {
                 case "jar": {
-                    System.out.println("Jar file detected. Extracting...");
+                    logger.info("JAR file detected. Extracting...");
                     File dir = new File(f.getParentFile(), FileUtilities.getFileName(f));
                     extractJar(f, dir);
                     processFiles(seekClasses(dir, recursive));
                     break;
                 }
                 case "class": {
-                    System.out.println("Class file detected.");
+                    logger.debug("Binary class file detected.");
                     processFiles(Arrays.asList(f));
                     break;
                 }
                 default:
-                    System.err.println("Unknown file type detected: " + extension + ".");
+                    logger.error("Unrecognized file type detected: {}.", extension);
                     break;
             }
         }
@@ -50,13 +49,13 @@ public abstract class AbstractGoalByteEditor extends AbstractGoal {
     private void extractJar(File jar, File dir) {
         if (!dir.exists()) {
             if (dir.mkdir()) {
-                System.out.println("Made export directory: " + dir.getAbsolutePath());
+                logger.info("Created output directory: {}", dir.getAbsolutePath());
             } else {
-                System.err.println("Failed to make export directory: " + dir.getAbsolutePath());
+                logger.error("Failed to create output directory: {}", dir.getAbsolutePath());
                 return;
             }
         } else {
-            System.out.println("Exporting to directory: " + dir.getAbsolutePath());
+            logger.info("Using output directory: {}", dir.getAbsolutePath());
         }
 
         byte[] buffer = new byte[2048];
@@ -72,15 +71,15 @@ public abstract class AbstractGoalByteEditor extends AbstractGoal {
                     while ((length = zin.read(buffer)) > 0) {
                         fout.write(buffer, 0, length);
                     }
-                } catch (Throwable t) {
-                    t.printStackTrace();
+                } catch (IOException ex) {
+                    logger.error("Failed to decompress a part of jar file {}.", jar.getPath(), ex);
                 }
             }
             zin.close();
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            logger.error("The jar file being decompressed was deleted before it could be read from.", e);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Failed to read from the jar file to be decompressed, or create a new folder for the output.", e);
         }
     }
 

@@ -1,7 +1,8 @@
 /bin
-/target
-/target
+/
+/target/
 
-.classpath
-.project
+/.classpath
+/.project
 /.settings
+/slf4j*.jar

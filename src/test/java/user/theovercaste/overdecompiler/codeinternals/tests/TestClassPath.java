@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import user.theovercaste.overdecompiler.codeinternals.ClassPath;
+import user.theovercaste.overdecompiler.util.ClassPath;
 
 public class TestClassPath {
     @Test

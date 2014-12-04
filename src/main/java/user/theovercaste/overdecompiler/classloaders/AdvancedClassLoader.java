@@ -5,12 +5,12 @@ import java.io.InputStream;
 import java.util.HashMap;
 
 import user.theovercaste.overdecompiler.classdataloaders.BinaryClassDataLoader;
-import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.ClassParsingException;
 import user.theovercaste.overdecompiler.exceptions.InvalidClassException;
-import user.theovercaste.overdecompiler.parserdata.ParsedClass;
+import user.theovercaste.overdecompiler.parseddata.ParsedClass;
 import user.theovercaste.overdecompiler.parsers.ClassParser;
 import user.theovercaste.overdecompiler.parsers.JavaParser;
+import user.theovercaste.overdecompiler.rawclassdata.ClassData;
 
 public abstract class AdvancedClassLoader extends ClassLoader {
     private final HashMap<String, Class<?>> loadedClasses = new HashMap<>();
@@ -48,8 +48,6 @@ public abstract class AdvancedClassLoader extends ClassLoader {
             modifyClass(parsed);
             // TODO unparse, convert to binary
         } catch (InvalidClassException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassParsingException e) {
             e.printStackTrace();

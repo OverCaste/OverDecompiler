@@ -2,9 +2,8 @@ package user.theovercaste.overdecompiler.instructions;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.Stack;
 
-import user.theovercaste.overdecompiler.parsers.javaparser.methodparsers.MethodActionPointer;
+import user.theovercaste.overdecompiler.parsers.javaparser.subparsers.methodparsers.MethodDecompileContext;
 
 public class InstructionPop extends AbstractInstructionStackModifier {
     public InstructionPop(int opcode, int byteIndex, int instructionIndex, int lineNumber) {
@@ -16,8 +15,8 @@ public class InstructionPop extends AbstractInstructionStackModifier {
     }
 
     @Override
-    public void modifyStack(Stack<MethodActionPointer> stack) {
-        stack.pop();
+    public void modifyStack(MethodDecompileContext ctx) {
+        ctx.popActionPointer();
     }
 
     public static int[] getOpcodes( ) {

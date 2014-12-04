@@ -1,13 +1,12 @@
 package user.theovercaste.overdecompiler.attributes;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
+import java.io.*;
 
 import user.theovercaste.overdecompiler.constantpool.ConstantPool;
 import user.theovercaste.overdecompiler.exceptions.InvalidAttributeException;
+import user.theovercaste.overdecompiler.util.AttributeData;
 
-public class CodeAttribute extends ParsedAttribute {
+public class CodeAttribute implements Attribute {
     private final int maxStacks;
     private final int maxLocals;
     private final byte[] code;
@@ -46,8 +45,8 @@ public class CodeAttribute extends ParsedAttribute {
         return "Code";
     }
 
-    public static Parser parser( ) {
-        return new Parser();
+    public static Loader loader( ) {
+        return new Loader();
     }
 
     public static class ExceptionAttribute {
@@ -64,10 +63,11 @@ public class CodeAttribute extends ParsedAttribute {
         }
     }
 
-    public static class Parser extends ParsedAttribute.Parser<CodeAttribute> {
+    public static class Loader implements AttributeLoader<CodeAttribute> {
+
         @Override
-        public CodeAttribute parse(AttributeData a, ConstantPool constantPool) throws InvalidAttributeException {
-            try (DataInputStream din = new DataInputStream(new ByteArrayInputStream(a.data))) {
+        public CodeAttribute load(AttributeData a, ConstantPool constantPool) throws InvalidAttributeException {
+            try (DataInputStream din = new DataInputStream(new ByteArrayInputStream(a.getData()))) {
                 int maxStack = din.readUnsignedShort();
                 int maxLocals = din.readUnsignedShort();
                 byte[] code = new byte[din.readInt()];

@@ -5,15 +5,15 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.EmptyStackException;
 
-import user.theovercaste.overdecompiler.codeinternals.ClassPath;
 import user.theovercaste.overdecompiler.constantpool.*;
-import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
 import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
-import user.theovercaste.overdecompiler.parserdata.methodmembers.MethodAction;
-import user.theovercaste.overdecompiler.parserdata.methodmembers.MethodActionInvokeMethod;
-import user.theovercaste.overdecompiler.parsers.javaparser.methodparsers.MethodActionPointer;
-import user.theovercaste.overdecompiler.parsers.javaparser.methodparsers.MethodDecompileContext;
+import user.theovercaste.overdecompiler.parseddata.methodmembers.MethodAction;
+import user.theovercaste.overdecompiler.parseddata.methodmembers.MethodActionInvokeMethod;
+import user.theovercaste.overdecompiler.parsers.javaparser.subparsers.methodparsers.MethodActionPointer;
+import user.theovercaste.overdecompiler.parsers.javaparser.subparsers.methodparsers.MethodDecompileContext;
+import user.theovercaste.overdecompiler.rawclassdata.ClassData;
+import user.theovercaste.overdecompiler.util.ClassPath;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;

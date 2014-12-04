@@ -3,13 +3,13 @@ package user.theovercaste.overdecompiler.instructions;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.EndOfStackException;
 import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
-import user.theovercaste.overdecompiler.parserdata.methodmembers.MethodAction;
-import user.theovercaste.overdecompiler.parserdata.methodmembers.MethodActionGetArrayLength;
-import user.theovercaste.overdecompiler.parsers.javaparser.methodparsers.MethodActionPointer;
-import user.theovercaste.overdecompiler.parsers.javaparser.methodparsers.MethodDecompileContext;
+import user.theovercaste.overdecompiler.parseddata.methodmembers.MethodAction;
+import user.theovercaste.overdecompiler.parseddata.methodmembers.MethodActionGetArrayLength;
+import user.theovercaste.overdecompiler.parsers.javaparser.subparsers.methodparsers.MethodActionPointer;
+import user.theovercaste.overdecompiler.parsers.javaparser.subparsers.methodparsers.MethodDecompileContext;
+import user.theovercaste.overdecompiler.rawclassdata.ClassData;
 
 public class InstructionArrayLength extends AbstractInstructionDirectAction {
     public InstructionArrayLength(int opcode, int byteIndex, int instructionIndex, int lineNumber) {
@@ -25,7 +25,6 @@ public class InstructionArrayLength extends AbstractInstructionDirectAction {
         if (ctx.getActionPointers().isEmpty()) {
             throw new EndOfStackException("There was no array to get the length of!");
         }
-        System.out.println("Action pointers: " + ctx.getActionPointers());
         MethodActionPointer value = ctx.popActionPointer();
         return new MethodActionGetArrayLength(value);
     }

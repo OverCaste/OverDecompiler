@@ -3,7 +3,7 @@ package user.theovercaste.overdecompiler.instructions;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import user.theovercaste.overdecompiler.parsers.javaparser.methodparsers.MethodDecompileContext;
+import user.theovercaste.overdecompiler.parsers.javaparser.subparsers.methodparsers.MethodDecompileContext;
 
 public class InstructionDup extends AbstractInstructionStackModifier {
     public InstructionDup(int opcode, int byteIndex, int instructionIndex, int lineNumber) {

@@ -3,7 +3,7 @@ package user.theovercaste.overdecompiler.instructions;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import user.theovercaste.overdecompiler.parsers.javaparser.methodparsers.MethodDecompileContext;
+import user.theovercaste.overdecompiler.parsers.javaparser.subparsers.methodparsers.MethodDecompileContext;
 
 public class InstructionStoreNumbered extends AbstractInstructionStackModifier {
     public InstructionStoreNumbered(int opcode, int byteIndex, int instructionIndex, int lineNumber) {
@@ -17,10 +17,10 @@ public class InstructionStoreNumbered extends AbstractInstructionStackModifier {
     public int getNumber( ) {
         return (opcode - 0x3b) & 3; // For clarity, this is (roughly) equivalent to (getOpcodes( )[0]) % 4, which takes advantage of the fact that all of the xstore_n operations are sequential.
     }
-    
+
     @Override
     public void modifyStack(MethodDecompileContext ctx) {
-        ctx.setVariable(getNumber( ), ctx.popActionPointer());
+        ctx.setVariable(getNumber(), ctx.popActionPointer());
     }
 
     @Override

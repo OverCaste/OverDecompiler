@@ -1,8 +1,8 @@
 package user.theovercaste.overdecompiler.filters;
 
-import user.theovercaste.overdecompiler.parserdata.ParsedClass;
-import user.theovercaste.overdecompiler.parserdata.ParsedMethod;
-import user.theovercaste.overdecompiler.parserdata.methodmembers.*;
+import user.theovercaste.overdecompiler.parseddata.ParsedClass;
+import user.theovercaste.overdecompiler.parseddata.ParsedMethod;
+import user.theovercaste.overdecompiler.parseddata.methodmembers.*;
 
 import com.google.common.collect.Iterables;
 

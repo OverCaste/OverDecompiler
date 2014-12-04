@@ -1,13 +1,12 @@
 package user.theovercaste.overdecompiler.attributes;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
+import java.io.*;
 
 import user.theovercaste.overdecompiler.constantpool.ConstantPool;
 import user.theovercaste.overdecompiler.exceptions.InvalidAttributeException;
+import user.theovercaste.overdecompiler.util.AttributeData;
 
-public class ConstantValueAttribute extends ParsedAttribute {
+public class ConstantValueAttribute implements Attribute {
     private final int attributeIndex;
 
     public ConstantValueAttribute(int attributeIndex) {
@@ -26,10 +25,10 @@ public class ConstantValueAttribute extends ParsedAttribute {
         return new Parser();
     }
 
-    public static class Parser extends ParsedAttribute.Parser<ConstantValueAttribute> {
+    public static class Parser implements AttributeLoader<ConstantValueAttribute> {
         @Override
-        public ConstantValueAttribute parse(AttributeData a, ConstantPool constantPool) throws InvalidAttributeException {
-            try (DataInputStream din = new DataInputStream(new ByteArrayInputStream(a.data))) {
+        public ConstantValueAttribute load(AttributeData a, ConstantPool constantPool) throws InvalidAttributeException {
+            try (DataInputStream din = new DataInputStream(new ByteArrayInputStream(a.getData()))) {
                 return new ConstantValueAttribute(din.readUnsignedShort());
             } catch (IOException e) {
                 throw new InvalidAttributeException(e);

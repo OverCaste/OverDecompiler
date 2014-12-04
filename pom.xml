@@ -18,6 +18,11 @@
 			<artifactId>guava</artifactId>
 			<version>16.0.1</version>
 		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.7</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -35,7 +40,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-						    <addClasspath>true</addClasspath>
+							<addClasspath>true</addClasspath>
 							<mainClass>user.theovercaste.overdecompiler.OverDecompiler</mainClass>
 						</manifest>
 					</archive>

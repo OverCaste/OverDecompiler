@@ -1,13 +1,12 @@
 package user.theovercaste.overdecompiler.attributes;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
+import java.io.*;
 
 import user.theovercaste.overdecompiler.constantpool.ConstantPool;
 import user.theovercaste.overdecompiler.exceptions.InvalidAttributeException;
+import user.theovercaste.overdecompiler.util.AttributeData;
 
-public class LineNumberTableAttribute extends ParsedAttribute {
+public class LineNumberTableAttribute implements Attribute {
     private final LineNumberTableValue[] table;
 
     public LineNumberTableAttribute(LineNumberTableValue[] table) {
@@ -22,8 +21,8 @@ public class LineNumberTableAttribute extends ParsedAttribute {
         return "LineNumberTable";
     }
 
-    public static Parser parser( ) {
-        return new Parser();
+    public static Loader loader( ) {
+        return new Loader();
     }
 
     public static class LineNumberTableValue {
@@ -44,10 +43,10 @@ public class LineNumberTableAttribute extends ParsedAttribute {
         }
     }
 
-    public static class Parser extends ParsedAttribute.Parser<LineNumberTableAttribute> {
+    public static class Loader implements AttributeLoader<LineNumberTableAttribute> {
         @Override
-        public LineNumberTableAttribute parse(AttributeData a, ConstantPool constantPool) throws InvalidAttributeException {
-            try (DataInputStream din = new DataInputStream(new ByteArrayInputStream(a.data))) {
+        public LineNumberTableAttribute load(AttributeData a, ConstantPool constantPool) throws InvalidAttributeException {
+            try (DataInputStream din = new DataInputStream(new ByteArrayInputStream(a.getData()))) {
                 LineNumberTableValue[] table = new LineNumberTableValue[din.readUnsignedShort()];
                 for (int i = 0; i < table.length; i++) {
                     table[i] = new LineNumberTableValue(din.readUnsignedShort(), din.readUnsignedShort());

@@ -1,10 +1,10 @@
 package user.theovercaste.overdecompiler.instructions;
 
-import user.theovercaste.overdecompiler.codeinternals.ArithmeticComparison;
-import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
-import user.theovercaste.overdecompiler.parserdata.methodmembers.MethodAction;
-import user.theovercaste.overdecompiler.parsers.javaparser.methodparsers.MethodDecompileContext;
+import user.theovercaste.overdecompiler.parseddata.methodmembers.MethodAction;
+import user.theovercaste.overdecompiler.parsers.javaparser.subparsers.methodparsers.MethodDecompileContext;
+import user.theovercaste.overdecompiler.rawclassdata.ClassData;
+import user.theovercaste.overdecompiler.util.ArithmeticComparison;
 
 public abstract class AbstractInstructionComparison extends Instruction {
     protected final int branchOffset;

@@ -1,17 +1,19 @@
 package user.theovercaste.overdecompiler.classdataloaders;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import user.theovercaste.overdecompiler.FileUtilities;
-import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.InvalidClassException;
+import user.theovercaste.overdecompiler.rawclassdata.ClassData;
 
 import com.google.common.base.CharMatcher;
 
 public class FileClassDataLoader extends BinaryClassDataLoader implements AutoCloseable {
+    private final Logger logger = LoggerFactory.getLogger(FileClassDataLoader.class);
+
     protected final FileInputStream fileInput;
     protected final File file;
 
@@ -22,7 +24,7 @@ public class FileClassDataLoader extends BinaryClassDataLoader implements AutoCl
     }
 
     @Override
-    public ClassData getClassData( ) throws InvalidClassException, IOException {
+    public ClassData getClassData( ) throws InvalidClassException {
         ClassData ret = super.getClassData();
         String currentFileName = FileUtilities.getFileName(file);
         CharMatcher dollarSignMatcher = CharMatcher.is('$');
@@ -33,6 +35,11 @@ public class FileClassDataLoader extends BinaryClassDataLoader implements AutoCl
                     try (FileClassDataLoader innerLoader = new FileClassDataLoader(otherFile)) {
                         ClassData innerData = innerLoader.getClassData();
                         ret.addNestedClass(innerData);
+                    } catch (FileNotFoundException ex) {
+                        logger.warn("A subclass wasn't available for decompilation.", ex);
+                        ex.printStackTrace();
+                    } catch (IOException ex) {
+                        logger.warn("Failed to close output stream for inner class data loader.", ex);
                     }
                 }
             }

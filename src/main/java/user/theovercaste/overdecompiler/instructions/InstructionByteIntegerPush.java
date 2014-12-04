@@ -3,11 +3,11 @@ package user.theovercaste.overdecompiler.instructions;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
-import user.theovercaste.overdecompiler.parserdata.methodmembers.*;
-import user.theovercaste.overdecompiler.parserdata.methodmembers.MethodActionGetConstant.ConstantType;
-import user.theovercaste.overdecompiler.parsers.javaparser.methodparsers.MethodDecompileContext;
+import user.theovercaste.overdecompiler.parseddata.methodmembers.*;
+import user.theovercaste.overdecompiler.parseddata.methodmembers.MethodActionGetConstant.ConstantType;
+import user.theovercaste.overdecompiler.parsers.javaparser.subparsers.methodparsers.MethodDecompileContext;
+import user.theovercaste.overdecompiler.rawclassdata.ClassData;
 
 public class InstructionByteIntegerPush extends AbstractInstructionDirectAction {
     private final int byteValue;

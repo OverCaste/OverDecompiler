@@ -1,6 +1,6 @@
 package user.theovercaste.overdecompiler.printerdata.variablenamers;
 
-import user.theovercaste.overdecompiler.codeinternals.ClassPath;
+import user.theovercaste.overdecompiler.util.ClassPath;
 
 public interface VariableNamer {
     /**

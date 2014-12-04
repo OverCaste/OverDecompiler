@@ -1,7 +1,5 @@
 package user.theovercaste.overdecompiler.instructions;
 
-import java.io.IOException;
-
 import user.theovercaste.overdecompiler.exceptions.InvalidInstructionException;
 import user.theovercaste.overdecompiler.instructions.comparisons.InstructionIfNotEqual;
 
@@ -50,7 +48,7 @@ public final class Instructions {
         }
     }
 
-    public static Instruction.Factory getFactory(int id) throws IOException {
+    public static Instruction.Factory getFactory(int id) {
         if (factoryMap.containsKey(id)) {
             return factoryMap.get(id);
         }

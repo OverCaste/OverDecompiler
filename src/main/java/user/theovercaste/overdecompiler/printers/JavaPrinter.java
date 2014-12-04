@@ -5,28 +5,53 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import user.theovercaste.overdecompiler.codeinternals.*;
-import user.theovercaste.overdecompiler.parserdata.*;
-import user.theovercaste.overdecompiler.parserdata.methodmembers.*;
-import user.theovercaste.overdecompiler.parsers.javaparser.methodparsers.MethodPrintingContext;
+import user.theovercaste.overdecompiler.parseddata.*;
+import user.theovercaste.overdecompiler.parseddata.annotation.ParsedAnnotation;
+import user.theovercaste.overdecompiler.parseddata.annotation.AnnotationMember;
+import user.theovercaste.overdecompiler.parseddata.methodmembers.*;
+import user.theovercaste.overdecompiler.parsers.javaparser.subparsers.methodparsers.MethodPrintingContext;
 import user.theovercaste.overdecompiler.printerdata.IndentationStrategy;
 import user.theovercaste.overdecompiler.printerdata.variablenamers.VariableNamer;
+import user.theovercaste.overdecompiler.util.*;
 
 import com.google.common.base.*;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
-public class JavaPrinter extends AbstractPrinter {
+public class JavaPrinter implements Printer {
     private final VariableNamer varNamer;
     private final IndentationStrategy indentationStrategy;
-    
+
     private int currentIndent = 0;
-    
+
     public JavaPrinter(VariableNamer varNamer, IndentationStrategy indentationStrategy) {
         this.varNamer = varNamer;
         this.indentationStrategy = indentationStrategy;
     }
-    
+
+    protected boolean printAnnotations(AnnotatableElement element, PrintStream out) {
+        for (ParsedAnnotation e : element.getAnnotations()) {
+            out.print(indentationStrategy.getIndentation(currentIndent));
+            out.print("@" + e.getType().getDefinition());
+            if (e.getMembers().size() > 0) {
+                out.print("(");
+                boolean first = true;
+                for (AnnotationMember m : e.getMembers()) {
+                    if (!first) {
+                        out.print(", ");
+                    }
+                    out.print(m.getName());
+                    out.print("=");
+                    out.print(m.getValue());
+                    first = false;
+                }
+                out.print(")");
+            }
+            out.println();
+        }
+        return true;
+    }
+
     protected boolean printPackage(ParsedClass clazz, PrintStream out) {
         String p = clazz.getPackage();
         if (p.length() > 0) {
@@ -38,21 +63,15 @@ public class JavaPrinter extends AbstractPrinter {
         return false;
     }
 
-    protected boolean printImport(ParsedClass clazz, ClassPath i, PrintStream out) {
-        if (i.isObject()) {
-            String path = i.getSimplePath();
-            if (!path.startsWith("java.lang.") && !i.equals(clazz.getClassPath())) {
-                out.println("import " + path + ";");
-                return true;
-            }
-        }
-        return false;
+    protected boolean printImport(ParsedClass clazz, String path, PrintStream out) {
+        out.println("import " + path + ";");
+        return true;
     }
 
     protected boolean printImports(ParsedClass clazz, PrintStream out) {
         int count = 0;
-        for (ClassPath i : clazz.getImports()) { // import is a keyword, c is already used, i it is!
-            if (printImport(clazz, i, out)) {
+        for (String path : clazz.getImports()) {
+            if (printImport(clazz, path, out)) {
                 count++;
             }
         }
@@ -176,6 +195,7 @@ public class JavaPrinter extends AbstractPrinter {
     protected boolean printMethods(ParsedClass clazz, PrintStream out) {
         int count = 0;
         for (ParsedMethod m : clazz.getMethods()) {
+            printAnnotations(m, out);
             if (printMethodHeader(clazz, m, out)) {
                 printMethodCode(clazz, m, out);
                 printFooter(clazz, out);
@@ -187,13 +207,13 @@ public class JavaPrinter extends AbstractPrinter {
 
     protected void printMethodCode(ParsedClass clazz, ParsedMethod m, PrintStream out) {
         MethodPrintingContext ctx = new MethodPrintingContext(new ArrayList<>(m.getMembers()), varNamer);
-        for(MethodMember member : m.getMembers()) {
+        for (MethodMember member : m.getMembers()) {
             member.countReferences(ctx);
         }
-        for(MethodMember member : m.getMembers()) {
-            if(member instanceof MethodActionSetVariable) {
+        for (MethodMember member : m.getMembers()) {
+            if (member instanceof MethodActionSetVariable) {
                 int index = ((MethodActionSetVariable) member).getVariableIndex();
-                if(ctx.getReferences(index) == 1) {
+                if (ctx.getReferences(index) == 1) {
                     ctx.setReferenceInlined(index);
                 }
             }
@@ -204,7 +224,7 @@ public class JavaPrinter extends AbstractPrinter {
     }
 
     protected void printMethodAction(ParsedClass clazz, ParsedMethod m, MethodAction action, PrintStream out, MethodPrintingContext ctx) {
-        if(action.isForceInlined() || ctx.isActionInlined(action)) {
+        if (action.isForceInlined() || ctx.isActionInlined(action)) {
             return;
         }
         out.print(indentationStrategy.getIndentation(currentIndent));
@@ -267,7 +287,6 @@ public class JavaPrinter extends AbstractPrinter {
                 out.print("void ");
             } else {
                 ClassPath returnType = m.getReturnType();
-                clazz.addImport(returnType);
                 out.print(returnType.getDefinition());
                 out.print(" ");
             }
@@ -322,18 +341,18 @@ public class JavaPrinter extends AbstractPrinter {
         printMethods(c, printer);
         printFooter(c, printer); // Close the class
     }
-    
+
     public static class Factory implements AbstractPrinterFactory {
         private VariableNamer varNamer;
         private IndentationStrategy indentationStrategy;
-        
+
         public Factory(VariableNamer varNamer, IndentationStrategy indentationStrategy) {
             this.varNamer = varNamer;
             this.indentationStrategy = indentationStrategy;
         }
 
         @Override
-        public AbstractPrinter createPrinter( ) {
+        public Printer createPrinter( ) {
             return new JavaPrinter(varNamer, indentationStrategy);
         }
     }

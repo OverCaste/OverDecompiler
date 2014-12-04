@@ -3,14 +3,14 @@ package user.theovercaste.overdecompiler.instructions;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import user.theovercaste.overdecompiler.codeinternals.ClassPath;
 import user.theovercaste.overdecompiler.constantpool.ConstantPool;
-import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
 import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
-import user.theovercaste.overdecompiler.parserdata.methodmembers.MethodAction;
-import user.theovercaste.overdecompiler.parserdata.methodmembers.MethodActionGetStaticField;
-import user.theovercaste.overdecompiler.parsers.javaparser.methodparsers.MethodDecompileContext;
+import user.theovercaste.overdecompiler.parseddata.methodmembers.MethodAction;
+import user.theovercaste.overdecompiler.parseddata.methodmembers.MethodActionGetStaticField;
+import user.theovercaste.overdecompiler.parsers.javaparser.subparsers.methodparsers.MethodDecompileContext;
+import user.theovercaste.overdecompiler.rawclassdata.ClassData;
+import user.theovercaste.overdecompiler.util.ClassPath;
 
 public class InstructionGetStatic extends AbstractInstructionDirectAction {
     private final int fieldIndex;
@@ -29,7 +29,8 @@ public class InstructionGetStatic extends AbstractInstructionDirectAction {
     public MethodAction getAction(ClassData originClass, MethodDecompileContext ctx) throws InstructionParsingException {
         try {
             ConstantPool constantPool = originClass.getConstantPool();
-            return new MethodActionGetStaticField(constantPool.getFieldReferenceName(fieldIndex), ClassPath.getInternalPath(constantPool.getFieldReferenceClassName(fieldIndex).replace("/", ".")), ClassPath.getMangledPath(constantPool.getFieldReferenceType(fieldIndex)));
+            return new MethodActionGetStaticField(constantPool.getFieldReferenceName(fieldIndex), ClassPath.getInternalPath(constantPool.getFieldReferenceClassName(fieldIndex)),
+                    ClassPath.getMangledPath(constantPool.getFieldReferenceType(fieldIndex)));
         } catch (InvalidConstantPoolPointerException e) {
             throw new InstructionParsingException(e);
         }

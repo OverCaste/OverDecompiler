@@ -3,14 +3,14 @@ package user.theovercaste.overdecompiler.instructions;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import user.theovercaste.overdecompiler.codeinternals.ClassPath;
 import user.theovercaste.overdecompiler.constantpool.*;
-import user.theovercaste.overdecompiler.datahandlers.ClassData;
 import user.theovercaste.overdecompiler.exceptions.InstructionParsingException;
 import user.theovercaste.overdecompiler.exceptions.InvalidConstantPoolPointerException;
-import user.theovercaste.overdecompiler.parserdata.methodmembers.*;
-import user.theovercaste.overdecompiler.parserdata.methodmembers.MethodActionGetConstant.ConstantType;
-import user.theovercaste.overdecompiler.parsers.javaparser.methodparsers.MethodDecompileContext;
+import user.theovercaste.overdecompiler.parseddata.methodmembers.*;
+import user.theovercaste.overdecompiler.parseddata.methodmembers.MethodActionGetConstant.ConstantType;
+import user.theovercaste.overdecompiler.parsers.javaparser.subparsers.methodparsers.MethodDecompileContext;
+import user.theovercaste.overdecompiler.rawclassdata.ClassData;
+import user.theovercaste.overdecompiler.util.ClassPath;
 
 /**
  * Equivalent to <a href="http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html#jvms-6.5.ldc">ldc</a>
@@ -52,7 +52,7 @@ public class InstructionLoadConstant extends AbstractInstructionDirectAction {
             }
             else if (e instanceof ConstantPoolEntryClass) {
                 ClassPath path = ClassPath.getMangledPath(originClass.getConstantPool().getClassName(constantIndex));
-                return new MethodActionGetConstant(path.getSimplePath(), ConstantType.CLASS);
+                return new MethodActionGetConstantClass(path);
             }
         } catch (InvalidConstantPoolPointerException ex) {
             throw new InstructionParsingException(ex);

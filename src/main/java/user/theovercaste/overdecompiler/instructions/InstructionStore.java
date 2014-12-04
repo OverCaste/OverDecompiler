@@ -2,13 +2,10 @@ package user.theovercaste.overdecompiler.instructions;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.Stack;
 
-import user.theovercaste.overdecompiler.datahandlers.ClassData;
-import user.theovercaste.overdecompiler.exceptions.*;
-import user.theovercaste.overdecompiler.parserdata.methodmembers.*;
+import user.theovercaste.overdecompiler.parsers.javaparser.subparsers.methodparsers.MethodDecompileContext;
 
-public class InstructionStore extends AbstractInstructionDirectAction {
+public class InstructionStore extends AbstractInstructionStackModifier {
     private final int value;
 
     public InstructionStore(int opcode, int byteIndex, int instructionIndex, int lineNumber, int value) {
@@ -26,16 +23,8 @@ public class InstructionStore extends AbstractInstructionDirectAction {
     }
 
     @Override
-    public MethodAction getAction(ClassData originClass, Stack<MethodMember> stack) throws InstructionParsingException {
-        if (stack.isEmpty()) {
-            throw new EndOfStackException();
-        }
-        MethodMember a = stack.pop();
-        if (a instanceof MethodActionGetter) {
-            return new MethodActionSetVariable(getNumber(), (MethodActionGetter) a);
-        } else {
-            throw new InvalidStackTypeException(a);
-        }
+    public void modifyStack(MethodDecompileContext ctx) {
+        ctx.pushActionPointer(ctx.getVariable(value));
     }
 
     @Override

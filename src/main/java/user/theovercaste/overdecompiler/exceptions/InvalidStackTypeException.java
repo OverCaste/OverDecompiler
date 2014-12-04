@@ -1,6 +1,6 @@
 package user.theovercaste.overdecompiler.exceptions;
 
-import user.theovercaste.overdecompiler.parserdata.methodmembers.MethodMember;
+import user.theovercaste.overdecompiler.parseddata.methodmembers.MethodMember;
 
 public class InvalidStackTypeException extends InstructionParsingException {
     private static final long serialVersionUID = 2983302269144247035L;

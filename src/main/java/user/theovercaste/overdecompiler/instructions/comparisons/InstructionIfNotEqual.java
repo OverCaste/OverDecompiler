@@ -3,9 +3,9 @@ package user.theovercaste.overdecompiler.instructions.comparisons;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import user.theovercaste.overdecompiler.codeinternals.ArithmeticComparison;
 import user.theovercaste.overdecompiler.instructions.AbstractInstructionComparison;
 import user.theovercaste.overdecompiler.instructions.Instruction;
+import user.theovercaste.overdecompiler.util.ArithmeticComparison;
 
 public class InstructionIfNotEqual extends AbstractInstructionComparison {
     public InstructionIfNotEqual(int opcode, int byteIndex, int instructionIndex, int lineNumber, int branchIndex) {

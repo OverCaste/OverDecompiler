@@ -3,11 +3,11 @@ package user.theovercaste.overdecompiler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.slf4j.Logger;
+
 import user.theovercaste.overdecompiler.exceptions.ArgumentParsingException;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.*;
 
 public class ArgumentHandler {
     private final ImmutableList<String> argumentList;
@@ -41,9 +41,9 @@ public class ArgumentHandler {
         argumentFlags = argumentFlagsBuilder.build();
     }
 
-    public static void sendDefaultUsageMessage( ) {
+    public static void sendDefaultUsageMessage(Logger logger) {
         for (String s : getDefaultUsage()) {
-            System.out.println(s);
+            logger.info(s);
         }
     }
 
@@ -56,12 +56,7 @@ public class ArgumentHandler {
         };
     }
 
-    @SuppressWarnings("unchecked")
-    // Actually checked by isAssignableFrom
     public <T> T getClassArgument(String key, String defaultPackage, T def, Class<T> type) throws ArgumentParsingException {
-        if (!argumentFlags.contains(key)) {
-            return def;
-        }
         if (!argumentValues.containsKey(key)) {
             return def;
         }
@@ -73,22 +68,27 @@ public class ArgumentHandler {
             Class<?> clazz = Class.forName(parserName);
             if (clazz.isAssignableFrom(type)) {
                 Method getInstanceMethod = clazz.getMethod("getInstance");
-                return (T) getInstanceMethod.invoke(null);
+                @SuppressWarnings("unchecked")
+                // This is actually checked by .isAssignableFrom
+                T ret = (T) getInstanceMethod.invoke(null);
+                return ret;
+            } else {
+                throw new ArgumentParsingException("The " + key + " flag's value isn't an instance of " + type.getName() + ".");
             }
         } catch (ClassNotFoundException e) { // Reflection gives you a lot of errors.
-            e.printStackTrace();
+            throw new ArgumentParsingException("Class argument for argument " + key + " couldn't be found on the classpath.");
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            throw new ArgumentParsingException("The getInstance() method of the class argument for flag " + key + " couldn't be accessed.", e);
         } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+            throw new AssertionError("Invoking getInstance() threw an IllegalArgumentException. This should never happen as NoSuchMethodException would be thrown instead.");
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
+            throw new ArgumentParsingException("The getInstance() method of the class specified for flag " + key + " threw an exception.", e);
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            throw new ArgumentParsingException("The class specified for flag " + key + " didn't implement a getInstance() method. Is it of the proper kind?");
         } catch (SecurityException e) {
-            e.printStackTrace();
+            throw new ArgumentParsingException("A SecurityException was thrown while instantiating the class specified for flag " + key, e);
         }
-        throw new ArgumentParsingException("The " + key + " flag's value isn't an instance of " + type.getName() + ".");
+
     }
 
     public boolean checkFlagExists(char c) {

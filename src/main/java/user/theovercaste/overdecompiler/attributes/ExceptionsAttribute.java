@@ -1,13 +1,12 @@
 package user.theovercaste.overdecompiler.attributes;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
+import java.io.*;
 
 import user.theovercaste.overdecompiler.constantpool.ConstantPool;
 import user.theovercaste.overdecompiler.exceptions.InvalidAttributeException;
+import user.theovercaste.overdecompiler.util.AttributeData;
 
-public class ExceptionsAttribute extends ParsedAttribute {
+public class ExceptionsAttribute implements Attribute {
     private final int[] exceptions;
 
     public ExceptionsAttribute(int[] exceptions) {
@@ -22,14 +21,14 @@ public class ExceptionsAttribute extends ParsedAttribute {
         return "Exceptions";
     }
 
-    public static Parser parser( ) {
-        return new Parser();
+    public static Loader loader( ) {
+        return new Loader();
     }
 
-    public static class Parser extends ParsedAttribute.Parser<ExceptionsAttribute> {
+    public static class Loader implements AttributeLoader<ExceptionsAttribute> {
         @Override
-        public ExceptionsAttribute parse(AttributeData a, ConstantPool constantPool) throws InvalidAttributeException {
-            try (DataInputStream din = new DataInputStream(new ByteArrayInputStream(a.data))) {
+        public ExceptionsAttribute load(AttributeData a, ConstantPool constantPool) throws InvalidAttributeException {
+            try (DataInputStream din = new DataInputStream(new ByteArrayInputStream(a.getData()))) {
                 int exceptionsCount = din.readUnsignedShort();
                 int[] exceptions = new int[exceptionsCount];
                 for (int i = 0; i < exceptionsCount; i++) {
